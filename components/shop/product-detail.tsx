@@ -11,12 +11,12 @@ import { TextField, TextAreaField } from "@/components/ui/field";
 import { ProductEntry } from "@/components/shop/product-entry";
 import { useCart } from "@/lib/cart-context";
 import { useFavorites } from "@/lib/favorites-context";
-import { categoryLabel, formatTL, type Product } from "@/lib/products";
+import { categoryLabel, formatTL, sourceBadgeLabel, type Product } from "@/lib/products";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { routes } from "@/lib/site";
 import { recordProductView } from "@/lib/recently-viewed";
 import { EASE } from "@/lib/motion";
-import { STOCK_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
+import { STOCK_BADGE_STYLE, SOURCE_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
 
 const GUARANTEES = [
   { label: "Ücretsiz kargo", detail: "500₺ üzeri siparişlerde" },
@@ -179,6 +179,9 @@ export function ProductDetail({
                 <span className="label">Stokta yok</span>
               </span>
             )}
+            <span className="absolute px-4 py-2" style={SOURCE_BADGE_STYLE}>
+              <span className="label">{sourceBadgeLabel(product.source)}</span>
+            </span>
           </div>
 
           {galleryImages.length > 1 && (

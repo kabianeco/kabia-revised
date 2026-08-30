@@ -6,7 +6,7 @@ import { ProductEntry } from "@/components/shop/product-entry";
 import { ArrowLink } from "@/components/ui/button";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { fetchPublicProducts } from "@/lib/catalog";
-import { CATEGORIES, type Product, type ProductCategory } from "@/lib/products";
+import { CATEGORIES, SOURCES, type Product, type ProductCategory, type ProductSource } from "@/lib/products";
 import { routes } from "@/lib/site";
 import { getPublicSettings } from "@/lib/settings";
 import { shopBannerVisible, type ShopBannerSettings } from "@/lib/shop-banner";
@@ -33,9 +33,10 @@ const isSort = (v: string | undefined): v is SortOption =>
 
 /** Filters are links, not client state: the view stays server-rendered and
  *  every combination is a shareable URL. */
-function shopHref(category: string, sort: SortOption) {
+function shopHref(category: string, source: string, sort: SortOption) {
   const params = new URLSearchParams();
   if (category !== "tumu") params.set("kategori", category);
+  if (source !== "tumu") params.set("kaynak", source);
   if (sort !== "onerilen") params.set("sirala", sort);
   const qs = params.toString();
   return qs ? `${routes.store}?${qs}` : routes.store;
@@ -83,9 +84,11 @@ function GridSkeleton() {
  */
 async function ProductGrid({
   activeCategory,
+  activeSource,
   sort,
 }: {
   activeCategory: ProductCategory | "tumu";
+  activeSource: ProductSource | "tumu";
   sort: SortOption;
 }) {
   const supabase = await createSupabaseServerClient();
@@ -104,7 +107,9 @@ async function ProductGrid({
   }
   const all = result.products;
   const filtered = all.filter(
-    (p) => activeCategory === "tumu" || p.category === activeCategory,
+    (p) =>
+      (activeCategory === "tumu" || p.category === activeCategory) &&
+      (activeSource === "tumu" || p.source === activeSource),
   );
   const products = sortProducts(filtered, sort);
 
@@ -143,9 +148,9 @@ async function ProductGrid({
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: Promise<{ kategori?: string; sirala?: string }>;
+  searchParams: Promise<{ kategori?: string; kaynak?: string; sirala?: string }>;
 }) {
-  const { kategori, sirala } = await searchParams;
+  const { kategori, kaynak, sirala } = await searchParams;
   const settings = await getPublicSettings();
   const banner: ShopBannerSettings = {
     enabled: settings.shopBannerEnabled,
@@ -160,6 +165,10 @@ export default async function ShopPage({
   const activeCategory =
     kategori && CATEGORIES.some((c) => c.id === kategori)
       ? (kategori as ProductCategory)
+      : "tumu";
+  const activeSource =
+    kaynak && SOURCES.some((s) => s.id === kaynak)
+      ? (kaynak as ProductSource)
       : "tumu";
 
   return (
@@ -196,7 +205,7 @@ export default async function ShopPage({
                 return (
                   <li key={cat.id}>
                     <Link
-                      href={shopHref(cat.id, sort)}
+                      href={shopHref(cat.id, activeSource, sort)}
                       prefetch={false}
                       aria-current={active ? "true" : undefined}
                       className={`inline-flex min-h-11 items-center text-sm transition-colors duration-300 ${
@@ -213,6 +222,30 @@ export default async function ShopPage({
             </ul>
           </nav>
 
+          <nav aria-label="Kaynak" className="mt-4 pt-4 border-t border-ink/10">
+            <ul className="flex flex-wrap items-center gap-x-7 gap-y-3">
+              {SOURCES.map((src) => {
+                const active = src.id === activeSource;
+                return (
+                  <li key={src.id}>
+                    <Link
+                      href={shopHref(activeCategory, src.id, sort)}
+                      prefetch={false}
+                      aria-current={active ? "true" : undefined}
+                      className={`inline-flex min-h-11 items-center text-sm transition-colors duration-300 ${
+                        active
+                          ? "text-ink underline decoration-brand decoration-2 underline-offset-8"
+                          : "text-ink/55 hover:text-ink"
+                      }`}
+                    >
+                      {src.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
           <div className="mt-4 border-b border-ink/10 pb-5">
             <nav aria-label="Sıralama">
               <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
@@ -221,7 +254,7 @@ export default async function ShopPage({
                   return (
                     <li key={opt.id}>
                       <Link
-                        href={shopHref(activeCategory, opt.id)}
+                        href={shopHref(activeCategory, activeSource, opt.id)}
                         prefetch={false}
                         aria-current={active ? "true" : undefined}
                         className={`inline-flex min-h-11 items-center text-sm transition-colors duration-300 ${
@@ -239,10 +272,14 @@ export default async function ShopPage({
 
           <div className="pt-14">
             <Suspense
-              key={`${activeCategory}-${sort}`}
+              key={`${activeCategory}-${activeSource}-${sort}`}
               fallback={<GridSkeleton />}
             >
-              <ProductGrid activeCategory={activeCategory} sort={sort} />
+              <ProductGrid
+                activeCategory={activeCategory}
+                activeSource={activeSource}
+                sort={sort}
+              />
             </Suspense>
           </div>
         </div>

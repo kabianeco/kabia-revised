@@ -59,6 +59,7 @@ export interface ProductRow {
   shelf_life: string | null;
   storage_conditions: string | null;
   certifications: string | null;
+  source: string;
   short_description: string | null;
   description: string | null;
   is_active: boolean;

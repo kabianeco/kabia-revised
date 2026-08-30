@@ -3,8 +3,10 @@ import { createClient } from "@supabase/supabase-js"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import {
   CATEGORIES,
+  SOURCES,
   type Product,
   type ProductCategory,
+  type ProductSource,
   type ProductReview,
   type ProductVariant,
   type NutritionInfo,
@@ -39,6 +41,12 @@ function mapNutrition(n: NutritionFactsRow | null): NutritionInfo {
 function toCategory(slug: string | undefined): ProductCategory {
   const known = CATEGORIES.find((c) => c.id !== "tumu" && c.id === slug)
   return (known?.id as ProductCategory | undefined) ?? "cig-badem"
+}
+
+/** Same defend-against-unexpected-values approach as toCategory above. */
+function toSource(value: string | undefined): ProductSource {
+  const known = SOURCES.find((s) => s.id !== "tumu" && s.id === value)
+  return (known?.id as ProductSource | undefined) ?? "ciftlik"
 }
 
 function nameSeed(name: string): number {
@@ -86,6 +94,7 @@ export function mapProduct(row: ProductRow, includeReviews = false): Product {
     slug: row.slug,
     name: row.name,
     category: toCategory(row.category?.slug),
+    source: toSource(row.source),
     defaultWeight: defaultVariant?.weight ?? "",
     price: base,
     originalPrice: row.original_price != null ? Number(row.original_price) : undefined,
@@ -112,7 +121,7 @@ export function mapProduct(row: ProductRow, includeReviews = false): Product {
 
 const PRODUCT_SELECT = `
   id, slug, name, base_price, original_price, main_image_url,
-  origin, production_method, shelf_life, storage_conditions, certifications,
+  origin, production_method, shelf_life, storage_conditions, certifications, source,
   short_description, description, is_active, is_featured, created_at,
   rating_avg, rating_count, rating_breakdown,
   category:categories(slug),
@@ -123,7 +132,7 @@ const PRODUCT_SELECT = `
 
 // Lean select for listing pages (anasayfa, magaza): sadece kartta görünen alanlar + rating
 const PRODUCT_LEAN_SELECT = `
-  id, slug, name, base_price, main_image_url,
+  id, slug, name, base_price, main_image_url, source,
   short_description, is_active, is_featured, created_at,
   rating_avg, rating_count,
   category:categories(slug)

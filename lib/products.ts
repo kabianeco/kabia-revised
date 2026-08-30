@@ -25,6 +25,22 @@ export function categoryLabel(id: ProductCategory) {
   return CATEGORIES.find((c) => c.id === id)?.label ?? id
 }
 
+/** Which of Kabia's three product lines this belongs to. */
+export type ProductSource = "ciftlik" | "secki" | "mutfak"
+
+// UI label config — the matching `products.source` values are the enum
+// public.product_source ('ciftlik' | 'secki' | 'mutfak').
+export const SOURCES: { id: ProductSource | "tumu"; label: string; badgeLabel: string }[] = [
+  { id: "tumu", label: "Tümü", badgeLabel: "" },
+  { id: "ciftlik", label: "Çiftlik", badgeLabel: "Kabia Çiftliği" },
+  { id: "secki", label: "Seçki", badgeLabel: "Kabia Seçki" },
+  { id: "mutfak", label: "Mutfak", badgeLabel: "Kabia Mutfak" },
+]
+
+export function sourceBadgeLabel(id: ProductSource) {
+  return SOURCES.find((s) => s.id === id)?.badgeLabel ?? id
+}
+
 export interface ProductVariant {
   id: string
   weight: string
@@ -56,6 +72,7 @@ export interface Product {
   slug: string
   name: string
   category: ProductCategory
+  source: ProductSource
   defaultWeight: string
   price: number
   originalPrice?: number

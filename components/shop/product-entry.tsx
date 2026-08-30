@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { categoryLabel, formatTL, inStock, type Product } from "@/lib/products";
+import { categoryLabel, formatTL, inStock, sourceBadgeLabel, type Product } from "@/lib/products";
 import { routes } from "@/lib/site";
-import { STOCK_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
+import { STOCK_BADGE_STYLE, SOURCE_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
 
 /**
  * One entry in the shop index. Deliberately not a card: no shadow, no radius,
@@ -43,6 +43,9 @@ export function ProductEntry({
               <span className="label">Stokta yok</span>
             </span>
           )}
+          <span className="absolute px-3 py-1.5" style={SOURCE_BADGE_STYLE}>
+            <span className="label">{sourceBadgeLabel(product.source)}</span>
+          </span>
         </div>
 
         <div className="mt-5 border-t border-ink/10 pt-4">
