@@ -41,6 +41,25 @@ export function sourceBadgeLabel(id: ProductSource) {
   return SOURCES.find((s) => s.id === id)?.badgeLabel ?? id
 }
 
+/**
+ * Legal-weight label — see the Phase 2 migration comment on
+ * `products.certification`. `organik_sertifikali` asserts a real organic
+ * certificate; the other two express Kabia's own selection approach and must
+ * never be described using the word "organik".
+ */
+export type ProductCertification = "organik_sertifikali" | "kabia_secki" | "kabia_mutfak"
+
+export const CERTIFICATION_LABEL: Record<ProductCertification, string> = {
+  organik_sertifikali: "Organik Sertifikalı",
+  kabia_secki: "Kabia Seçki Standardı",
+  kabia_mutfak: "Kabia Mutfak Standardı",
+}
+
+/** Whether this certification value may be described as organic anywhere in the UI. */
+export function isOrganicCertified(certification: ProductCertification): boolean {
+  return certification === "organik_sertifikali"
+}
+
 export interface ProductVariant {
   id: string
   weight: string
@@ -90,6 +109,18 @@ export interface Product {
   shelfLife: string
   storage: string
   certificates: string
+  certification: ProductCertification
+  producerId: string | null
+  producerName: string
+  producerSlug: string
+  producerWhySelected: string
+  harvestYear: number | null
+  lotCode: string
+  variety: string
+  rootstock: string
+  processing: string
+  allergens: string
+  netWeight: string
   nutrition: NutritionInfo
   reviews: ProductReview[]
 }

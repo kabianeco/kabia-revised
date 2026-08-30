@@ -7,6 +7,7 @@ import {
   type Product,
   type ProductCategory,
   type ProductSource,
+  type ProductCertification,
   type ProductReview,
   type ProductVariant,
   type NutritionInfo,
@@ -47,6 +48,15 @@ function toCategory(slug: string | undefined): ProductCategory {
 function toSource(value: string | undefined): ProductSource {
   const known = SOURCES.find((s) => s.id !== "tumu" && s.id === value)
   return (known?.id as ProductSource | undefined) ?? "ciftlik"
+}
+
+/**
+ * Defends the organic-labeling rule at the mapping boundary too: an
+ * unrecognized value never falls back to 'organik_sertifikali'.
+ */
+function toCertification(value: string | undefined): ProductCertification {
+  if (value === "organik_sertifikali" || value === "kabia_mutfak") return value
+  return "kabia_secki"
 }
 
 function nameSeed(name: string): number {
@@ -96,6 +106,17 @@ export function mapProduct(row: ProductRow, includeReviews = false): Product {
     category: toCategory(row.category?.slug),
     source: toSource(row.source),
     defaultWeight: defaultVariant?.weight ?? "",
+    producerId: row.producer_id ?? null,
+    producerName: row.producer?.name ?? "",
+    producerSlug: row.producer?.slug ?? "",
+    producerWhySelected: row.producer?.why_selected ?? "",
+    harvestYear: row.harvest_year ?? null,
+    lotCode: row.lot_code ?? "",
+    variety: row.variety ?? "",
+    rootstock: row.rootstock ?? "",
+    processing: row.processing ?? "",
+    allergens: row.allergens ?? "",
+    netWeight: row.net_weight ?? "",
     price: base,
     originalPrice: row.original_price != null ? Number(row.original_price) : undefined,
     seed: row.slug,
@@ -114,6 +135,7 @@ export function mapProduct(row: ProductRow, includeReviews = false): Product {
     shelfLife: row.shelf_life ?? "",
     storage: row.storage_conditions ?? "",
     certificates: row.certifications ?? "",
+    certification: toCertification(row.certification),
     nutrition: mapNutrition(row.nutrition_facts),
     reviews,
   }
@@ -122,9 +144,12 @@ export function mapProduct(row: ProductRow, includeReviews = false): Product {
 const PRODUCT_SELECT = `
   id, slug, name, base_price, original_price, main_image_url,
   origin, production_method, shelf_life, storage_conditions, certifications, source,
+  certification, producer_id, harvest_year, lot_code, variety, rootstock,
+  processing, allergens, net_weight,
   short_description, description, is_active, is_featured, created_at,
   rating_avg, rating_count, rating_breakdown,
   category:categories(slug),
+  producer:producers(slug, name, why_selected),
   product_variants(id, label, price, stock_quantity),
   product_images(image_url, sort_order),
   nutrition_facts(calories, protein, carbohydrates, fat, fiber, sodium)

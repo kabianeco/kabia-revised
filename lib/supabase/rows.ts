@@ -60,6 +60,15 @@ export interface ProductRow {
   storage_conditions: string | null;
   certifications: string | null;
   source: string;
+  certification: string;
+  producer_id: string | null;
+  harvest_year: number | null;
+  lot_code: string | null;
+  variety: string | null;
+  rootstock: string | null;
+  processing: string | null;
+  allergens: string | null;
+  net_weight: string | null;
   short_description: string | null;
   description: string | null;
   is_active: boolean;
@@ -73,6 +82,8 @@ export interface ProductRow {
   product_images: ProductImageRow[] | null;
   nutrition_facts: NutritionFactsRow | null;
   reviews?: ReviewRow[] | null;
+  /** Only present when producer_id is set and the producer passes RLS (published, or admin). */
+  producer: { slug: string; name: string; why_selected: string | null } | null;
 }
 
 export interface CartItemRow {

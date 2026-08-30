@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
@@ -11,19 +11,116 @@ import { TextField, TextAreaField } from "@/components/ui/field";
 import { ProductEntry } from "@/components/shop/product-entry";
 import { useCart } from "@/lib/cart-context";
 import { useFavorites } from "@/lib/favorites-context";
-import { categoryLabel, formatTL, sourceBadgeLabel, type Product } from "@/lib/products";
+import {
+  categoryLabel,
+  formatTL,
+  sourceBadgeLabel,
+  CERTIFICATION_LABEL,
+  isOrganicCertified,
+  type Product,
+} from "@/lib/products";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { routes } from "@/lib/site";
 import { recordProductView } from "@/lib/recently-viewed";
 import { EASE } from "@/lib/motion";
 import { STOCK_BADGE_STYLE, SOURCE_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
 
-const GUARANTEES = [
-  { label: "Ücretsiz kargo", detail: "500₺ üzeri siparişlerde" },
-  { label: "15 gün iade", detail: "Açılmamış ürünlerde" },
-  { label: "Tek kaynak", detail: "Geyve, Sabırlar" },
-  { label: "Katkısız", detail: "Yalnızca badem" },
-];
+/**
+ * The last two rows named a single farm/product ("Geyve, Sabırlar" / "Yalnızca
+ * badem") — accurate for Çiftlik products, but wrong once Seçki/Mutfak
+ * products (other regions, other goods) exist. Source-aware so the claim
+ * stays true for every product line.
+ */
+function guarantees(source: Product["source"]) {
+  const originGuarantee =
+    source === "ciftlik"
+      ? { label: "Tek kaynak", detail: "Geyve, Sabırlar" }
+      : { label: "Bilinen kaynak", detail: "Üreticisi tanınan ürün" };
+  const additiveGuarantee =
+    source === "ciftlik"
+      ? { label: "Katkısız", detail: "Yalnızca badem" }
+      : { label: "Katkısız", detail: "Ek katkı maddesi yok" };
+  return [
+    { label: "Ücretsiz kargo", detail: "500₺ üzeri siparişlerde" },
+    { label: "15 gün iade", detail: "Açılmamış ürünlerde" },
+    originGuarantee,
+    additiveGuarantee,
+  ];
+}
+
+/**
+ * Certification rendering is legal-critical (brief §7.2/§9): only
+ * 'organik_sertifikali' may ever be described as organic. 'kabia_secki' and
+ * 'kabia_mutfak' are Kabia's own selection standard, never that word, and
+ * link to /kabia-standardi where the distinction is explained (Appendix A.8).
+ */
+function certificationRow(product: Product): ReactNode {
+  if (isOrganicCertified(product.certification)) {
+    return CERTIFICATION_LABEL[product.certification];
+  }
+  return (
+    <span>
+      {CERTIFICATION_LABEL[product.certification]} — resmi organik sertifika
+      değildir.{" "}
+      <Link
+        href={routes.kabiaStandard}
+        prefetch={false}
+        className="underline decoration-brand decoration-2 underline-offset-4"
+      >
+        Kabia Standardı nedir?
+      </Link>
+    </span>
+  );
+}
+
+function producerRow(product: Product): ReactNode {
+  if (!product.producerName) return "";
+  if (!product.producerSlug) return product.producerName;
+  return (
+    <Link
+      href={`${routes.producers}/${product.producerSlug}`}
+      prefetch={false}
+      className="underline decoration-brand decoration-2 underline-offset-4"
+    >
+      {product.producerName}
+    </Link>
+  );
+}
+
+/**
+ * Row order adapts to source (brief §9): Mutfak products foreground
+ * allergens/net weight, since farm-specific fields (variety, rootstock,
+ * harvest year) don't apply to them and are filtered out as empty anyway.
+ */
+function productDetailRows(product: Product): [string, ReactNode][] {
+  const identity: [string, ReactNode][] = [
+    ["Üretici", producerRow(product)],
+    ["Menşei", product.origin],
+    ["Çeşit", product.variety],
+    ["Anaç", product.rootstock],
+    ["Hasat yılı", product.harvestYear ? String(product.harvestYear) : ""],
+    ["Lot kodu", product.lotCode],
+  ];
+  const production: [string, ReactNode][] = [
+    ["Üretim yöntemi", product.productionMethod],
+    ["İşleme", product.processing],
+  ];
+  const keeping: [string, ReactNode][] = [
+    ["Raf ömrü", product.shelfLife],
+    ["Saklama", product.storage],
+  ];
+  const foodInfo: [string, ReactNode][] = [
+    ["Alerjenler", product.allergens],
+    ["Net ağırlık", product.netWeight],
+  ];
+  const certs: [string, ReactNode][] = [
+    ["Sertifikalar", product.certificates],
+    ["Sertifika", certificationRow(product)],
+  ];
+  return product.source === "mutfak"
+    ? [...identity, ...foodInfo, ...production, ...keeping, ...certs]
+    : [...identity, ...production, ...keeping, ...foodInfo, ...certs];
+}
 
 const TABS = [
   { id: "detaylar", label: "Ürün detayları" },
@@ -344,7 +441,7 @@ export function ProductDetail({
           </div>
 
           <dl className="mt-12 grid grid-cols-2 border-t border-ink/10">
-            {GUARANTEES.map((g) => (
+            {guarantees(product.source).map((g) => (
               <div key={g.label} className="border-b border-ink/10 py-4 pr-4">
                 <dt className="text-sm text-ink">{g.label}</dt>
                 <dd className="mt-1 text-xs text-ink/50">{g.detail}</dd>
@@ -392,27 +489,39 @@ export function ProductDetail({
             <p className="max-w-prose text-base leading-relaxed text-ink/70">
               {product.description}
             </p>
-            <dl className="border-t border-ink/10">
-              {(
-                [
-                  ["Menşei", product.origin],
-                  ["Üretim yöntemi", product.productionMethod],
-                  ["Raf ömrü", product.shelfLife],
-                  ["Saklama", product.storage],
-                  ["Sertifikalar", product.certificates],
-                ] as const
-              )
-                .filter(([, value]) => !!value)
-                .map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="grid grid-cols-[10rem_1fr] gap-4 border-b border-ink/10 py-4"
-                  >
-                    <dt className="label text-olive">{label}</dt>
-                    <dd className="text-sm text-ink/70">{value}</dd>
-                  </div>
-                ))}
-            </dl>
+            <div>
+              <dl className="border-t border-ink/10">
+                {productDetailRows(product)
+                  .filter(([, value]) => !!value)
+                  .map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="grid grid-cols-[10rem_1fr] gap-4 border-b border-ink/10 py-4"
+                    >
+                      <dt className="label text-olive">{label}</dt>
+                      <dd className="text-sm text-ink/70">{value}</dd>
+                    </div>
+                  ))}
+              </dl>
+
+              {product.source === "secki" && product.producerWhySelected && (
+                <div className="mt-8 border-t border-ink/10 pt-8">
+                  <p className="label text-olive">Neden bu üreticiyi seçtik?</p>
+                  <p className="mt-3 max-w-prose text-sm leading-relaxed text-ink/70">
+                    {product.producerWhySelected}
+                  </p>
+                  {product.producerSlug && (
+                    <Link
+                      href={`${routes.producers}/${product.producerSlug}`}
+                      prefetch={false}
+                      className="mt-4 inline-block text-sm text-ink underline decoration-brand decoration-2 underline-offset-4"
+                    >
+                      Üreticiyi tanıyın
+                    </Link>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
