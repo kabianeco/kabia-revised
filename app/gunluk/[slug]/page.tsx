@@ -1,0 +1,98 @@
+import type { Metadata } from "next"
+import { notFound } from "next/navigation"
+import Link from "next/link"
+import { PageShell } from "@/components/layout/page-shell"
+import { journalEntries, type JournalEntry } from "@/content/journal"
+import { routes } from "@/lib/site"
+
+function getEntry(slug: string): JournalEntry | undefined {
+  return journalEntries.find((e) => e.slug === slug)
+}
+
+function formatEntryDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })
+}
+
+export function generateStaticParams() {
+  return journalEntries.map((entry) => ({ slug: entry.slug }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const entry = getEntry(slug)
+  if (!entry) return { title: "Günlük" }
+  return {
+    title: `${formatEntryDate(entry.date)} — ${entry.location}`,
+    description: entry.observation,
+    alternates: { canonical: routes.journalEntry(entry.slug) },
+  }
+}
+
+function Breadcrumbs({ label, slug }: { label: string; slug: string }) {
+  const items = [
+    { label: "Ana sayfa", href: routes.home },
+    { label: "Günlük", href: routes.journal },
+    { label, href: routes.journalEntry(slug) },
+  ]
+  return (
+    <nav aria-label="Breadcrumb" className="mb-8">
+      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink/45">
+        {items.map((item, i) => (
+          <li key={item.href} className="flex items-center gap-2">
+            {i > 0 && <span aria-hidden="true">/</span>}
+            {i === items.length - 1 ? (
+              <span aria-current="page" className="truncate text-ink/60">
+                {item.label}
+              </span>
+            ) : (
+              <Link href={item.href} prefetch={false} className="transition-colors duration-300 hover:text-ink">
+                {item.label}
+              </Link>
+            )}
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}
+
+function Field({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border-t border-ink/10 py-5">
+      <dt className="label text-olive">{label}</dt>
+      <dd className="mt-2 text-sm leading-relaxed text-ink/70 md:text-base">{value}</dd>
+    </div>
+  )
+}
+
+export default async function JournalEntryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const entry = getEntry(slug)
+  if (!entry) notFound()
+
+  return (
+    <PageShell>
+      <article className="wrap page-top pb-24 md:pb-32">
+        <div className="mx-auto max-w-[42rem]">
+          <Breadcrumbs label={formatEntryDate(entry.date)} slug={entry.slug} />
+
+          <p className="label text-olive">
+            <time dateTime={entry.date}>{formatEntryDate(entry.date)}</time>
+            <span className="mx-2" aria-hidden="true">
+              ·
+            </span>
+            {entry.location}
+          </p>
+          <h1 className="mt-5 text-3xl leading-[1.12] tracking-tight md:text-4xl">{entry.observation}</h1>
+
+          <dl>
+            <Field label="Hava" value={entry.weather} />
+            <Field label="Bahçenin durumu" value={entry.orchardState} />
+            <Field label="Uygulama" value={entry.application} />
+            <Field label="Sonuç" value={entry.outcome} />
+          </dl>
+        </div>
+      </article>
+    </PageShell>
+  )
+}

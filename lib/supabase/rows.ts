@@ -152,3 +152,20 @@ export interface FavoriteRow {
   product_id: string;
   products: { slug: string } | null;
 }
+
+export interface ProducerRow {
+  id: string;
+  slug: string;
+  name: string;
+  product_type: string | null;
+  region: string | null;
+  photo_url: string | null;
+  story: string | null;
+  production_place: string | null;
+  method: string | null;
+  inputs: string | null;
+  certificates: string | null;
+  why_selected: string | null;
+  is_published: boolean;
+  created_at: string;
+}

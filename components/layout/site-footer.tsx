@@ -33,21 +33,26 @@ function XIcon(props: React.SVGProps<SVGSVGElement>) {
 /* Absolute so these keep working from the store and account routes, where the
    homepage sections do not exist.
    Grouped by brand pillar (Appendix A.10 of the KABIA 2.0 brief) rather than
-   by page type. Links to routes the brief adds in a later phase (Üreticiler,
-   Kabia Standardı, Günlük, Akademi, /ciftlik, /toprak, /hikayemiz) are left
-   out here on purpose — they don't exist yet, so linking them would 404. */
+   by page type. Phase 3 added /ureticiler, /kabia-standardi, /gunluk,
+   /ciftlik and /toprak, so those now appear below. Hikâyemiz and Akademi are
+   still P2/deferred — not linked here yet, since those routes don't exist. */
 const farmItems = [
   { label: "Çiftliğimiz", href: homeAnchor(anchors.farm) },
+  { label: "Bahçeyi keşfet", href: routes.farm },
+  { label: "Toprak", href: routes.soil },
   { label: "Yaklaşım", href: homeAnchor(anchors.approach) },
 ];
 
 const selectionItems = [
   { label: "Ürünler", href: homeAnchor(anchors.products) },
   { label: "Mağaza", href: routes.store },
+  { label: "Üreticiler", href: routes.producers },
+  { label: "Kabia Standardı", href: routes.kabiaStandard },
 ];
 
 const kabiaItems = [
   { label: "Blog", href: routes.blog },
+  { label: "Günlük", href: routes.journal },
   { label: "İletişim", href: homeAnchor(anchors.contact) },
 ];
 

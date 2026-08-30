@@ -183,6 +183,18 @@ export async function fetchFeaturedProducts(client: SupabaseClient): Promise<Pro
   return data.map((row) => mapProduct(row as unknown as ProductRow, false))
 }
 
+/** A producer's own products, for their profile page — same card fields as the storefront grid. */
+export async function fetchProductsByProducer(client: SupabaseClient, producerId: string): Promise<Product[]> {
+  const { data, error } = await client
+    .from("products")
+    .select(PRODUCT_LEAN_SELECT)
+    .eq("is_active", true)
+    .eq("producer_id", producerId)
+    .order("created_at", { ascending: true })
+  if (error || !data) return []
+  return data.map((row) => mapProduct(row as unknown as ProductRow, false))
+}
+
 export async function fetchLeanProducts(client: SupabaseClient, limit = 4): Promise<Product[]> {
   const { data, error } = await client
     .from("products")
