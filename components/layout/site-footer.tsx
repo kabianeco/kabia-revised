@@ -31,21 +31,31 @@ function XIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 /* Absolute so these keep working from the store and account routes, where the
-   homepage sections do not exist. */
-const navItems = [
-  { label: "Ürünler", href: homeAnchor(anchors.products) },
-  { label: "Çiftlik", href: homeAnchor(anchors.farm) },
+   homepage sections do not exist.
+   Grouped by brand pillar (Appendix A.10 of the KABIA 2.0 brief) rather than
+   by page type. Links to routes the brief adds in a later phase (Üreticiler,
+   Kabia Standardı, Günlük, Akademi, /ciftlik, /toprak, /hikayemiz) are left
+   out here on purpose — they don't exist yet, so linking them would 404. */
+const farmItems = [
+  { label: "Çiftliğimiz", href: homeAnchor(anchors.farm) },
   { label: "Yaklaşım", href: homeAnchor(anchors.approach) },
+];
+
+const selectionItems = [
+  { label: "Ürünler", href: homeAnchor(anchors.products) },
+  { label: "Mağaza", href: routes.store },
+];
+
+const kabiaItems = [
+  { label: "Blog", href: routes.blog },
   { label: "İletişim", href: homeAnchor(anchors.contact) },
 ];
 
-const storeItems = [
-  { label: "Mağaza", href: routes.store },
+const supportItems = [
   { label: "Sepet", href: routes.cart },
   { label: "Hesabım", href: routes.account },
+  ...legalLinks,
 ];
-
-const legalItems = legalLinks;
 
 export async function SiteFooter() {
   // Contact details and social links are editable from the admin content screen.
@@ -81,8 +91,7 @@ export async function SiteFooter() {
               />
             </Link>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-ink/60">
-              Sakarya Geyve&apos;de, kimyasal gübre ve ilaç kullanmadan
-              yetiştirilen badem.
+              Toprağa saygıyla üretilenleri bir araya getiriyoruz.
             </p>
             <p className="mt-4 max-w-xs text-xs leading-relaxed text-ink/45">
               ETBİS kayıtlı satıcıyız. Güvenli ödeme altyapısı ve 3D Secure ile
@@ -90,10 +99,10 @@ export async function SiteFooter() {
             </p>
           </div>
 
-          <nav aria-label="Alt menü" className="md:col-span-2">
-            <h2 className="label text-olive">Sayfa</h2>
+          <nav aria-label="Çiftlik menüsü" className="md:col-span-2">
+            <h2 className="label text-olive">Çiftlik</h2>
             <ul className="mt-5 space-y-3">
-              {navItems.map((item) => (
+              {farmItems.map((item) => (
                 <li key={item.href}>
                   <a
                     href={item.href}
@@ -103,22 +112,13 @@ export async function SiteFooter() {
                   </a>
                 </li>
               ))}
-              <li>
-                <Link
-                  href="/blog"
-                  prefetch={false}
-                  className="text-sm text-ink/70 hover:text-ink transition-colors duration-300"
-                >
-                  Blog
-                </Link>
-              </li>
             </ul>
           </nav>
 
-          <nav aria-label="Mağaza menüsü" className="md:col-span-2">
-            <h2 className="label text-olive">Alışveriş</h2>
+          <nav aria-label="Seçki menüsü" className="md:col-span-2">
+            <h2 className="label text-olive">Seçki</h2>
             <ul className="mt-5 space-y-3">
-              {storeItems.map((item) => (
+              {selectionItems.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
@@ -129,22 +129,30 @@ export async function SiteFooter() {
                   </Link>
                 </li>
               ))}
-              <li>
-                <Link
-                  href={routes.deliveryAndReturn}
-                  prefetch={false}
-                  className="text-sm text-ink/70 hover:text-ink transition-colors duration-300"
-                >
-                  Teslimat ve İade
-                </Link>
-              </li>
             </ul>
           </nav>
 
-          <nav aria-label="Yasal menü" className="md:col-span-2">
-            <h2 className="label text-olive">Yasal</h2>
+          <nav aria-label="Kabia menüsü" className="md:col-span-2">
+            <h2 className="label text-olive">Kabia</h2>
             <ul className="mt-5 space-y-3">
-              {legalItems.map((item) => (
+              {kabiaItems.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    prefetch={false}
+                    className="text-sm text-ink/70 hover:text-ink transition-colors duration-300"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <nav aria-label="Destek menüsü" className="md:col-span-2">
+            <h2 className="label text-olive">Destek</h2>
+            <ul className="mt-5 space-y-3">
+              {supportItems.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
@@ -226,7 +234,7 @@ export async function SiteFooter() {
             <Link href={routes.cookiePolicy} className="hover:text-ink transition-colors">
               Çerezler
             </Link>
-            <span className="text-ink/35">Sabırlar Köyü, Geyve — badem üreticisi</span>
+            <span className="text-ink/35">Sabırlar Köyü, Geyve</span>
           </div>
         </div>
       </div>

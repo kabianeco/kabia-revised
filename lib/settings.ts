@@ -71,9 +71,9 @@ export const SETTINGS_FALLBACK: PublicSettings = {
   socialInstagram: site.social.instagram,
   socialFacebook: site.social.facebook,
   socialX: site.social.x,
-  seoDefaultTitle: "Kabia Ekolojik | Geyve'den Ekolojik Badem",
+  seoDefaultTitle: "Kabia Ekolojik | Toprağa Saygıyla Üretilenler",
   seoDefaultDescription:
-    "Sakarya Geyve'de, kimyasal gübre ve ilaç kullanılmadan yetiştirilen badem. Katkısız ürünler, tek kaynaktan.",
+    "Toprağa saygıyla üretilenleri bir araya getiriyoruz. Kendi çiftliğimizden ve güvendiğimiz üreticilerden.",
   seoSocialImage: "/images/almonds-drying.jpg",
   shopBannerEnabled: false,
   shopBannerHeadline: "",

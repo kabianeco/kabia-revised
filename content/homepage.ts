@@ -1,11 +1,12 @@
-import { anchors, mailto, site } from "@/lib/site";
+import { anchors, routes, site } from "@/lib/site";
 
 /**
  * All visible homepage copy lives here, in Turkish.
  * Facts are limited to what the existing Kabia project states:
  * ecological cultivation without chemical fertilizer or pesticide,
- * additive-free products, local production in Geyve/Sakarya, and the
- * product names listed on the current site.
+ * additive-free products, local production in Geyve/Sakarya, the
+ * product names listed on the current site, and the farm-plus-trusted-
+ * producers positioning from the KABIA 2.0 brief (Appendix A).
  */
 
 /**
@@ -18,27 +19,29 @@ export const intro = {
   act1: {
     eyebrow: `Kabia Ekolojik — ${site.region}`,
     /* Serif italic is applied to the second line in the component. */
-    headlineA: "Kendi bahçemizden,",
-    headlineB: "ekolojik badem.",
-    supporting:
-      "Kabia, Sakarya Geyve'deki bahçelerinde kimyasal gübre ve ilaç kullanmadan badem yetiştiriyor. Hasat, katkı maddesi olmadan hazırlanıp sofranıza ulaşıyor.",
-    primaryCta: { label: "Ürünleri İncele", href: anchors.products },
-    secondaryCta: { label: "Çiftliği tanıyın", href: anchors.farm },
+    headlineA: "Toprağa saygıyla",
+    headlineB: "üretilenler.",
+    supporting: "Kendi çiftliğimizden ve güvendiğimiz üreticilerden.",
+    primaryCta: { label: "Çiftliği keşfet", href: anchors.farm },
+    secondaryCta: { label: "Seçkimizi gör", href: anchors.products },
   },
   /* First editorial beat, set in the secondary (serif italic) voice. */
   act2: {
-    kicker: "Kabuğun altında",
-    text: "Bir bademin iyi olması için bahçede başlayan özenin sofraya kadar sürmesi gerekir. Kabia bu zinciri kendi elinde tutar: yetiştirir, kurutur, hazırlar.",
+    kicker: "İzini süreriz",
+    text: "Kendi bahçemizde badem yetiştiririz. Bazı ürünleri, güvendiğimiz üreticilerden seçeriz. İkisinde de aynı soruyu sorarız: nasıl üretildi?",
   },
   /* Second editorial beat — more reflective, about time and patience. */
   act3: {
-    kicker: "Zamanla olgunlaşır",
-    text: "İyi badem, zamana gösterilen saygıyla oluşur. Dalda olgunlaşmayı, güneşte kurumayı, sırasını beklemeyi ister. Lezzet, acele edilmeden kurulan bir sürecin sonucudur.",
+    kicker: "Önce üretici",
+    text: "Her ürünü biz üretmiyoruz. Ama üreticisini tanırız, üretim yerini görürüz, nasıl yapıldığını sorarız. Sonra seçeriz.",
   },
   final: {
-    /* Broken into two lines for the controlled full-screen setting. */
-    statementA: "Badem aceleye",
-    statementB: "gelmez.",
+    /* Broken into two lines for the controlled full-screen setting.
+       Character counts are matched closely to the lines they replace —
+       this pair is revealed letter-by-letter on a fixed scroll-progress
+       timeline (see intro-sequence.tsx), so length changes shift timing. */
+    statementA: "Önce üretici.",
+    statementB: "Sonra ürün.",
     ctaLabel: "Keşfet",
   },
   /** Read by screen readers in place of the decorative 3D scene. */
@@ -50,9 +53,9 @@ export const intro = {
 } as const;
 
 export const manifesto = {
-  statementA: "Badem aceleye gelmez;",
-  statementB: "biz de acele etmiyoruz.",
-  body: "Kabia Ekolojik, Geyve'nin dağ köyü Sabırlar'da badem yetiştirir. Bahçeye kimyasal gübre ve ilaç girmez; ürüne katkı maddesi eklenmez. Az ama iyi üretmeyi tercih ediyoruz.",
+  statementA: "Her ürünü biz üretmiyoruz.",
+  statementB: "Neden seçtiğimizi biliyoruz.",
+  body: "Kendi çiftliğimizde badem yetiştiririz. Güvendiğimiz üreticilerden seçtiğimiz ürünleri bir araya getiririz. Az ama doğru üretmeyi tercih ediyoruz.",
 } as const;
 
 /**
@@ -62,15 +65,16 @@ export const manifesto = {
 export const products = {
   title: "Ürünler",
   intro:
-    "Tek kaynak: Geyve'deki bahçelerimiz. Öne çıkan ürünler aşağıda; tamamı mağazada.",
+    "Kendi çiftliğimizden ve güvendiğimiz üreticilerden. Öne çıkan ürünler aşağıda; tamamı mağazada.",
 } as const;
 
 export const origin = {
   title: "Çiftlik",
   eyebrow: "Sabırlar Köyü — Geyve, Sakarya",
   body: [
-    "Bahçelerimiz Sakarya'nın Geyve ilçesinde, Sabırlar köyünün yamaçlarında. Badem burada dört mevsimi de görür: baharda çiçek, yazda yeşil kabuk, sonbaharda hasat, kışta uyku.",
-    "Üretimi başkasına devretmiyoruz. Ağaçların bakımı, hasat ve kurutma bizim elimizden geçer; bölge çiftçileriyle birlikte çalışırız.",
+    "Her şey bir badem bahçesinde başladı.",
+    "Geyve'nin Sabırlar köyünde 19 dönümlük bir bahçede, toprağı yalnızca ürün yetiştirilen bir alan olarak değil, yaşayan bir ekosistem olarak görerek üretmeye çalışıyoruz.",
+    "19 DÖNÜM · 946 BADEM AĞACI · 1 ÇİFTLİK · 4 MEVSİM",
   ],
   images: [
     {
@@ -137,17 +141,17 @@ export const principles = {
     {
       name: "Kimyasalsız bahçe",
       description:
-        "Bahçede kimyasal gübre ve ilaç kullanmıyoruz. Ekolojik tarım bizim için bir etiket değil, çalışma biçimi.",
+        "Kendi bahçemizde kimyasal gübre ve ilaç kullanmıyoruz. Ekolojik tarım bizim için bir etiket değil, çalışma biçimi.",
     },
     {
       name: "Katkısız ürün",
       description:
-        "Ürünlerimize katkı maddesi girmez. Bademin tadı, bademin tadıdır.",
+        "Ürünlerimize katkı maddesi eklemeyiz — kendi ürettiklerimizde de, seçtiğimiz üreticilerin ürünlerinde de.",
     },
     {
-      name: "Yerinde üretim",
+      name: "Üreticiyi tanırız",
       description:
-        "Geyve'de üretiyor, bölge çiftçileriyle birlikte çalışıyoruz. Üretim yerinden kopmaz.",
+        "Sattığımız her ürünün nereden, nasıl ve kim tarafından üretildiğini biliriz.",
     },
   ],
 } as const;
@@ -171,10 +175,10 @@ export const quote = {
 } as const;
 
 export const finalCta = {
-  titleA: "Bu hasadın bademini",
-  titleB: "birlikte tadalım.",
-  body: "Satış kanalımız hazırlanıyor. Sipariş ve sorularınız için bize yazın; hasat takvimimizi paylaşalım.",
-  cta: { label: "Bize Yazın", href: mailto("Kabia — sipariş ve bilgi") },
+  titleA: "Toprakla başlayan",
+  titleB: "bir hikâye.",
+  body: "Kendi çiftliğimizden ve güvendiğimiz üreticilerden.",
+  cta: { label: "Mağazaya Git", href: routes.store },
   image: {
     src: "/images/almonds-net.jpg",
     alt: "File içinde kabuklu Kabia bademleri",
