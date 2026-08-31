@@ -148,26 +148,6 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
           >
             Blog
           </Link>
-          <Link
-            href={routes.producers}
-            prefetch={false}
-            aria-current={pathname.startsWith(routes.producers) ? "page" : undefined}
-            className={`text-sm transition-colors duration-300 hover:text-ink ${
-              pathname.startsWith(routes.producers) ? "text-ink" : "text-ink/70"
-            }`}
-          >
-            Üreticiler
-          </Link>
-          <Link
-            href={routes.journal}
-            prefetch={false}
-            aria-current={pathname.startsWith(routes.journal) ? "page" : undefined}
-            className={`text-sm transition-colors duration-300 hover:text-ink ${
-              pathname.startsWith(routes.journal) ? "text-ink" : "text-ink/70"
-            }`}
-          >
-            Günlük
-          </Link>
           {sectionItems.map((item) => (
             <a
               key={item.anchor}
@@ -254,22 +234,6 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
               className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
             >
               Blog
-            </Link>
-            <Link
-              href={routes.producers}
-              prefetch={false}
-              onClick={() => close(false)}
-              className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
-            >
-              Üreticiler
-            </Link>
-            <Link
-              href={routes.journal}
-              prefetch={false}
-              onClick={() => close(false)}
-              className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
-            >
-              Günlük
             </Link>
             {sectionItems.map((item) => (
               <a
