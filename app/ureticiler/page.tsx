@@ -3,6 +3,7 @@ import { PageShell } from "@/components/layout/page-shell"
 import { ProducerCard } from "@/components/producers/producer-card"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { fetchPublicProducers } from "@/lib/producers"
+import { producerFixtures } from "@/content/producer-fixtures"
 
 export const metadata: Metadata = {
   title: "Üreticiler",
@@ -12,7 +13,12 @@ export const metadata: Metadata = {
 
 export default async function ProducersPage() {
   const supabase = await createSupabaseServerClient()
-  const producers = await fetchPublicProducers(supabase)
+  const realProducers = await fetchPublicProducers(supabase)
+  // PREVIEW FIXTURE fallback — see content/producer-fixtures.ts header comment.
+  const producers =
+    realProducers.length === 0 && process.env.NEXT_PUBLIC_KABIA_PREVIEW_FIXTURES === "1"
+      ? producerFixtures
+      : realProducers
 
   return (
     <PageShell>
