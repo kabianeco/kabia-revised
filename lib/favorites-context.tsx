@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { useAuth } from "@/lib/auth-context"
+import { isPreviewItem } from "@/lib/preview-identity"
 import type { FavoriteRow } from "@/lib/supabase/rows"
 
 interface FavoritesContextValue {
@@ -31,7 +32,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         let guest: string[] = []
         try {
           const raw = localStorage.getItem(STORAGE_KEY)
-          if (raw) guest = JSON.parse(raw)
+          if (raw) guest = JSON.parse(raw).filter((slug: string) => !isPreviewItem({ slug }))
         } catch {
           guest = []
         }
@@ -46,12 +47,12 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         if (!cancelled) setFavoriteSlugs(
             ((data ?? []) as unknown as FavoriteRow[])
               .map((r) => r.products?.slug)
-              .filter((s): s is string => !!s),
+              .filter((s): s is string => !!s && !isPreviewItem({ slug: s })),
           )
       } else {
         try {
           const raw = localStorage.getItem(STORAGE_KEY)
-          if (!cancelled) setFavoriteSlugs(raw ? JSON.parse(raw) : [])
+          if (!cancelled) setFavoriteSlugs(raw ? JSON.parse(raw).filter((slug: string) => !isPreviewItem({ slug })) : [])
         } catch {
           if (!cancelled) setFavoriteSlugs([])
         }
@@ -71,6 +72,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
   const toggleFavorite = useCallback(
     (slug: string) => {
+      if (isPreviewItem({ slug })) return
       setFavoriteSlugs((prev) => {
         const next = prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
         return next

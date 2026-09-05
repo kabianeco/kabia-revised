@@ -4,13 +4,13 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Heart, Minus, Plus, ShoppingBag, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { TextField, TextAreaField } from "@/components/ui/field";
 import { ProductEntry } from "@/components/shop/product-entry";
-import { useCart } from "@/lib/cart-context";
-import { useFavorites } from "@/lib/favorites-context";
+import { ProductPurchase } from "@/components/shop/product-purchase";
+import { isPreviewItem } from "@/lib/preview-identity";
 import {
   categoryLabel,
   formatTL,
@@ -93,6 +93,7 @@ function producerRow(product: Product): ReactNode {
  * harvest year) don't apply to them and are filtered out as empty anyway.
  */
 function productDetailRows(product: Product): [string, ReactNode][] {
+  if (isPreviewItem(product)) return [["Üretici", producerRow(product)]];
   const identity: [string, ReactNode][] = [
     ["Üretici", producerRow(product)],
     ["Menşei", product.origin],
@@ -172,8 +173,7 @@ export function ProductDetail({
   product: Product;
   related?: Product[];
 }) {
-  const { addItem } = useCart();
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const preview = isPreviewItem(product);
   const reviewsRef = useRef<HTMLDivElement>(null);
 
   const galleryImages = useMemo(
@@ -182,8 +182,6 @@ export function ProductDetail({
   );
   const [activeImage, setActiveImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(product.defaultWeight);
-  const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>("detaylar");
 
   // Feeds the "recently viewed" row on the account overview.
@@ -191,7 +189,6 @@ export function ProductDetail({
     recordProductView(product.slug);
   }, [product.slug]);
 
-  const favorited = isFavorite(product.slug);
   const variant =
     product.variants.find((v) => v.weight === selectedVariant) ??
     product.variants[0];
@@ -208,25 +205,6 @@ export function ProductDetail({
     );
   };
 
-  const handleAddToCart = () => {
-    if (!variant || !available) return;
-    addItem({
-      id: `${product.slug}__${variant.weight}`,
-      slug: product.slug,
-      name: product.name,
-      variant: variant.weight,
-      price: variant.price,
-      image,
-      quantity,
-      variantId: variant.id,
-      productId: product.id,
-    });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
-    toast.success(`Sepete eklendi — ${product.name}, ${variant.weight}`, {
-      action: { label: "Sepete git", onClick: () => (window.location.href = routes.cart) },
-    });
-  };
 
   return (
     <div className="wrap page-top pb-24 md:pb-32">
@@ -346,108 +324,16 @@ export function ProductDetail({
             {product.shortDescription}
           </p>
 
-          {product.variants.length > 0 && (
-            <fieldset className="mt-10">
-              <legend className="label text-olive">Ağırlık</legend>
-              <div className="mt-4 flex flex-wrap gap-3">
-                {product.variants.map((v) => {
-                  const active = v.weight === selectedVariant;
-                  const sold = v.stock <= 0;
-                  return (
-                    <button
-                      key={v.id}
-                      type="button"
-                      disabled={sold}
-                      onClick={() => setSelectedVariant(v.weight)}
-                      aria-pressed={active}
-                      className={`min-h-11 rounded-theme-button border px-5 text-sm transition-colors duration-300 ${
-                        active
-                          ? "border-brand bg-brand text-on-brand"
-                          : "border-ink/20 text-ink hover:border-brand hover:text-brand"
-                      } ${sold ? "cursor-not-allowed line-through opacity-45 hover:border-ink/20 hover:text-ink" : ""}`}
-                    >
-                      {v.weight}
-                    </button>
-                  );
-                })}
-              </div>
-            </fieldset>
-          )}
+          <ProductPurchase product={product} image={image} selectedWeight={selectedVariant} onWeightChange={setSelectedVariant} />
 
-          <div className="mt-8">
-            <p className="label text-olive" id="quantity-label">
-              Adet
-            </p>
-            <div
-              className="mt-4 inline-flex items-center border border-ink/20"
-              role="group"
-              aria-labelledby="quantity-label"
-            >
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                disabled={quantity <= 1}
-                className="flex h-12 w-12 items-center justify-center text-ink transition-colors hover:text-brand disabled:opacity-35"
-                aria-label="Adedi azalt"
-              >
-                <Minus className="h-4 w-4" aria-hidden="true" />
-              </button>
-              <output className="figure w-12 text-center text-base" aria-live="polite">
-                {quantity}
-              </output>
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => Math.min(99, q + 1))}
-                disabled={quantity >= 99}
-                className="flex h-12 w-12 items-center justify-center text-ink transition-colors hover:text-brand disabled:opacity-35"
-                aria-label="Adedi artır"
-              >
-                <Plus className="h-4 w-4" aria-hidden="true" />
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button
-              onClick={handleAddToCart}
-              disabled={!available}
-              className="flex-1"
-              size="lg"
-            >
-              {added ? (
-                <>
-                  <Check className="h-4 w-4" aria-hidden="true" /> Eklendi
-                </>
-              ) : available ? (
-                <>
-                  <ShoppingBag className="h-4 w-4" aria-hidden="true" /> Sepete ekle
-                </>
-              ) : (
-                "Stokta yok"
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => toggleFavorite(product.slug)}
-              aria-pressed={favorited}
-            >
-              <Heart
-                className={`h-4 w-4 transition-colors ${favorited ? "fill-brand text-brand" : ""}`}
-                aria-hidden="true"
-              />
-              {favorited ? "Favorilerde" : "Favorilere ekle"}
-            </Button>
-          </div>
-
-          <dl className="mt-12 grid grid-cols-2 border-t border-ink/10">
+          {!preview && <dl className="mt-12 grid grid-cols-2 border-t border-ink/10">
             {guarantees(product.source).map((g) => (
               <div key={g.label} className="border-b border-ink/10 py-4 pr-4">
                 <dt className="text-sm text-ink">{g.label}</dt>
                 <dd className="mt-1 text-xs text-ink/50">{g.detail}</dd>
               </div>
             ))}
-          </dl>
+          </dl>}
         </div>
       </div>
 
@@ -455,7 +341,7 @@ export function ProductDetail({
       <div className="mt-20 md:mt-28" ref={reviewsRef}>
         <div className="border-b border-ink/10">
           <div role="tablist" aria-label="Ürün bilgileri" className="flex flex-wrap gap-8">
-            {TABS.map((tab) => {
+            {(preview ? TABS.slice(0, 1) : TABS).map((tab) => {
               const active = tab.id === activeTab;
               return (
                 <button
@@ -525,7 +411,7 @@ export function ProductDetail({
           </div>
         )}
 
-        {activeTab === "beslenme" && (
+        {!preview && activeTab === "beslenme" && (
           <div role="tabpanel" id="panel-beslenme" aria-labelledby="tab-beslenme" className="mt-10">
             <p className="text-sm text-ink/55">
               100 g ürün için yaklaşık besin değerleri
@@ -555,7 +441,7 @@ export function ProductDetail({
           </div>
         )}
 
-        {activeTab === "degerlendirmeler" && (
+        {!preview && activeTab === "degerlendirmeler" && (
           <div
             role="tabpanel"
             id="panel-degerlendirmeler"
@@ -595,6 +481,7 @@ function ReviewsPanel({ product }: { product: Product }) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isPreviewItem(product)) return;
     const fd = new FormData(e.currentTarget);
     const reviewerName = String(fd.get("reviewerName") ?? "").trim();
     const reviewText = String(fd.get("reviewText") ?? "").trim();

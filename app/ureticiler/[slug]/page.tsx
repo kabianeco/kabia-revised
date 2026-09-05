@@ -9,11 +9,17 @@ import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { fetchPublishedProducerBySlug, type Producer } from "@/lib/producers"
 import { fetchProductsByProducer } from "@/lib/catalog"
 import type { Product } from "@/lib/products"
-import { producerFixtures } from "@/content/producer-fixtures"
+import { sourceProducers } from "@/content/producers"
+import { previewProducts } from "@/content/preview-products"
+import { isBrandPreview } from "@/lib/brand-preview"
 import { routes } from "@/lib/site"
 
 /** One React cache() read per request, shared between generateMetadata and the page body — same pattern as the blog detail page. */
 const getProducer = cache(async (slug: string) => {
+  if (isBrandPreview()) {
+    const producer = sourceProducers.find((producer) => producer.slug === slug)
+    return producer ? { status: "ok" as const, producer } : { status: "not_found" as const }
+  }
   const supabase = await createSupabaseServerClient()
   return fetchPublishedProducerBySlug(supabase, slug)
 })
@@ -25,6 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const producer = result.producer
   return {
+    robots: isBrandPreview() ? { index: false, follow: false } : undefined,
     title: producer.name,
     description: producer.story ?? `${producer.name} — Kabia'nın güvendiği üreticilerden.`,
     alternates: { canonical: routes.producer(producer.slug) },
@@ -73,16 +80,7 @@ export default async function ProducerDetailPage({ params }: { params: Promise<{
   const { slug } = await params
   const result = await getProducer(slug)
 
-  // PREVIEW FIXTURE fallback — see content/producer-fixtures.ts header comment.
-  // Covers both "not_found" (no such row) and "error" (e.g. the query fails
-  // outright, as it currently does — see the open Supabase-state question in
-  // conversation), since either way the real path can't produce this page.
-  const fixture =
-    result.status !== "ok" && process.env.NEXT_PUBLIC_KABIA_PREVIEW_FIXTURES === "1"
-      ? producerFixtures.find((p) => p.slug === slug)
-      : undefined
-
-  if (result.status === "error" && !fixture) {
+  if (result.status === "error") {
     return (
       <PageShell>
         <div role="alert" className="wrap page-top flex min-h-[50vh] flex-col items-start pb-24">
@@ -93,20 +91,13 @@ export default async function ProducerDetailPage({ params }: { params: Promise<{
     )
   }
 
-  if (result.status === "not_found" && !fixture) notFound()
+  if (result.status === "not_found") notFound()
 
-  let producer: Producer
-  let products: Product[] = []
-
-  if (fixture) {
-    producer = fixture
-  } else if (result.status === "ok") {
-    producer = result.producer
-    const supabase = await createSupabaseServerClient()
-    products = await fetchProductsByProducer(supabase, producer.id)
-  } else {
-    notFound()
-  }
+  if (result.status !== "ok") notFound()
+  const producer: Omit<Producer, "createdAt"> = result.producer
+  const products: Product[] = isBrandPreview()
+    ? previewProducts.filter((product) => product.producerSlug === producer.slug)
+    : await fetchProductsByProducer(await createSupabaseServerClient(), producer.id)
 
   return (
     <PageShell>

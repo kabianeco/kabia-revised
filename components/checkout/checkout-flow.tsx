@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
@@ -18,6 +18,8 @@ import { formatTL } from "@/lib/products";
 import { routes } from "@/lib/site";
 import { EASE } from "@/lib/motion";
 import { StepIndicator } from "./step-indicator";
+import { hasPreviewItems, PREVIEW_MESSAGE } from "@/lib/preview-identity";
+import { submitOrder } from "@/lib/checkout-order";
 import { PaymentStep } from "./payment-step";
 import { ReviewStep } from "./review-step";
 import { ConfirmationStep } from "./confirmation-step";
@@ -62,10 +64,15 @@ export function CheckoutFlow() {
     subtotal >= FREE_SHIPPING_THRESHOLD || subtotal === 0 ? 0 : SHIPPING_COST;
   const total = subtotal + shippingCost;
 
+  const currentItems = useRef(items);
+  currentItems.current = items;
+  const containsPreview = hasPreviewItems(items);
+
   // Route guards: checkout needs a session, a cart and a delivery address.
   // The confirmation screen is exempt — by then the cart has been emptied.
   useEffect(() => {
     if (!hydrated || step === "confirmation") return;
+    if (containsPreview) { router.replace(routes.cart); return; }
     if (!isLoggedIn) {
       router.replace(`${routes.login}?next=${encodeURIComponent(routes.checkout)}`);
       return;
@@ -77,7 +84,7 @@ export function CheckoutFlow() {
     if (!selectedAddress) {
       router.replace(routes.cart);
     }
-  }, [hydrated, isLoggedIn, items.length, selectedAddress, step, router]);
+  }, [hydrated, containsPreview, isLoggedIn, items.length, selectedAddress, step, router]);
 
   const goToStep = (target: StepId) => {
     const targetIndex = STEP_ORDER.indexOf(target);
@@ -87,13 +94,13 @@ export function CheckoutFlow() {
   };
 
   const handleConfirmOrder = async () => {
+    if (hasPreviewItems(currentItems.current)) { toast.error(PREVIEW_MESSAGE); router.replace(routes.cart); return; }
     if (submitting || !selectedAddress) return;
     if (!agreedSales || !agreedKvkk) {
       toast.error("Lütfen mesafeli satış sözleşmesi ve KVKK metnini onaylayın.");
       return;
     }
     setSubmitting(true);
-    const supabase = createSupabaseBrowserClient();
     const addressSnapshot = {
       label: selectedAddress.label,
       recipientName: selectedAddress.recipientName,
@@ -109,7 +116,7 @@ export function CheckoutFlow() {
 
     // Order totals and the order number are produced by the `create_order`
     // Postgres function, not by the browser.
-    const { data, error } = await supabase.rpc("create_order", {
+    const submission = await submitOrder(currentItems.current, createSupabaseBrowserClient, {
       p_shipping_address: addressSnapshot,
       p_payment_method: payment.method,
       p_card_last4: isCard ? digits.slice(-4) : null,
@@ -121,6 +128,8 @@ export function CheckoutFlow() {
     });
     setSubmitting(false);
 
+    if (submission.status === "preview_blocked") { toast.error(PREVIEW_MESSAGE); router.replace(routes.cart); return; }
+    const { data, error } = submission;
     if (error) {
       toast.error("Sipariş oluşturulamadı. Lütfen tekrar deneyin.");
       return;
@@ -151,7 +160,7 @@ export function CheckoutFlow() {
   // While the guards above decide, render nothing but keep the page height so
   // the footer does not jump into view.
   const blocked =
-    !hydrated ||
+    !hydrated || containsPreview ||
     (step !== "confirmation" && (items.length === 0 || !selectedAddress));
   if (blocked) {
     return <div className="min-h-[60vh]" aria-busy="true" />;

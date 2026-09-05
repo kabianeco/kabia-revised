@@ -1,0 +1,173 @@
+import type { ProductSource } from "@/lib/products";
+import type { Producer } from "@/lib/producers";
+/** Editorial text/images: read-only kabia-2.0/content/producers.ts. Preserve PLACEHOLDER markers. */
+export type SourceProducer = Omit<Producer, "createdAt"> & { source: ProductSource; desc: string };
+export const producerCollections: Record<ProductSource, SourceProducer[]> = {
+"ciftlik": [
+  {
+    "id": "editorial:kabia-ciftligi",
+    "slug": "kabia-ciftligi",
+    "name": "Kabia Çiftliği",
+    "source": "ciftlik",
+    "productType": "Badem",
+    "region": "Sabırlar · Geyve / Sakarya",
+    "photoUrl": "/images/kabia-badem.jpeg",
+    "desc": "Organik sertifikalı, ekolojik hasadımız.",
+    "story": "Kabia Çiftliği'nde her şeyden önce toprağı düşündük. Bizim için tarımın başlangıcı ağaç değil, toprak. Toprağın içindeki milyonlarca canlıyı — bakterileri, mantarları, yararlı fungusları — çoğaltmak; toprağı yeniden yaşayan bir ekosistem haline getirmek asıl işimiz. Önce toprağı iyileştirmeye çalışıyoruz. Canlanan, gelişen toprak ağaçları zaten kendisi besleyip büyütüyor.\n\nDışarıdan hiçbir girdi yok. Organik üretimde kullanımı sertifikalı olsa bile, gübre anlamında bahçeye hiçbir şey almıyoruz. Otları biçmiyoruz, toprağı sürmüyoruz. Doğayı kontrol etmeye değil, taklit etmeye çalışıyoruz; üretimimizi doğanın kendi döngüsüne emanet ediyoruz. Tüm girdilerimiz doğadan ve kendi bahçemizden: kompost, kompost gübresi ve kompost çayı.\n\n946 Marinada ağacı. Her hasat, toprağa verdiğimiz emeğin karşılığı — bir yılın değil, yılların hikâyesi.",
+    "productionPlace": null,
+    "method": null,
+    "inputs": null,
+    "certificates": null,
+    "whySelected": null
+  }
+],
+"secki": [
+  {
+    "id": "editorial:geyce-setce-findik",
+    "slug": "geyce-setce-findik",
+    "name": "Geyve — Setçe Köyü Aile Bahçesi",
+    "source": "secki",
+    "productType": "Fındık",
+    "region": "Setçe Köyü — Aile Bahçesi",
+    "photoUrl": "/images/findik1.jpeg",
+    "desc": "Sade, doğal ve olduğu gibi.",
+    "story": "Göktepe’nin Eteğinde Üç Nesillik Bir Miras — Kabia ekosisteminde her üreticinin bir hikayesi, her toprağın bir hafızası vardır. Setçe Köyü’nün Sisli Göktepe dağ yamaçlarına vardığınızda, yeşilin en derin tonuyla karşılar sizi Engin Abi’nin bahçesi. Burası sadece fındık ağaçlarının dizildiği bir arazi değil; üç nesildir kimyasal tek bir damla zehir girmemiş, mantar ağının ve toprak altı canlılığının özgürce nefes aldığı canlı bir orman ekosistemidir.\n\nBiz Kabia olarak toprağı sürmeden, onu sentetik gübrelerle zorlamadan, doğanın kendi dengesini koruyarak üretim yapmanın peşindeyiz. Engin Abi de bu felsefeyi Göktepe’nin sert ama cömert coğrafyasında yıllardır bizzat yaşayan, toprağın kadim bilgesidir.\n\nEngin Abi’nin Ağzından: “Biz Toprağa Efendi Olmaya Değil, Çırak Olmaya Geldik”\n\n“Bu dağın yamacında dedem fındık toplarken de sis aynı böyle çökerdi. Ben bu bahçede büyüdüm, çocukluğum ocak diplerindeki yaprak kompostlarının içinde geçti.\n\n‘Millet ilacı basıyor, sen neden kullanmıyorsun?’ diye soruyorlar. Dedem zehirsiz teslim etti, babam tek gram suni gübre atmadan büyüttü. İki çuval fazla için Göktepe’nin canlısını nasıl zehirleyeyim?\n\nBiz zehir atmayız. Dökülen yaprak, çürüyen dal gübremizdir. Ağacın suyunu, rüzgarını doğru okursan hakkını verir. Bizim fındığın tadı bundandır; kimyasal değil, Göktepe’nin rüzgarı kalır.”\n\nNot: Engin Abi’nin bahçesi organik sertifikalı değil, doğal üretimdir — yerinde gördüğümüz, tanıdığımız üretim.",
+    "productionPlace": null,
+    "method": null,
+    "inputs": null,
+    "certificates": null,
+    "whySelected": null
+  },
+  {
+    "id": "editorial:ege-ceviz",
+    "slug": "ege-ceviz",
+    "name": "Kayadibi Köyü Aile Bahçesi",
+    "source": "secki",
+    "productType": "Ceviz",
+    "region": "Kayadibi Köyü Aile Bahçesi",
+    "photoUrl": "/images/kabuklu-ceviz.jpeg",
+    "desc": "Doğal üretim.",
+    "story": "Gediz Havzası'na bakan yirmi yaşında ceviz bahçesi. Toprak her yıl analize gider, budama elle yapılır, hasat sonrası cevizler gölgede, tel ızgaralarda kurutulur. Acele yok; kabuk çatlamadan, içi tam kurumadan çuvala girmez. Bahçe sahibi, \"Ceviz sabır ister\" der. (PLACEHOLDER — gerçek üretici hikâyesi ile değiştirilecek)",
+    "productionPlace": null,
+    "method": null,
+    "inputs": null,
+    "certificates": null,
+    "whySelected": null
+  },
+  {
+    "id": "editorial:anadolu-bal",
+    "slug": "anadolu-bal",
+    "name": "Kılıçkaya Vadisi Balı",
+    "source": "secki",
+    "productType": "Bal",
+    "region": "Kılıçkaya Vadisi — Sabit kovan",
+    "photoUrl": "/images/bal.png",
+    "desc": "Gezgin değil, sabit kovan. Aynı flora, aynı rakım.",
+    "story": "Kılıçkaya Vadisi'nde, Sabırlar Kayadibi'nde sabit kovanlar. Arıcı gezgin değil; aynı rakım, aynı flora, aynı kovan yeri. Bal olgunlaşmadan, sırlanmadan alınmaz. \"Arı ne topladıysa o\" der arıcı, şeker yok, erken hasat yok. (PLACEHOLDER — gerçek arıcı hikâyesi ile değiştirilecek)",
+    "productionPlace": null,
+    "method": null,
+    "inputs": null,
+    "certificates": null,
+    "whySelected": null
+  },
+  {
+    "id": "editorial:akinci-ihlamur",
+    "slug": "akinci-ihlamur",
+    "name": "Geyve — Akıncı Köyü Ormanı",
+    "source": "secki",
+    "productType": "Ihlamur",
+    "region": "Geyve / Akıncı Köyü — Orman",
+    "photoUrl": "/images/ihlamur.jpeg",
+    "desc": "Doğal ürün.",
+    "story": "Geyve Akıncı Köyü’nün ormanlarında, Haziran’ın ilk sıcaklarıyla ıhlamurlar açar. Sabah serinliği varken, çiçek henüz tam kurumamışken toplanır — öğle sıcağı beklenmez, çünkü uçucu yağ o saatlerde uçar.\n\nAile, ormanın bildiği patikalarından girer, tek tek elle toplar; dal kırılmaz, ağaç yorulmaz. Toplanan çiçekler aynı gün harmanda değil, gölgede, temiz bezler üzerinde ağır ağır kurutulur. Güneşte değil — gölgede, çünkü ıhlamurun rengi ve kokusu gölgede saklanır.\n\nBiz Kabia’da ıhlamuru ıhlamur olduğu için severiz: ne aroma verici, ne koruyucu. Sadece çiçek ve yaprak. Her paket, hangi gün, hangi orman yamacından toplandığı yazılarak kapanır. (PLACEHOLDER — gerçek Akıncı hikâyesi ile değiştirilecek)",
+    "productionPlace": null,
+    "method": null,
+    "inputs": null,
+    "certificates": null,
+    "whySelected": null
+  }
+],
+"mutfak": [
+  {
+    "id": "editorial:domates-salcasi",
+    "slug": "domates-salcasi",
+    "name": "Domates Salçası",
+    "source": "mutfak",
+    "productType": "Salça",
+    "region": "Geyve — Mevsiminde",
+    "photoUrl": "/images/domates1.jpeg",
+    "desc": "Mevsiminde olgunlaşan domatesler, güneşte ağır ağır kurutulur.",
+    "story": "Geyve'de yaz sonu domatesleri tam olgunlaşınca toplanır, odun ateşinde değil, güneşte ağır ağır koyulaşır. Sadece domates ve tuz; koruyucu yok, hızlandırıcı yok. Geleneksel yöntemle, cam kavanozda saklanır. Her kavanozun üzerine hasat haftası yazılır. (PLACEHOLDER — gerçek mutfak hikâyesi ile değiştirilecek)",
+    "productionPlace": null,
+    "method": null,
+    "inputs": null,
+    "certificates": null,
+    "whySelected": null
+  },
+  {
+    "id": "editorial:elma-sirkesi",
+    "slug": "elma-sirkesi",
+    "name": "Elma Sirkesi",
+    "source": "mutfak",
+    "productType": "Sirke",
+    "region": "Geyve — Doğal Fermentasyon",
+    "photoUrl": "/images/elma-sirkesi1.jpeg",
+    "desc": "Geyve'nin elmalarından, annelerimizin yaptığı gibi.",
+    "story": "Geyve elmalarından, anne usulü. Doğal fermentasyon, filtre edilmez, tortulu kalır. Sirke anası ile birlikte 6 ay dinlenir, sonra süzülmeden şişelenir. Hızlı sirke değil, sabır sirkesi. (PLACEHOLDER — gerçek mutfak hikâyesi ile değiştirilecek)",
+    "productionPlace": null,
+    "method": null,
+    "inputs": null,
+    "certificates": null,
+    "whySelected": null
+  },
+  {
+    "id": "editorial:alic-sirkesi",
+    "slug": "alic-sirkesi",
+    "name": "Alıç Sirkesi",
+    "source": "mutfak",
+    "productType": "Sirke",
+    "region": "Geyve — Doğal Fermentasyon",
+    "photoUrl": "/images/alic1.jpeg",
+    "desc": "Geyve alıçlarından, doğal fermentasyonla.",
+    "story": "Geyve alıçlarından, elma sirkesi gibi ama daha buruk, daha derin. Alıçlar tam olgunlaşınca toplanır, ezilir, doğal fermentasyona bırakılır. Filtre edilmez, tortulu kalır, sirke anası ile 6 ay dinlenir. Katkı yok, hızlandırma yok. Her şişe, hangi bahçeden geldiği yazılarak kapanır. (PLACEHOLDER — gerçek alıç hikâyesi ile değiştirilecek)",
+    "productionPlace": null,
+    "method": null,
+    "inputs": null,
+    "certificates": null,
+    "whySelected": null
+  },
+  {
+    "id": "editorial:eriste",
+    "slug": "eriste",
+    "name": "Erişte",
+    "source": "mutfak",
+    "productType": "Erişte",
+    "region": "Geyve — Elde Kesme",
+    "photoUrl": "/images/eriste1.jpeg",
+    "desc": "Un, yumurta ve tuz. Ovalarda kurutulan yufka, elle kesilir.",
+    "story": "Un, yumurta, tuz ve sabır. Hamur açılır, yufka olur, ovalarda güneşte kurur, sonra elle kesilir. Makine yok, acele yok. Geleneksel mutfakta, aynı tezgahta yıllardır aynı eller keser. (PLACEHOLDER — gerçek mutfak hikâyesi ile değiştirilecek)",
+    "productionPlace": null,
+    "method": null,
+    "inputs": null,
+    "certificates": null,
+    "whySelected": null
+  },
+  {
+    "id": "editorial:tarhana",
+    "slug": "tarhana",
+    "name": "Tarhana",
+    "source": "mutfak",
+    "productType": "Tarhana",
+    "region": "Geyve — Geleneksel",
+    "photoUrl": "/images/tarhana1.jpeg",
+    "desc": "Domates, biber, yoğurt ve un. Geleneksel tarhana fermantasyonu.",
+    "story": "Domates, biber, yoğurt ve un bir araya gelir, 3-4 gün fermente olur. Sonra güneşte kurutulur, elle kırılır, toz olur. Kışın çorbası, yazın emeği. Her tarhana aynı tarife değil, aynı mutfağın eline aittir. (PLACEHOLDER — gerçek mutfak hikâyesi ile değiştirilecek)",
+    "productionPlace": null,
+    "method": null,
+    "inputs": null,
+    "certificates": null,
+    "whySelected": null
+  }
+],
+};
+export const sourceProducers = Object.values(producerCollections).flat();

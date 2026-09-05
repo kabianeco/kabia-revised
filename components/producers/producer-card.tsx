@@ -8,7 +8,7 @@ import type { Producer } from "@/lib/producers"
  * components/blog/post-card.tsx and components/shop/product-entry.tsx: the
  * image sits directly on the page, a hairline carries the metadata.
  */
-export function ProducerCard({ producer, priority = false }: { producer: Producer; priority?: boolean }) {
+export function ProducerCard({ producer, priority = false }: { producer: Omit<Producer, "createdAt">; priority?: boolean }) {
   return (
     <li className="group">
       <Link href={routes.producer(producer.slug)} prefetch={false} className="block">

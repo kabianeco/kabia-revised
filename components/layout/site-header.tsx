@@ -17,13 +17,6 @@ const sectionItems = [
   { label: "İletişim", anchor: anchors.contact },
 ];
 
-// PREVIEW FIXTURE — restores the Üreticiler/Günlük header links (pulled in
-// 6d28b2a because their pages were empty) only while previewing fixture
-// content. See content/producer-fixtures.ts and content/journal.ts. Delete
-// this const and both `{PREVIEW_FIXTURES_ENABLED && (...)}` blocks below in
-// the fixture-removal commit named in the preview PR — the links then stay
-// pulled from the header per the earlier decision until real content lands.
-const PREVIEW_FIXTURES_ENABLED = process.env.NEXT_PUBLIC_KABIA_PREVIEW_FIXTURES === "1";
 
 export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean }) {
   const pathname = usePathname();
@@ -156,30 +149,7 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
           >
             Blog
           </Link>
-          {PREVIEW_FIXTURES_ENABLED && (
-            <>
-              <Link
-                href={routes.producers}
-                prefetch={false}
-                aria-current={pathname.startsWith(routes.producers) ? "page" : undefined}
-                className={`text-sm transition-colors duration-300 hover:text-ink ${
-                  pathname.startsWith(routes.producers) ? "text-ink" : "text-ink/70"
-                }`}
-              >
-                Üreticiler
-              </Link>
-              <Link
-                href={routes.journal}
-                prefetch={false}
-                aria-current={pathname.startsWith(routes.journal) ? "page" : undefined}
-                className={`text-sm transition-colors duration-300 hover:text-ink ${
-                  pathname.startsWith(routes.journal) ? "text-ink" : "text-ink/70"
-                }`}
-              >
-                Günlük
-              </Link>
-            </>
-          )}
+
           {sectionItems.map((item) => (
             <a
               key={item.anchor}
@@ -267,26 +237,7 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
             >
               Blog
             </Link>
-            {PREVIEW_FIXTURES_ENABLED && (
-              <>
-                <Link
-                  href={routes.producers}
-                  prefetch={false}
-                  onClick={() => close(false)}
-                  className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
-                >
-                  Üreticiler
-                </Link>
-                <Link
-                  href={routes.journal}
-                  prefetch={false}
-                  onClick={() => close(false)}
-                  className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
-                >
-                  Günlük
-                </Link>
-              </>
-            )}
+
             {sectionItems.map((item) => (
               <a
                 key={item.anchor}

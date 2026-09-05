@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
-import { ProductEntry } from "@/components/shop/product-entry";
-import { ArrowLink } from "@/components/ui/button";
+import { StoreListing } from "@/components/shop/store-listing";
+import { isBrandPreview } from "@/lib/brand-preview";
+import { previewProducts } from "@/content/preview-products";
+import { SORT_OPTIONS } from "@/lib/store-listing";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { fetchPublicProducts } from "@/lib/catalog";
-import { CATEGORIES, SOURCES, type Product, type ProductCategory, type ProductSource } from "@/lib/products";
+import { CATEGORIES, SOURCES, type ProductCategory, type ProductSource } from "@/lib/products";
 import { routes } from "@/lib/site";
 import { getPublicSettings } from "@/lib/settings";
 import { shopBannerVisible, type ShopBannerSettings } from "@/lib/shop-banner";
@@ -19,42 +20,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/magaza" },
 };
 
-type SortOption = "onerilen" | "fiyat-artan" | "fiyat-azalan" | "en-yeni";
-
-const SORT_OPTIONS: { id: SortOption; label: string }[] = [
-  { id: "onerilen", label: "Önerilen" },
-  { id: "fiyat-artan", label: "Artan fiyat" },
-  { id: "fiyat-azalan", label: "Azalan fiyat" },
-  { id: "en-yeni", label: "En yeni" },
-];
-
-const isSort = (v: string | undefined): v is SortOption =>
-  SORT_OPTIONS.some((o) => o.id === v);
-
-/** Filters are links, not client state: the view stays server-rendered and
- *  every combination is a shareable URL. */
-function shopHref(category: string, source: string, sort: SortOption) {
-  const params = new URLSearchParams();
-  if (category !== "tumu") params.set("kategori", category);
-  if (source !== "tumu") params.set("kaynak", source);
-  if (sort !== "onerilen") params.set("sirala", sort);
-  const qs = params.toString();
-  return qs ? `${routes.store}?${qs}` : routes.store;
-}
-
-function sortProducts(list: Product[], sort: SortOption): Product[] {
-  switch (sort) {
-    case "fiyat-artan":
-      return [...list].sort((a, b) => a.price - b.price);
-    case "fiyat-azalan":
-      return [...list].sort((a, b) => b.price - a.price);
-    case "en-yeni":
-      // fetchProducts returns oldest-first, so newest is the reverse.
-      return [...list].reverse();
-    default:
-      return list;
-  }
-}
+type SortOption = typeof SORT_OPTIONS[number]["id"];
+const isSort = (value: string | undefined): value is SortOption => SORT_OPTIONS.some(option => option.id === value);
 
 function GridSkeleton() {
   return (
@@ -91,58 +58,10 @@ async function ProductGrid({
   activeSource: ProductSource | "tumu";
   sort: SortOption;
 }) {
-  const supabase = await createSupabaseServerClient();
-  const result = await fetchPublicProducts(supabase);
-  if (result.status === "error") {
-    return (
-      <div role="alert" className="py-24 text-center">
-        <p className="font-theme-display text-2xl italic text-clay">
-          Ürünler şu anda yüklenemiyor.
-        </p>
-        <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink/55">
-          Mağaza sayfası açık kalacak. Lütfen daha sonra yeniden deneyin.
-        </p>
-      </div>
-    );
-  }
-  const all = result.products;
-  const filtered = all.filter(
-    (p) =>
-      (activeCategory === "tumu" || p.category === activeCategory) &&
-      (activeSource === "tumu" || p.source === activeSource),
-  );
-  const products = sortProducts(filtered, sort);
-
-  if (products.length === 0) {
-    return (
-      <div className="py-24 text-center">
-        <p className="font-theme-display text-2xl italic text-ink/70">
-          {all.length === 0 ? "Mağaza şu an boş." : "Bu kategoride ürün yok."}
-        </p>
-        <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink/55">
-          {all.length === 0
-            ? "Yeni hasat yüklendiğinde ürünler burada listelenir."
-            : "Diğer kategorilere göz atabilirsiniz."}
-        </p>
-        {all.length > 0 && (
-          <div className="mt-8">
-            <ArrowLink href={routes.store} prefetch={false}>Tüm ürünler</ArrowLink>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <p className="label pb-5 text-olive">{products.length} ürün</p>
-      <ul className="grid grid-cols-1 gap-x-8 gap-y-14 pb-24 sm:grid-cols-2 md:pb-32 lg:grid-cols-3">
-        {products.map((product, i) => (
-          <ProductEntry key={product.id} product={product} priority={i < 3} />
-        ))}
-      </ul>
-    </>
-  );
+  const search = { kategori: activeCategory, kaynak: activeSource, sirala: sort };
+  if (isBrandPreview()) return <StoreListing products={previewProducts} base={routes.store} search={search} />;
+  const result = await fetchPublicProducts(await createSupabaseServerClient());
+  return <StoreListing products={result.status === "error" ? [] : result.products} error={result.status === "error"} base={routes.store} search={search} />;
 }
 
 export default async function ShopPage({
@@ -198,78 +117,6 @@ export default async function ShopPage({
         </div>
 
         <div className="wrap mt-14 md:mt-20">
-          <nav aria-label="Kategoriler" className="border-t border-ink/10 pt-5">
-            <ul className="flex flex-wrap items-center gap-x-7 gap-y-3">
-              {CATEGORIES.map((cat) => {
-                const active = cat.id === activeCategory;
-                return (
-                  <li key={cat.id}>
-                    <Link
-                      href={shopHref(cat.id, activeSource, sort)}
-                      prefetch={false}
-                      aria-current={active ? "true" : undefined}
-                      className={`inline-flex min-h-11 items-center text-sm transition-colors duration-300 ${
-                        active
-                          ? "text-ink underline decoration-brand decoration-2 underline-offset-8"
-                          : "text-ink/55 hover:text-ink"
-                      }`}
-                    >
-                      {cat.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-
-          <nav aria-label="Kaynak" className="mt-4 pt-4 border-t border-ink/10">
-            <ul className="flex flex-wrap items-center gap-x-7 gap-y-3">
-              {SOURCES.map((src) => {
-                const active = src.id === activeSource;
-                return (
-                  <li key={src.id}>
-                    <Link
-                      href={shopHref(activeCategory, src.id, sort)}
-                      prefetch={false}
-                      aria-current={active ? "true" : undefined}
-                      className={`inline-flex min-h-11 items-center text-sm transition-colors duration-300 ${
-                        active
-                          ? "text-ink underline decoration-brand decoration-2 underline-offset-8"
-                          : "text-ink/55 hover:text-ink"
-                      }`}
-                    >
-                      {src.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-
-          <div className="mt-4 border-b border-ink/10 pb-5">
-            <nav aria-label="Sıralama">
-              <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                {SORT_OPTIONS.map((opt) => {
-                  const active = opt.id === sort;
-                  return (
-                    <li key={opt.id}>
-                      <Link
-                        href={shopHref(activeCategory, activeSource, opt.id)}
-                        prefetch={false}
-                        aria-current={active ? "true" : undefined}
-                        className={`inline-flex min-h-11 items-center text-sm transition-colors duration-300 ${
-                          active ? "text-brand" : "text-ink/50 hover:text-ink"
-                        }`}
-                      >
-                        {opt.label}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
-          </div>
-
           <div className="pt-14">
             <Suspense
               key={`${activeCategory}-${activeSource}-${sort}`}

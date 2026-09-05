@@ -1,5 +1,6 @@
 "use client";
 
+import { isPreviewItem } from "@/lib/preview-identity";
 import { useSyncExternalStore } from "react";
 
 /**
@@ -29,7 +30,7 @@ function parse(raw: string | null): string[] {
   try {
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed)
-      ? parsed.filter((s): s is string => typeof s === "string")
+      ? parsed.filter((s): s is string => typeof s === "string" && !isPreviewItem({ slug: s }))
       : EMPTY;
   } catch {
     return EMPTY;
@@ -63,7 +64,7 @@ function subscribe(onChange: () => void) {
 
 /** Moves `slug` to the front of the list, trimming to the most recent few. */
 export function recordProductView(slug: string) {
-  if (typeof window === "undefined" || !slug) return;
+  if (typeof window === "undefined" || !slug || isPreviewItem({ slug })) return;
   try {
     const current = getSnapshot();
     if (current[0] === slug) return;

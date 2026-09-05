@@ -9,6 +9,7 @@ import { AddressSelector } from "./address-selector";
 import { OrderSummary } from "./order-summary";
 import { isContactValid } from "./validation";
 import { useCart } from "@/lib/cart-context";
+import { hasPreviewItems, PREVIEW_MESSAGE } from "@/lib/preview-identity";
 import { useCheckout } from "@/lib/checkout-context";
 import { routes } from "@/lib/site";
 
@@ -70,7 +71,8 @@ export function CartPage() {
   }
 
   const contactValid = isContactValid({ fullName, email, phone });
-  const canContinue = contactValid && !!selectedAddressId;
+  const containsPreview = hasPreviewItems(items);
+  const canContinue = !containsPreview && contactValid && !!selectedAddressId;
 
   return (
     <div className="wrap page-top pb-24 md:pb-32">
@@ -136,7 +138,7 @@ export function CartPage() {
           <OrderSummary
             subtotal={subtotal}
             note={
-              !canContinue
+              containsPreview ? PREVIEW_MESSAGE : !canContinue
                 ? !contactValid
                   ? "Devam etmek için ad soyad, e-posta ve telefon bilgilerinizi girin."
                   : "Devam etmek için bir teslimat adresi seçin."
@@ -147,7 +149,7 @@ export function CartPage() {
               className="w-full"
               size="lg"
               disabled={!canContinue}
-              onClick={() => router.push(routes.checkout)}
+              onClick={() => { if (!hasPreviewItems(items) && canContinue) router.push(routes.checkout); }}
             >
               Ödemeye geç
             </Button>

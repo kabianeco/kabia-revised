@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { useAuth } from "@/lib/auth-context"
+import { hasPreviewItems, isPreviewItem } from "@/lib/preview-identity"
 import type { CartItemRow } from "@/lib/supabase/rows"
 
 export interface CartItem {
@@ -22,7 +23,7 @@ interface CartContextValue {
   itemCount: number
   subtotal: number
   hydrated: boolean
-  addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void
+  addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => boolean
   updateQuantity: (id: string, quantity: number) => void
   removeItem: (id: string) => void
   clearCart: () => void
@@ -60,11 +61,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [hydrated, setHydrated] = useState(false)
   const cartIdRef = useRef<string | null>(null)
+  // Handlers created before an auth transition must use current authority.
+  const authority = useRef({ userId, authHydrated })
+  authority.current = { userId, authHydrated }
+  const [loadedFor, setLoadedFor] = useState<string | null | undefined>(undefined)
 
   const ensureCart = useCallback(
     async (uid: string) => {
       let { data: cartRow } = await supabase.from("carts").select("id").eq("user_id", uid).maybeSingle()
-      if (!cartRow) {
+      if (!cartRow && authority.current.userId === uid) {
         const { data: nc } = await supabase.from("carts").insert({ user_id: uid }).select("id").maybeSingle()
         cartRow = nc
       }
@@ -76,7 +81,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const loadDbCart = useCallback(
     async (uid: string) => {
-      const cid = await ensureCart(uid)
+      const { data: cartRow } = await supabase.from("carts").select("id").eq("user_id", uid).maybeSingle()
+      if (authority.current.userId !== uid) return
+      const cid = cartRow?.id ?? null
+      cartIdRef.current = cid
       if (!cid) {
         setItems([])
         return
@@ -84,9 +92,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const { data: rows } = await supabase.from("cart_items").select(CART_SELECT).eq("cart_id", cid)
       // PostgREST types embedded relations as arrays; both of these are
       // to-one joins and come back as single objects.
-      setItems(((rows ?? []) as unknown as CartItemRow[]).map(mapCartRow))
+      if (authority.current.userId === uid) setItems(((rows ?? []) as unknown as CartItemRow[]).map(mapCartRow).filter((item) => !isPreviewItem(item)))
     },
-    [supabase, ensureCart],
+    [supabase],
   )
 
   const loadGuestCart = useCallback(() => {
@@ -102,6 +110,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Bootstrap + react to auth state (guest <-> authed). Merges guest cart on login.
   useEffect(() => {
     if (!authHydrated) return
+    setHydrated(false)
+    cartIdRef.current = null
     let cancelled = false
     ;(async () => {
       if (userId) {
@@ -113,16 +123,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
         } catch {
           guest = []
         }
+        const previewGuest = guest.filter(isPreviewItem)
+        guest = guest.filter((item) => !isPreviewItem(item))
         if (guest.length) {
           const cid = await ensureCart(userId)
           if (cid && !cancelled) {
             for (const gi of guest) {
+              if (cancelled || authority.current.userId !== userId) break
               const { data: ex } = await supabase
                 .from("cart_items")
                 .select("id, quantity")
                 .eq("cart_id", cid)
                 .eq("variant_id", gi.variantId)
                 .maybeSingle()
+              if (cancelled || authority.current.userId !== userId) break
               if (ex) {
                 await supabase.from("cart_items").update({ quantity: ex.quantity + gi.quantity }).eq("id", ex.id)
               } else {
@@ -131,14 +145,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
                   .insert({ cart_id: cid, product_id: gi.productId, variant_id: gi.variantId, quantity: gi.quantity })
               }
             }
-            localStorage.removeItem(STORAGE_KEY)
+            if (!cancelled) localStorage.setItem(STORAGE_KEY, JSON.stringify(previewGuest))
           }
         }
         if (!cancelled) await loadDbCart(userId)
       } else {
         loadGuestCart()
       }
-      if (!cancelled) setHydrated(true)
+      if (!cancelled) { setLoadedFor(userId); setHydrated(true) }
     })()
     return () => {
       cancelled = true
@@ -147,19 +161,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Persist guest cart to localStorage
   useEffect(() => {
-    if (!hydrated || userId) return
+    if (!hydrated || !authHydrated || userId || loadedFor !== null) return
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
-  }, [items, hydrated, userId])
+  }, [items, hydrated, userId, authHydrated, loadedFor])
 
   const isAuthed = !!userId
 
   const addItem = useCallback<CartContextValue["addItem"]>(
     (item) => {
+      const auth = authority.current
+      if (!auth.authHydrated || (isPreviewItem(item) && auth.userId)) return false
       const qty = item.quantity ?? 1
-      if (isAuthed && cartIdRef.current) {
-        const cid = cartIdRef.current
+      if (auth.userId) {
+        const uid = auth.userId
         const existing = items.find((i) => i.variantId === item.variantId)
         ;(async () => {
+          const cid = cartIdRef.current ?? await ensureCart(uid)
+          if (!cid || authority.current.userId !== uid) return
           if (existing) {
             const newQty = Math.min(99, existing.quantity + qty)
             await supabase.from("cart_items").update({ quantity: newQty }).eq("cart_id", cid).eq("variant_id", item.variantId)
@@ -178,15 +196,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
         return [...prev, { ...item, quantity: qty }]
       })
+      return true
     },
-    [isAuthed, items, supabase],
+    [items, supabase, ensureCart],
   )
 
   const updateQuantity = useCallback(
     (id: string, quantity: number) => {
       const item = items.find((i) => i.id === id)
-      if (!item) return
-      if (isAuthed && cartIdRef.current) {
+      if (!item || (isPreviewItem(item) && (!authority.current.authHydrated || authority.current.userId))) return
+      if (!isPreviewItem(item) && authority.current.userId && cartIdRef.current) {
         const cid = cartIdRef.current
         ;(async () => {
           if (quantity <= 0) {
@@ -208,7 +227,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const removeItem = useCallback(
     (id: string) => {
       const item = items.find((i) => i.id === id)
-      if (item && isAuthed && cartIdRef.current) {
+      if (item && !isPreviewItem(item) && authority.current.userId && cartIdRef.current) {
         const cid = cartIdRef.current
         ;(async () => {
           await supabase.from("cart_items").delete().eq("cart_id", cid).eq("variant_id", item.variantId)
@@ -220,14 +239,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   )
 
   const clearCart = useCallback(() => {
-    if (isAuthed && cartIdRef.current) {
+    if (!hasPreviewItems(items) && authority.current.userId && cartIdRef.current) {
       const cid = cartIdRef.current
       ;(async () => {
         await supabase.from("cart_items").delete().eq("cart_id", cid)
       })()
     }
     setItems([])
-  }, [isAuthed, supabase])
+  }, [items, supabase])
 
 
   const itemCount = useMemo(() => items.reduce((sum, i) => sum + i.quantity, 0), [items])
