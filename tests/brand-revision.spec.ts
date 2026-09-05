@@ -286,7 +286,7 @@ test("preview producer stores validate source slugs and avoid catalog reads incl
   }
 });
 
-test("the restored grid, source bar and sort control drive one shared listing", async ({ page }) => {
+test("the restored grid, source row and two controls drive one shared listing", async ({ page }) => {
   test.skip(!previewEnabled, "local example catalog only; off-state result/layout covered separately");
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/magaza");
@@ -300,18 +300,22 @@ test("the restored grid, source bar and sort control drive one shared listing", 
   expect(columns).toBe(3);
   await expect(store.getByText("Stokta yok").first()).toBeVisible();
 
-  // Sorting is one select, not a row of links.
+  // Option A: sources stay as the row; category and sort are controls right.
   const sort = store.getByLabel("Sırala");
+  const category = store.getByLabel("Kategori");
   await expect(sort).toHaveCount(1);
+  await expect(category).toHaveCount(1);
   await expect(store.getByRole("link", { name: "Fiyat: azalan", exact: true })).toHaveCount(0);
+  await expect(store.getByRole("link", { name: "Çiğ Badem", exact: true })).toHaveCount(0);
   await sort.selectOption("fiyat-azalan");
   await expect(page).toHaveURL(/sirala=fiyat-azalan/);
   await expect(store.locator("h2").first()).toHaveText("Örnek Tarhana");
 
-  // The source row narrows the category row to what that source has.
+  // The source row narrows the category control to what that source has.
   await store.getByRole("link", { name: "Çiftlik", exact: true }).click();
   await expect(page).toHaveURL(/kaynak=ciftlik/);
-  await store.getByRole("link", { name: "Çiğ Badem", exact: true }).click();
+  await expect(category.locator("option")).toHaveText(["Tümü", "Çiğ Badem"]);
+  await category.selectOption("cig-badem");
   await expect(page).toHaveURL(/kategori=cig-badem&kaynak=ciftlik/);
   await expect(store.locator("h2")).toHaveCount(1);
 
@@ -334,7 +338,7 @@ test("shop, magaza and a producer store render the same listing structure", asyn
       const entry = grid?.querySelector("li");
       return {
         navs: [...store.querySelectorAll("nav")].map((n) => n.getAttribute("aria-label")),
-        hasSort: !!store.querySelector("select"),
+        selects: [...store.querySelectorAll("select")].map((s) => s.labels?.[0]?.textContent ?? null),
         gridClass: grid?.className ?? null,
         columns: grid ? getComputedStyle(grid).gridTemplateColumns.split(" ").length : 0,
         entryClass: entry?.className ?? null,
@@ -348,12 +352,14 @@ test("shop, magaza and a producer store render the same listing structure", asyn
   const producer = await shape("/magaza/tarhana");
 
   expect(magaza).toEqual(shop);
+  expect(shop.navs).toEqual(["Kaynaklar"]);
+  expect(shop.selects).toEqual(["Kategori", "Sırala"]);
   // The producer store is the same listing, only its catalogue is narrower.
   expect(producer.gridClass).toBe(shop.gridClass);
   expect(producer.entryClass).toBe(shop.entryClass);
   expect(producer.imageClass).toBe(shop.imageClass);
   expect(producer.columns).toBe(shop.columns);
-  expect(producer.hasSort).toBe(shop.hasSort);
+  expect(producer.selects).toEqual(shop.selects);
 });
 
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLink } from "@/components/ui/button";
 import { ProductEntry } from "@/components/shop/product-entry";
+import { CategorySelect } from "@/components/shop/category-select";
 import { SortSelect } from "@/components/shop/sort-select";
 import {
   listingHref,
@@ -23,9 +24,9 @@ export type StoreSearch = {
  *
  * Presentation is the shop index as it stands on main: the same filter bar
  * treatment, the same three-column ProductEntry grid, the same count line and
- * the same empty and error states. What this adds is the source row, because
- * the catalogue now comes from three of them, and a sort control in place of
- * main's row of sort links.
+ * the same empty and error states. What this adds is option A: the sources
+ * stay as the row, because the catalogue now comes from three of them, while
+ * category and sort sit as controls on the right.
  */
 
 /** Selected filters read as links, so every combination stays a shareable URL. */
@@ -65,40 +66,20 @@ export function StoreListing({
 
   return (
     <div data-store-listing>
-      <nav aria-label="Kaynaklar" className="border-t border-ink/10 pt-5">
-        <ul className="flex flex-wrap items-center gap-x-7 gap-y-3">
-          {sources.map((entry) => {
-            const active = entry.id === source;
-            return (
-              <li key={entry.id}>
-                <Link
-                  href={href(entry.id === "tumu" ? "tumu" : category, entry.id)}
-                  prefetch={false}
-                  aria-current={active ? "true" : undefined}
-                  className={linkClass(active)}
-                >
-                  {entry.label}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-
-      <div className="mt-4 flex flex-wrap items-end justify-between gap-x-7 gap-y-4 border-b border-ink/10 pb-5">
-        <nav aria-label="Kategoriler" className="min-w-0">
+      <div className="flex flex-wrap items-end justify-between gap-x-7 gap-y-4 border-y border-ink/10 py-5">
+        <nav aria-label="Kaynaklar" className="min-w-0">
           <ul className="flex flex-wrap items-center gap-x-7 gap-y-3">
-            {categories.map((cat) => {
-              const active = cat.id === category;
+            {sources.map((entry) => {
+              const active = entry.id === source;
               return (
-                <li key={cat.id}>
+                <li key={entry.id}>
                   <Link
-                    href={href(cat.id, source)}
+                    href={href(entry.id === "tumu" ? "tumu" : category, entry.id)}
                     prefetch={false}
                     aria-current={active ? "true" : undefined}
                     className={linkClass(active)}
                   >
-                    {cat.label}
+                    {entry.label}
                   </Link>
                 </li>
               );
@@ -106,14 +87,24 @@ export function StoreListing({
           </ul>
         </nav>
 
-        <SortSelect
-          value={sort}
-          options={SORT_OPTIONS.map((option) => ({
-            id: option.id,
-            label: option.label,
-            href: href(category, source, option.id),
-          }))}
-        />
+        <div className="flex flex-wrap items-end gap-x-7 gap-y-4">
+          <CategorySelect
+            value={category}
+            options={categories.map((cat) => ({
+              id: cat.id,
+              label: cat.label,
+              href: href(cat.id, source),
+            }))}
+          />
+          <SortSelect
+            value={sort}
+            options={SORT_OPTIONS.map((option) => ({
+              id: option.id,
+              label: option.label,
+              href: href(category, source, option.id),
+            }))}
+          />
+        </div>
       </div>
 
       <div className="pt-14">
