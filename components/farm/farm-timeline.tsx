@@ -25,6 +25,30 @@ import { farmTimeline } from "@/content/farm";
  * hydration.
  */
 
+/* Large year masthead above each state's copy, derived from the state's own
+   year/substep — no new content, only emphasis. The "03 / 07" counter is
+   positional information from the same data. */
+function YearMasthead({ index }: { index: number }) {
+  const entry = farmTimeline[index];
+  return (
+    <>
+      <div className="flex items-end justify-between gap-6">
+        <p
+          data-farm-timeline-year
+          className="font-theme-display text-6xl leading-none tracking-tight md:text-7xl"
+        >
+          {entry.year}
+        </p>
+        <p className="figure label text-olive">
+          {String(index + 1).padStart(2, "0")} /{" "}
+          {String(farmTimeline.length).padStart(2, "0")}
+        </p>
+      </div>
+      {entry.substep && <p className="label mt-3 text-ink/55">{entry.substep}</p>}
+    </>
+  );
+}
+
 function SyncedTimeline() {
   const [active, setActive] = useState(0);
   const figuresRef = useRef<(HTMLElement | null)[]>([]);
@@ -67,8 +91,9 @@ function SyncedTimeline() {
           {/* All seven texts share one grid cell so the tallest sets the
               height and swapping never moves the block. Hidden panels stay
               in layout (invisible, not display:none) but are inert and
-              excluded from the accessibility tree. The swap itself is the
-              existing short opacity treatment on the text only. */}
+              excluded from the accessibility tree. The swap is a soft
+              fade-through on the text only: opacity with a slight rise,
+              long enough to feel continuous while scrolling. */}
           <div className="grid">
             {farmTimeline.map((entry, index) => {
               const isActive = index === active;
@@ -79,13 +104,14 @@ function SyncedTimeline() {
                   data-index={index}
                   aria-hidden={!isActive}
                   inert={!isActive}
-                  className={`col-start-1 row-start-1 motion-safe:transition-opacity motion-safe:duration-300 ${
+                  className={`col-start-1 row-start-1 motion-safe:transition-all motion-safe:duration-500 motion-safe:ease-out ${
                     isActive
-                      ? "opacity-100"
-                      : "pointer-events-none invisible opacity-0"
+                      ? "translate-y-0 opacity-100"
+                      : "pointer-events-none invisible translate-y-3 opacity-0"
                   }`}
                 >
-                  <p className="label text-olive">{entry.eyebrow}</p>
+                  <YearMasthead index={index} />
+                  <p className="label mt-5 text-olive">{entry.eyebrow}</p>
                   <h3 className="mt-5 text-3xl tracking-tight md:text-4xl">
                     {entry.heading}
                   </h3>
@@ -152,7 +178,8 @@ function QuietTimeline() {
         <div key={entry.id} className="grid gap-14 md:grid-cols-12">
           <div className="md:col-span-5">
             <div data-farm-timeline-panel data-index={index}>
-              <p className="label text-olive">{entry.eyebrow}</p>
+              <YearMasthead index={index} />
+              <p className="label mt-5 text-olive">{entry.eyebrow}</p>
               <h3 className="mt-5 text-3xl tracking-tight md:text-4xl">
                 {entry.heading}
               </h3>

@@ -28,6 +28,12 @@ test("sticky farm text stays put while the figures scroll past in order", async 
   const sticky = page.locator("[data-farm-timeline-sticky]");
   await expect(sticky).toBeVisible();
 
+  // Soft fade-through on the text: half-second ease, not a hard cut.
+  const swapDuration = await page
+    .locator('[data-farm-timeline-panel][aria-hidden="false"]')
+    .evaluate((el) => getComputedStyle(el).transitionDuration);
+  expect(swapDuration).toContain("0.5s");
+
   const box = (selector: string) => page.evaluate((sel) => {
     const el = document.querySelector(sel);
     if (!el) return null;
@@ -69,8 +75,10 @@ test("sticky farm text stays put while the figures scroll past in order", async 
   expect(seen, "every state is reached, in order, exactly once").toEqual(states.map((s) => s[2]));
 
   // The sticky block holds its place: x never moves, and y/width/height are
-  // constant across every sample where it is stuck to the top offset.
-  const stuck = stickyBoxes.filter((b) => Math.abs(b.y - 128) < 12);
+  // constant across every sample where it is stuck to the top offset. The
+  // band is tight on purpose — samples from the section tail, where the
+  // block legitimately unsticks as its parent ends, must not count.
+  const stuck = stickyBoxes.filter((b) => Math.abs(b.y - 128) < 2);
   expect(stuck.length, "sticky block engages for most of the column").toBeGreaterThan(steps / 2);
   const baseline = stuck[0];
   for (const measured of stuck) {
@@ -96,8 +104,9 @@ test("every state and image is in the DOM up front, in order", async ({ page }) 
   const figures = page.locator("[data-farm-timeline-figure]");
   await expect(panels).toHaveCount(states.length);
   await expect(figures).toHaveCount(states.length);
-  for (const [index, [, , title, image]] of states.entries()) {
+  for (const [index, [year, , title, image]] of states.entries()) {
     await expect(panels.nth(index).locator("h3")).toHaveText(title);
+    await expect(panels.nth(index).locator("[data-farm-timeline-year]")).toHaveText(year);
     await expect(figures.nth(index).locator("img")).toHaveAttribute("src", new RegExp(encodeURIComponent(image)));
   }
 });
