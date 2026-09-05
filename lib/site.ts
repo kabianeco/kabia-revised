@@ -42,6 +42,10 @@ export const routes = {
   blogPost: (slug: string) => `/blog/${slug}`,
   producers: "/ureticiler",
   producer: (slug: string) => `/ureticiler/${slug}`,
+  // The Seçki grid is the brand-facing entry to the producers; /ureticiler
+  // stays as it is and remains the story route that Seçki links into.
+  secki: "/secki",
+  producerStore: (slug: string) => `/magaza/${slug}`,
   kabiaStandard: "/kabia-standardi",
   journal: "/gunluk",
   journalEntry: (slug: string) => `/gunluk/${slug}`,

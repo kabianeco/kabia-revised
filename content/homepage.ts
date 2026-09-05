@@ -59,13 +59,51 @@ export const manifesto = {
 } as const;
 
 /**
- * Section framing only. The rows themselves are the live catalogue, read from
- * Supabase by components/home/product-collection.tsx.
+ * The homepage introduces the three sources with one product each — it is not a
+ * storefront row. Price, stock, badges and purchase controls belong to the shop
+ * and the product page, never here.
+ *
+ * The slugs are curated rather than queried, so the section keeps the same three
+ * products regardless of what the catalogue is doing. They are the verified
+ * active rows: `kabuklu-badem`, `findik-ici` and `tarhana`. The name recorded
+ * here is the short display name; `findik-ici` ships under the name
+ * "Kabuklu Fındık", and that existing slug/name mismatch is left alone.
  */
 export const products = {
   title: "Ürünler",
+  statement: [
+    "Bizim toprağımızdan.",
+    "Tanıdığımız üreticilerden.",
+    "Üreticilerin mutfağından.",
+  ],
   intro:
-    "Kendi çiftliğimizden ve güvendiğimiz üreticilerden. Öne çıkan ürünler aşağıda; tamamı mağazada.",
+    "Kendi çiftliğimizden ve güvendiğimiz üreticilerden. Üç kaynak, üç ürün; tamamı mağazada.",
+  entries: [
+    {
+      source: "ciftlik",
+      sourceName: "Kabia Çiftliği",
+      name: "Kabuklu Badem",
+      slug: "kabuklu-badem",
+      image: "/images/kabia-badem.jpeg",
+      alt: "Kabia Çiftliği'nin kendi bahçesinden kabuklu badem",
+    },
+    {
+      source: "secki",
+      sourceName: "Kabia Seçki",
+      name: "Kabuklu Fındık",
+      slug: "findik-ici",
+      image: "/images/findik1.jpeg",
+      alt: "Güvendiğimiz üreticiden gelen kabuklu fındık",
+    },
+    {
+      source: "mutfak",
+      sourceName: "Kabia Mutfak",
+      name: "Tarhana",
+      slug: "tarhana",
+      image: "/images/tarhana1.jpeg",
+      alt: "Üreticinin mutfağında geleneksel yöntemle hazırlanan tarhana",
+    },
+  ],
 } as const;
 
 export const origin = {

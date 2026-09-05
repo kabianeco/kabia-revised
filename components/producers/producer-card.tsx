@@ -1,33 +1,103 @@
 import Image from "next/image"
 import Link from "next/link"
+import { ButtonLink } from "@/components/ui/button"
 import { routes } from "@/lib/site"
 import type { Producer } from "@/lib/producers"
+
+type CardProducer = Omit<Producer, "createdAt"> & { desc?: string }
+
+function CardImage({ producer, priority }: { producer: CardProducer; priority: boolean }) {
+  return (
+    <div className="relative aspect-[4/3] overflow-hidden rounded-media bg-paper">
+      {producer.photoUrl ? (
+        <Image
+          src={producer.photoUrl}
+          alt={producer.name}
+          fill
+          priority={priority}
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+        />
+      ) : (
+        <div className="flex h-full items-center justify-center">
+          <span className="label text-olive">Fotoğraf hazırlanıyor</span>
+        </div>
+      )}
+    </div>
+  )
+}
 
 /**
  * One entry in the /ureticiler grid — the same editorial language as
  * components/blog/post-card.tsx and components/shop/product-entry.tsx: the
  * image sits directly on the page, a hairline carries the metadata.
+ *
+ * The `secki` variant reorders the same markup for /secki — image, one line of
+ * copy, product type, then two explicit destinations. It cannot wrap the tile
+ * in a link the way the default does, because the two buttons would then be
+ * nested inside it, so on that variant only the image is the passive link and
+ * the buttons carry the real navigation.
  */
-export function ProducerCard({ producer, priority = false }: { producer: Omit<Producer, "createdAt">; priority?: boolean }) {
+export function ProducerCard({
+  producer,
+  priority = false,
+  variant = "default",
+}: {
+  producer: CardProducer
+  priority?: boolean
+  variant?: "default" | "secki"
+}) {
+  if (variant === "secki") {
+    return (
+      <li className="group flex flex-col">
+        <Link
+          href={routes.producer(producer.slug)}
+          prefetch={false}
+          tabIndex={-1}
+          aria-hidden="true"
+          className="block"
+        >
+          <CardImage producer={producer} priority={priority} />
+        </Link>
+
+        <div className="mt-5 flex flex-1 flex-col border-t border-ink/10 pt-4">
+          <h2 className="text-xl leading-snug tracking-tight">{producer.name}</h2>
+          {producer.desc && (
+            <p className="mt-2 text-sm leading-relaxed text-ink/60">{producer.desc}</p>
+          )}
+          {producer.productType && (
+            <p className="label mt-3 text-olive">{producer.productType}</p>
+          )}
+
+          <div className="mt-5 flex flex-wrap gap-3">
+            <ButtonLink
+              href={routes.producer(producer.slug)}
+              prefetch={false}
+              variant="outline"
+              size="sm"
+            >
+              Hikâyeyi Gör
+              <span className="sr-only"> — {producer.name}</span>
+            </ButtonLink>
+            <ButtonLink
+              href={routes.producerStore(producer.slug)}
+              prefetch={false}
+              variant="outline"
+              size="sm"
+            >
+              Mağazada Gör
+              <span className="sr-only"> — {producer.name}</span>
+            </ButtonLink>
+          </div>
+        </div>
+      </li>
+    )
+  }
+
   return (
     <li className="group">
       <Link href={routes.producer(producer.slug)} prefetch={false} className="block">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-media bg-paper">
-          {producer.photoUrl ? (
-            <Image
-              src={producer.photoUrl}
-              alt={producer.name}
-              fill
-              priority={priority}
-              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center">
-              <span className="label text-olive">Fotoğraf hazırlanıyor</span>
-            </div>
-          )}
-        </div>
+        <CardImage producer={producer} priority={priority} />
 
         <div className="mt-5 border-t border-ink/10 pt-4">
           {producer.productType && <p className="label text-olive">{producer.productType}</p>}

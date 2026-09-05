@@ -204,3 +204,84 @@ test("store category pair, sorting, mobile disclosure and stock controls share o
   await store.locator('summary').click();
   await expect(store.getByRole('link', { name: 'Varsayılan', exact: true })).toBeVisible();
 });
+
+test("homepage introduces three sources with three product links and no commerce", async ({ page }) => {
+  await page.goto("/");
+  const intro = page.locator("#urunler");
+  await expect(intro).toBeVisible();
+
+  // The three lines are one heading split by <br>, so assert on its text.
+  const statement = (await intro.getByRole("heading", { level: 2 }).first().textContent()) ?? "";
+  for (const line of ["Bizim toprağımızdan.", "Tanıdığımız üreticilerden.", "Üreticilerin mutfağından."]) {
+    expect(statement).toContain(line);
+  }
+
+  const links = intro.locator('a[href^="/shop/"]');
+  await expect(links).toHaveCount(3);
+  const hrefs = await links.evaluateAll(nodes => nodes.map(n => n.getAttribute("href")));
+  expect(hrefs).toEqual(previewEnabled
+    ? ["/shop/onizleme-kabia-ciftligi", "/shop/onizleme-geyce-setce-findik", "/shop/onizleme-domates-salcasi"]
+    : ["/shop/kabuklu-badem", "/shop/findik-ici", "/shop/tarhana"]);
+
+  for (const name of ["Kabia Çiftliği", "Kabia Seçki", "Kabia Mutfak"]) {
+    await expect(intro.getByText(name, { exact: true })).toBeVisible();
+  }
+
+  const text = (await intro.textContent()) ?? "";
+  expect(text).not.toMatch(/₺\d/);
+  expect(text).not.toMatch(/Sepete/);
+  await expect(intro.getByRole("button")).toHaveCount(0);
+});
+
+test("secki grid shows the four producers at every breakpoint with distinct destinations", async ({ page }) => {
+  const slugs = ["geyce-setce-findik", "ege-ceviz", "anadolu-bal", "akinci-ihlamur"];
+  const response = await page.goto("/secki");
+  expect(response?.status()).toBe(200);
+
+  const cards = page.locator("#secki-heading ~ * li, section li").filter({ has: page.getByRole("link", { name: /Hikâyeyi Gör/ }) });
+  await expect(cards).toHaveCount(4);
+
+  for (const slug of slugs) {
+    await expect(page.locator(`a[href="/ureticiler/${slug}"]`).first()).toBeVisible();
+    await expect(page.locator(`a[href="/magaza/${slug}"]`)).toHaveCount(1);
+  }
+
+  // No farm or kitchen record leaked in through an exclusion filter.
+  for (const absent of ["kabia-ciftligi", "alic-sirkesi", "tarhana"]) {
+    await expect(page.locator(`a[href="/magaza/${absent}"]`)).toHaveCount(0);
+  }
+
+  // Accessible names stay distinct per producer, so the two buttons on each
+  // card are not four identically-named links.
+  await expect(page.getByRole("link", { name: /^Hikâyeyi Gör — / })).toHaveCount(4);
+  await expect(page.getByRole("link", { name: /^Mağazada Gör — / })).toHaveCount(4);
+
+  for (const width of [390, 768, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(cards.first()).toBeVisible();
+    const columns = await page.locator("#secki-heading").evaluate(() => {
+      const list = document.querySelector("section ul");
+      return list ? getComputedStyle(list).gridTemplateColumns.split(" ").length : 0;
+    });
+    expect(columns).toBe(width >= 1024 ? 3 : width >= 640 ? 2 : 1);
+  }
+});
+
+test("header offers Çiftlik and Seçki and keeps Üreticiler and Günlük in the footer", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  const header = page.getByRole("navigation", { name: "Ana menü" });
+  // Exactly one link per label: the farm section anchor was removed so that
+  // "Çiftlik" is not ambiguous between /ciftlik and #ciftlik.
+  await expect(header.getByRole("link", { name: "Çiftlik", exact: true })).toHaveCount(1);
+  await expect(header.getByRole("link", { name: "Çiftlik", exact: true })).toHaveAttribute("href", "/ciftlik");
+  await expect(header.getByRole("link", { name: "Seçki", exact: true })).toHaveCount(1);
+  await expect(header.getByRole("link", { name: "Seçki", exact: true })).toHaveAttribute("href", "/secki");
+  await expect(header.getByRole("link", { name: "Üreticiler", exact: true })).toHaveCount(0);
+  await expect(header.getByRole("link", { name: "Günlük", exact: true })).toHaveCount(0);
+
+  const footer = page.locator("footer");
+  for (const [label, href] of [["Seçki", "/secki"], ["Üreticiler", "/ureticiler"], ["Günlük", "/gunluk"]] as const) {
+    await expect(footer.getByRole("link", { name: label, exact: true })).toHaveAttribute("href", href);
+  }
+});

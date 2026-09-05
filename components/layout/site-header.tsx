@@ -11,8 +11,10 @@ import { useAuth } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
+/* The farm anchor is deliberately absent: /ciftlik now carries the farm story
+   in full, and the homepage section is only its short introduction, so keeping
+   both would put two links labelled "Çiftlik" in the same nav. */
 const sectionItems = [
-  { label: "Çiftlik", anchor: anchors.farm },
   { label: "Yaklaşım", anchor: anchors.approach },
   { label: "İletişim", anchor: anchors.contact },
 ];
@@ -140,6 +142,26 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
             Mağaza
           </Link>
           <Link
+            href={routes.farm}
+            prefetch={false}
+            aria-current={pathname.startsWith(routes.farm) ? "page" : undefined}
+            className={`text-sm transition-colors duration-300 hover:text-ink ${
+              pathname.startsWith(routes.farm) ? "text-ink" : "text-ink/70"
+            }`}
+          >
+            Çiftlik
+          </Link>
+          <Link
+            href={routes.secki}
+            prefetch={false}
+            aria-current={pathname.startsWith(routes.secki) ? "page" : undefined}
+            className={`text-sm transition-colors duration-300 hover:text-ink ${
+              pathname.startsWith(routes.secki) ? "text-ink" : "text-ink/70"
+            }`}
+          >
+            Seçki
+          </Link>
+          <Link
             href={routes.blog}
             prefetch={false}
             aria-current={pathname.startsWith(routes.blog) ? "page" : undefined}
@@ -228,6 +250,22 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
               className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
             >
               Mağaza
+            </Link>
+            <Link
+              href={routes.farm}
+              prefetch={false}
+              onClick={() => close(false)}
+              className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
+            >
+              Çiftlik
+            </Link>
+            <Link
+              href={routes.secki}
+              prefetch={false}
+              onClick={() => close(false)}
+              className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
+            >
+              Seçki
             </Link>
             <Link
               href={routes.blog}

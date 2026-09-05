@@ -98,10 +98,22 @@ describe("shop is backed by real data", () => {
     assert.match(body, /Kavrulmuş/);
   });
 
-  it("connects the homepage product ledger to the catalogue", async () => {
+  it("introduces the three sources with three product links and no commerce", async () => {
     const { body } = await get("/");
-    assert.match(body, /href="\/shop\//, "homepage has no links into the shop");
-    assert.match(body, /₺\d/, "homepage ledger shows no real prices");
+    const section = body.slice(body.indexOf('id="urunler"'));
+    const end = section.indexOf("</section>");
+    const intro = end === -1 ? section : section.slice(0, end);
+
+    const productLinks = [...intro.matchAll(/href="\/shop\/([^"]+)"/g)].map((m) => m[1]);
+    assert.equal(productLinks.length, 3, `expected three product links, got ${productLinks.length}`);
+
+    for (const line of ["Bizim toprağımızdan.", "Tanıdığımız üreticilerden.", "Üreticilerin mutfağından."]) {
+      assert.ok(intro.includes(line), `intro section is missing the line: ${line}`);
+    }
+
+    assert.doesNotMatch(intro, /₺\d/, "the intro section must not show prices");
+    assert.doesNotMatch(intro, /Sepete/, "the intro section must not offer add-to-cart");
+    assert.doesNotMatch(intro, /Stok|stokta/, "the intro section must not show stock state");
   });
 });
 

@@ -46,6 +46,7 @@ const farmItems = [
 const selectionItems = [
   { label: "Ürünler", href: homeAnchor(anchors.products) },
   { label: "Mağaza", href: routes.store },
+  { label: "Seçki", href: routes.secki },
   { label: "Üreticiler", href: routes.producers },
   { label: "Kabia Standardı", href: routes.kabiaStandard },
 ];

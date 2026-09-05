@@ -1,5 +1,7 @@
 import { manifesto } from "@/content/homepage";
 import { Reveal } from "@/components/motion/reveal";
+import { ArrowLink } from "@/components/ui/button";
+import { routes } from "@/lib/site";
 
 export function BrandManifesto() {
   return (
@@ -28,6 +30,9 @@ export function BrandManifesto() {
             <p className="max-w-xs text-sm leading-relaxed text-ink/60">
               {manifesto.body}
             </p>
+            <div className="mt-6">
+              <ArrowLink href={routes.secki}>Seçkiyi gör</ArrowLink>
+            </div>
           </Reveal>
         </div>
       </div>
