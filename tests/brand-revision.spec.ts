@@ -10,65 +10,95 @@ const states = [
   ["2025", "Don", "Dört gün, dört gece — tam çiçekte yakalandık.", "marinada-2025-don.jpeg"],
 ] as const;
 
-for (const width of [390, 1280]) {
-  test(`farm states preserve stage/image/approach geometry at ${width}px`, async ({ page }) => {
-    await page.setViewportSize({ width, height: 900 });
-    const response = await page.goto("/ciftlik");
-    expect(response?.status()).toBe(200);
-    await page.evaluate(() => document.fonts.ready);
-    const stage = page.locator("[data-farm-timeline-stage]");
-    await expect(stage).toBeVisible();
-    await expect(page.getByRole("button", { name: "2019", exact: true })).toHaveAttribute("aria-pressed", "true");
-    const geometry = () => page.evaluate(() => {
-      const box = (selector: string) => {
-        const rect = document.querySelector(selector)!.getBoundingClientRect();
-        return { y: rect.y + window.scrollY, height: rect.height };
-      };
-      return {
-        stage: box("[data-farm-timeline-stage]"),
-        image: box('[data-farm-timeline-panel][aria-hidden="false"] [data-farm-timeline-image]'),
-        substeps: box("[data-farm-timeline-substeps]"),
-        approach: box("[data-farm-approach]"),
-      };
-    });
-    const baseline = await geometry();
-    for (const [year, substep, title, image] of states) {
-      await page.getByRole("button", { name: year, exact: true }).click();
-      if (substep) await page.getByRole("button", { name: substep, exact: true }).click();
-      const active = page.locator('[data-farm-timeline-panel][aria-hidden="false"]');
-      await expect(active.getByRole("heading")).toHaveText(title);
-      await expect(active.locator("img")).toHaveAttribute("src", new RegExp(encodeURIComponent(image)));
-      await expect.poll(() => active.locator("img").evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
-      const measured = await geometry();
-      for (const part of ["stage", "image", "substeps", "approach"] as const) {
-        expect(measured[part].height, `${year}/${substep} ${part} height`).toBeCloseTo(baseline[part].height, 1);
-        expect(measured[part].y, `${year}/${substep} ${part} y`).toBeCloseTo(baseline[part].y, 1);
-      }
-      for (const panel of await page.locator('[data-farm-timeline-panel][aria-hidden="true"]').all()) {
-        await expect(panel).toHaveAttribute("inert", "");
-      }
-    }
-    await expect(page.getByRole("button", { name: "2026", exact: true })).toHaveCount(0);
-    await expect(page.locator("[data-farm-approach]").getByRole("link")).toHaveAttribute("href", "/toprak");
-  });
-}
+test("pinned farm stage advances through all seven states on scroll without moving", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const response = await page.goto("/ciftlik");
+  expect(response?.status()).toBe(200);
+  await page.evaluate(() => document.fonts.ready);
 
-test("farm keyboard selection and reduced motion keep inactive controls inaccessible", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
+  const stage = page.locator("[data-farm-timeline-stage]");
+  await expect(stage).toBeVisible();
+  await expect(page.locator("[data-farm-timeline-panel]")).toHaveCount(states.length);
+  // No control surface survives: the years advance by scrolling, not clicking.
+  await expect(stage.getByRole("button")).toHaveCount(0);
+
+  const geometry = () => page.evaluate(() => {
+    const box = (el: Element | null) => {
+      if (!el) return null;
+      const rect = el.getBoundingClientRect();
+      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+    };
+    const active = document.querySelector('[data-farm-timeline-panel][aria-hidden="false"]');
+    return {
+      heading: box(active?.querySelector("h3") ?? null),
+      image: box(active?.querySelector("[data-farm-timeline-image]") ?? null),
+    };
+  });
+
+  const seen: string[] = [];
+  let baseline: Awaited<ReturnType<typeof geometry>> | null = null;
+
+  const wrapper = await stage.evaluateHandle((el) => el.closest("div.relative")!);
+  const span = await wrapper.evaluate((el) => (el as HTMLElement).getBoundingClientRect().height);
+  const top = await wrapper.evaluate((el) => (el as HTMLElement).getBoundingClientRect().top + window.scrollY);
+
+  // Walk the pinned range and record every state the stage settles on.
+  for (let step = 0; step <= 48; step++) {
+    await page.evaluate(
+      ([y]) => window.scrollTo(0, y),
+      [top + (span - 900) * (step / 48)] as const,
+    );
+    await page.waitForTimeout(60);
+    const active = page.locator('[data-farm-timeline-panel][aria-hidden="false"]');
+    if ((await active.count()) !== 1) continue;
+    const title = (await active.locator("h3").textContent())?.trim() ?? "";
+    if (title && seen[seen.length - 1] !== title) seen.push(title);
+
+    const measured = await geometry();
+    if (!measured.heading || !measured.image) continue;
+    if (!baseline) { baseline = measured; continue; }
+    // The text block and the image frame hold their place across every state.
+    for (const part of ["heading", "image"] as const) {
+      expect(measured[part]!.x, `${title} ${part} x`).toBeCloseTo(baseline[part]!.x, 0);
+      expect(measured[part]!.y, `${title} ${part} y`).toBeCloseTo(baseline[part]!.y, 0);
+      expect(measured[part]!.width, `${title} ${part} width`).toBeCloseTo(baseline[part]!.width, 0);
+    }
+  }
+
+  expect(seen, "every state is reached, in order, exactly once").toEqual(states.map((s) => s[2]));
+  await expect(page.getByText("2026", { exact: true })).toHaveCount(0);
+  await expect(page.locator("[data-farm-approach]").getByRole("link")).toHaveAttribute("href", "/toprak");
+});
+
+test("every state and image is in the DOM up front, in order", async ({ page }) => {
   await page.goto("/ciftlik");
-  const year = page.getByRole("button", { name: "2025", exact: true });
-  await year.focus();
-  await page.keyboard.press("Enter");
-  await expect(page.getByRole("button", { name: "Erken bahar", exact: true })).toHaveAttribute("aria-pressed", "true");
-  const frost = page.getByRole("button", { name: "Don", exact: true });
-  await frost.focus();
-  await page.keyboard.press("Space");
-  await expect(frost).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "2019", exact: true }).focus();
-  await page.keyboard.press("Enter");
-  await expect(page.locator("[data-farm-timeline-substeps]")).toHaveAttribute("inert", "");
-  const active = page.locator('[data-farm-timeline-panel][aria-hidden="false"]');
-  expect(await active.evaluate((el) => getComputedStyle(el).transitionProperty)).toBe("none");
+  const panels = page.locator("[data-farm-timeline-panel]");
+  await expect(panels).toHaveCount(states.length);
+  for (const [index, [, , title, image]] of states.entries()) {
+    const panel = panels.nth(index);
+    await expect(panel.locator("h3")).toHaveText(title);
+    await expect(panel.locator("img")).toHaveAttribute("src", new RegExp(encodeURIComponent(image)));
+  }
+});
+
+test("reduced motion and narrow screens get the full chronology, stacked and unfaded", async ({ page }) => {
+  for (const [width, reducedMotion] of [[1280, "reduce"], [390, "no-preference"]] as const) {
+    await page.emulateMedia({ reducedMotion });
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/ciftlik");
+    await page.evaluate(() => document.fonts.ready);
+
+    const panels = page.locator("[data-farm-timeline-panel]");
+    await expect(panels).toHaveCount(states.length);
+    // Nothing hidden, nothing faded, nothing pinned — all seven are readable.
+    await expect(page.locator('[data-farm-timeline-panel][aria-hidden="true"]')).toHaveCount(0);
+    for (const [index, [, , title]] of states.entries()) {
+      await expect(panels.nth(index).locator("h3")).toHaveText(title);
+      const opacity = await panels.nth(index).evaluate((el) => getComputedStyle(el).opacity);
+      expect(Number(opacity), `${title} opacity at ${width}px`).toBe(1);
+    }
+    await expect(page.locator("[data-farm-timeline-stage]").getByRole("button")).toHaveCount(0);
+  }
 });
 
 test.beforeEach(async ({ request }) => { await request.get("http://localhost:3441/__test/reset"); });
