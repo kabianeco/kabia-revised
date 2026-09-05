@@ -52,7 +52,6 @@ const selectionItems = [
 ];
 
 const kabiaItems = [
-  { label: "Blog", href: routes.blog },
   { label: "Günlük", href: routes.journal },
   { label: "İletişim", href: homeAnchor(anchors.contact) },
 ];

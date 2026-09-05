@@ -312,3 +312,24 @@ test("admin blog surfaces are gone while every other admin route keeps its respo
     expect(response.status(), `${route} changed response`).toBe(expected);
   }
 });
+
+test("public blog is gone while the journal, soil and producer pages survive", async ({ page }) => {
+  for (const removed of ["/blog", "/blog/herhangi-bir-yazi", "/blog/rss.xml"]) {
+    const response = await page.request.get(removed, { maxRedirects: 0 });
+    expect(response.status(), `${removed} should be gone`).toBe(404);
+  }
+
+  await page.goto("/");
+  await expect(page.locator('a[href^="/blog"]')).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Blog", exact: true })).toHaveCount(0);
+
+  for (const kept of ["/gunluk", "/toprak", "/ciftlik", "/secki", "/ureticiler", "/magaza"]) {
+    const response = await page.request.get(kept, { maxRedirects: 0 });
+    expect(response.status(), `${kept} must survive`).toBe(200);
+  }
+
+  const sitemap = await (await page.request.get("/sitemap.xml")).text();
+  expect(sitemap).not.toContain("/blog");
+  expect(sitemap).not.toContain("onizleme-");
+  expect(sitemap).toContain("/secki");
+});

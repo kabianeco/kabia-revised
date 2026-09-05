@@ -1,6 +1,6 @@
 import { describe, it } from "node:test"
 import assert from "node:assert/strict"
-import { readdirSync, existsSync } from "node:fs"
+import { existsSync } from "node:fs"
 
 import { ADMIN_NAV } from "../lib/admin/nav.ts"
 import { PERMISSIONS } from "../lib/admin/roles.ts"
@@ -55,8 +55,9 @@ describe("admin blog removal", () => {
     }
   })
 
-  it("keeps the public blog until its own commit", () => {
-    assert.ok(existsSync("app/blog"), "public blog routes are removed in a later commit")
-    assert.ok(readdirSync("lib/blog").length > 0, "lib/blog survives the admin-only removal")
+  it("leaves no blog code anywhere once the public surfaces are gone too", () => {
+    for (const path of ["app/blog", "components/blog", "lib/blog"]) {
+      assert.equal(existsSync(path), false, `${path} should be deleted`)
+    }
   })
 })

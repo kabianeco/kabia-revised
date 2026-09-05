@@ -14,7 +14,7 @@ import { previewProducts } from "@/content/preview-products"
 import { isBrandPreview } from "@/lib/brand-preview"
 import { routes } from "@/lib/site"
 
-/** One React cache() read per request, shared between generateMetadata and the page body — same pattern as the blog detail page. */
+/** One React cache() read per request, shared between generateMetadata and the page body. */
 const getProducer = cache(async (slug: string) => {
   if (isBrandPreview()) {
     const producer = sourceProducers.find((producer) => producer.slug === slug)

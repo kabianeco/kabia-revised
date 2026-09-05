@@ -55,7 +55,6 @@ describe("public routes render", () => {
     ["/sepet", "cart"],
     ["/giris", "sign in"],
     ["/kayit", "sign up"],
-    ["/blog", "journal"],
     ["/odeme", "checkout"],
   ];
 

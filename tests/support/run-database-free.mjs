@@ -5,7 +5,6 @@ const files = [
   "admin-access", "admin-authorization", "admin-logging", "admin-url-settings",
   "auth-rate-limit", "order-state-machine", "security-headers", "shop-banner",
   "theme-engine-resolver", "theme-preview-cookie", "theme-editor-ui",
-  "blog-content", "blog-slug", "blog-preview-cookie",
   "farm-content", "admin-nav", "brand-preview", "preview-identity", "preview-order-boundary", "store-listing",
 ].map(name => `tests/${name}.test.ts`);
 files.push("tests/client-boundary.test.js");

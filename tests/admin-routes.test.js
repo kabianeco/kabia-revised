@@ -155,7 +155,7 @@ describe("the unauthorized screen", () => {
 })
 
 describe("the public store is unaffected by the admin work", () => {
-  const routes = ["/", "/shop", "/magaza", "/sepet", "/giris", "/kayit", "/blog", "/odeme"]
+  const routes = ["/", "/shop", "/magaza", "/sepet", "/giris", "/kayit", "/secki", "/odeme"]
 
   for (const route of routes) {
     it(`${route} still responds 200`, async () => {

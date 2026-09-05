@@ -55,7 +55,7 @@ export type ProducerBySlugResult =
   | { status: "not_found" }
   | { status: "error" }
 
-/** Distinguishes "no such producer" from "the database could not be read", same as the blog's slug lookup. */
+/** Distinguishes "no such producer" from "the database could not be read". */
 export async function fetchPublishedProducerBySlug(
   client: SupabaseClient,
   slug: string,

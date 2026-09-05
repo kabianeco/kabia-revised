@@ -38,8 +38,6 @@ export const routes = {
   home: "/",
   store: "/magaza",
   product: (slug: string) => `/shop/${slug}`,
-  blog: "/blog",
-  blogPost: (slug: string) => `/blog/${slug}`,
   producers: "/ureticiler",
   producer: (slug: string) => `/ureticiler/${slug}`,
   // The Seçki grid is the brand-facing entry to the producers; /ureticiler

@@ -14,7 +14,7 @@ import { validateSettingUrl, HREF_SETTING_KEYS, IMAGE_SETTING_KEYS } from "../li
 describe("SEC-06 site-setting URL validation", () => {
   describe("accepts intended values", () => {
     it("accepts same-origin relative path for href and image sinks", () => {
-      assert.equal(validateSettingUrl("/blog/foo", "shop_banner_cta_href").ok, true)
+      assert.equal(validateSettingUrl("/secki", "shop_banner_cta_href").ok, true)
       assert.equal(validateSettingUrl("/images/almonds.jpg", "seo_social_image").ok, true)
       assert.equal(validateSettingUrl("/shop", "shop_banner_image_url").ok, true)
     })

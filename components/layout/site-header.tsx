@@ -161,16 +161,6 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
           >
             Seçki
           </Link>
-          <Link
-            href={routes.blog}
-            prefetch={false}
-            aria-current={pathname.startsWith(routes.blog) ? "page" : undefined}
-            className={`text-sm transition-colors duration-300 hover:text-ink ${
-              pathname.startsWith(routes.blog) ? "text-ink" : "text-ink/70"
-            }`}
-          >
-            Blog
-          </Link>
 
           {sectionItems.map((item) => (
             <a
@@ -266,14 +256,6 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
               className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
             >
               Seçki
-            </Link>
-            <Link
-              href={routes.blog}
-              prefetch={false}
-              onClick={() => close(false)}
-              className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
-            >
-              Blog
             </Link>
 
             {sectionItems.map((item) => (
