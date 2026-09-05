@@ -10,7 +10,7 @@ const states = [
   ["2025", "Don", "Dört gün, dört gece — tam çiçekte yakalandık.", "marinada-2025-don.jpeg"],
 ] as const;
 
-test("pinned farm stage advances through all seven states on scroll without moving", async ({ page }) => {
+test("sticky farm text stays put while the figures scroll past in order", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   const response = await page.goto("/ciftlik");
   expect(response?.status()).toBe(200);
@@ -18,66 +18,87 @@ test("pinned farm stage advances through all seven states on scroll without movi
 
   const stage = page.locator("[data-farm-timeline-stage]");
   await expect(stage).toBeVisible();
+  await expect(stage).toHaveAttribute("data-mode", "synced");
   await expect(page.locator("[data-farm-timeline-panel]")).toHaveCount(states.length);
+  await expect(page.locator("[data-farm-timeline-figure]")).toHaveCount(states.length);
+  await expect(page.locator("[data-farm-timeline-image]")).toHaveCount(states.length);
   // No control surface survives: the years advance by scrolling, not clicking.
   await expect(stage.getByRole("button")).toHaveCount(0);
 
-  const geometry = () => page.evaluate(() => {
-    const box = (el: Element | null) => {
-      if (!el) return null;
-      const rect = el.getBoundingClientRect();
-      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-    };
-    const active = document.querySelector('[data-farm-timeline-panel][aria-hidden="false"]');
-    return {
-      heading: box(active?.querySelector("h3") ?? null),
-      image: box(active?.querySelector("[data-farm-timeline-image]") ?? null),
-    };
+  const sticky = page.locator("[data-farm-timeline-sticky]");
+  await expect(sticky).toBeVisible();
+
+  const box = (selector: string) => page.evaluate((sel) => {
+    const el = document.querySelector(sel);
+    if (!el) return null;
+    const rect = el.getBoundingClientRect();
+    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+  }, selector);
+
+  const stageInfo = await stage.evaluate((el) => {
+    const rect = (el as HTMLElement).getBoundingClientRect();
+    return { top: rect.top + window.scrollY, height: rect.height };
   });
 
   const seen: string[] = [];
-  let baseline: Awaited<ReturnType<typeof geometry>> | null = null;
+  const stickyBoxes: { x: number; y: number; width: number; height: number }[] = [];
+  const firstFigureYs: number[] = [];
 
-  const wrapper = await stage.evaluateHandle((el) => el.closest("div.relative")!);
-  const span = await wrapper.evaluate((el) => (el as HTMLElement).getBoundingClientRect().height);
-  const top = await wrapper.evaluate((el) => (el as HTMLElement).getBoundingClientRect().top + window.scrollY);
-
-  // Walk the pinned range and record every state the stage settles on.
-  for (let step = 0; step <= 48; step++) {
-    await page.evaluate(
-      ([y]) => window.scrollTo(0, y),
-      [top + (span - 900) * (step / 48)] as const,
-    );
-    await page.waitForTimeout(60);
+  // Walk the whole column from just above it to just below it. The sticky
+  // block should hold its viewport position while the figures move past.
+  const steps = 60;
+  const start = stageInfo.top - 200;
+  const distance = stageInfo.height - 900 + 400;
+  for (let step = 0; step <= steps; step++) {
+    await page.evaluate(([y]) => window.scrollTo(0, y), [start + (distance * step) / steps] as const);
+    await page.waitForTimeout(100);
     const active = page.locator('[data-farm-timeline-panel][aria-hidden="false"]');
-    if ((await active.count()) !== 1) continue;
-    const title = (await active.locator("h3").textContent())?.trim() ?? "";
-    if (title && seen[seen.length - 1] !== title) seen.push(title);
-
-    const measured = await geometry();
-    if (!measured.heading || !measured.image) continue;
-    if (!baseline) { baseline = measured; continue; }
-    // The text block and the image frame hold their place across every state.
-    for (const part of ["heading", "image"] as const) {
-      expect(measured[part]!.x, `${title} ${part} x`).toBeCloseTo(baseline[part]!.x, 0);
-      expect(measured[part]!.y, `${title} ${part} y`).toBeCloseTo(baseline[part]!.y, 0);
-      expect(measured[part]!.width, `${title} ${part} width`).toBeCloseTo(baseline[part]!.width, 0);
+    if ((await active.count()) === 1) {
+      const title = (await active.locator("h3").textContent())?.trim() ?? "";
+      if (title && seen[seen.length - 1] !== title) seen.push(title);
     }
+    const stickyBox = await box("[data-farm-timeline-sticky]");
+    if (stickyBox) stickyBoxes.push(stickyBox);
+    const figureBox = await page.evaluate(() => {
+      const figure = document.querySelector('[data-farm-timeline-figure][data-index="0"]');
+      return figure ? figure.getBoundingClientRect().y : null;
+    });
+    if (figureBox !== null) firstFigureYs.push(figureBox);
   }
 
   expect(seen, "every state is reached, in order, exactly once").toEqual(states.map((s) => s[2]));
+
+  // The sticky block holds its place: x never moves, and y/width/height are
+  // constant across every sample where it is stuck to the top offset.
+  const stuck = stickyBoxes.filter((b) => Math.abs(b.y - 128) < 12);
+  expect(stuck.length, "sticky block engages for most of the column").toBeGreaterThan(steps / 2);
+  const baseline = stuck[0];
+  for (const measured of stuck) {
+    expect(measured.x, "sticky x").toBeCloseTo(baseline.x, 0);
+    expect(measured.y, "sticky y").toBeCloseTo(baseline.y, 0);
+    expect(measured.width, "sticky width").toBeCloseTo(baseline.width, 0);
+    expect(measured.height, "sticky height never jumps between years").toBeCloseTo(baseline.height, 0);
+  }
+
+  // The figures really scroll: the first one travels well past the viewport
+  // while the sticky block stays where it is.
+  expect(firstFigureYs.length).toBeGreaterThan(0);
+  expect(firstFigureYs[0] - firstFigureYs[firstFigureYs.length - 1], "first figure scrolls past").toBeGreaterThan(500);
+
   await expect(page.getByText("2026", { exact: true })).toHaveCount(0);
   await expect(page.locator("[data-farm-approach]").getByRole("link")).toHaveAttribute("href", "/toprak");
 });
 
 test("every state and image is in the DOM up front, in order", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/ciftlik");
   const panels = page.locator("[data-farm-timeline-panel]");
+  const figures = page.locator("[data-farm-timeline-figure]");
   await expect(panels).toHaveCount(states.length);
+  await expect(figures).toHaveCount(states.length);
   for (const [index, [, , title, image]] of states.entries()) {
-    const panel = panels.nth(index);
-    await expect(panel.locator("h3")).toHaveText(title);
-    await expect(panel.locator("img")).toHaveAttribute("src", new RegExp(encodeURIComponent(image)));
+    await expect(panels.nth(index).locator("h3")).toHaveText(title);
+    await expect(figures.nth(index).locator("img")).toHaveAttribute("src", new RegExp(encodeURIComponent(image)));
   }
 });
 
@@ -88,17 +109,65 @@ test("reduced motion and narrow screens get the full chronology, stacked and unf
     await page.goto("/ciftlik");
     await page.evaluate(() => document.fonts.ready);
 
+    const stage = page.locator("[data-farm-timeline-stage]");
+    await expect(stage).toHaveAttribute("data-mode", "quiet");
     const panels = page.locator("[data-farm-timeline-panel]");
+    const figures = page.locator("[data-farm-timeline-figure]");
     await expect(panels).toHaveCount(states.length);
-    // Nothing hidden, nothing faded, nothing pinned — all seven are readable.
+    await expect(figures).toHaveCount(states.length);
+    // Nothing hidden, nothing faded, nothing sticky-swapped — all seven are readable.
     await expect(page.locator('[data-farm-timeline-panel][aria-hidden="true"]')).toHaveCount(0);
+    await expect(page.locator("[data-farm-timeline-sticky]")).toHaveCount(0);
     for (const [index, [, , title]] of states.entries()) {
       await expect(panels.nth(index).locator("h3")).toHaveText(title);
       const opacity = await panels.nth(index).evaluate((el) => getComputedStyle(el).opacity);
       expect(Number(opacity), `${title} opacity at ${width}px`).toBe(1);
     }
-    await expect(page.locator("[data-farm-timeline-stage]").getByRole("button")).toHaveCount(0);
+    await expect(stage.getByRole("button")).toHaveCount(0);
+
+    if (width < 768) {
+      // Mobile is a plain stacked sequence: each year text above its image.
+      for (const [index, [, , title]] of states.entries()) {
+        const positions = await page.evaluate((i) => {
+          const panel = document.querySelector(`[data-farm-timeline-panel][data-index="${i}"]`);
+          const figure = document.querySelector(`[data-farm-timeline-figure][data-index="${i}"]`);
+          if (!panel || !figure) return null;
+          const panelRect = panel.getBoundingClientRect();
+          const figureRect = figure.getBoundingClientRect();
+          const panelTop = panelRect.top + window.scrollY;
+          const figureTop = figureRect.top + window.scrollY;
+          return { panelTop, figureTop, panelBottom: panelTop + panelRect.height };
+        }, index);
+        expect(positions, `${title} positions`).not.toBeNull();
+        expect(positions!.panelTop, `${title} text above its image`).toBeLessThan(positions!.figureTop);
+      }
+    }
   }
+});
+
+test("without JavaScript the full chronology still reads as a coherent sequence", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const response = await page.goto("/ciftlik");
+  expect(response?.status()).toBe(200);
+
+  const stage = page.locator("[data-farm-timeline-stage]");
+  await expect(stage).toHaveAttribute("data-mode", "quiet");
+  await expect(page.locator("[data-farm-timeline-panel]")).toHaveCount(states.length);
+  await expect(page.locator("[data-farm-timeline-figure]")).toHaveCount(states.length);
+  for (const [index, [, , title, image]] of states.entries()) {
+    await expect(page.locator("[data-farm-timeline-panel]").nth(index).locator("h3")).toHaveText(title);
+    await expect(page.locator("[data-farm-timeline-figure]").nth(index).locator("img")).toHaveAttribute(
+      "src",
+      new RegExp(encodeURIComponent(image)),
+    );
+  }
+  // Coherent rather than a lone 2019 next to seven images: every text is
+  // present and none is hidden from assistive tech.
+  await expect(page.locator('[data-farm-timeline-panel][aria-hidden="true"]')).toHaveCount(0);
+  await expect(page.locator("[data-farm-timeline-sticky]")).toHaveCount(0);
+  await context.close();
 });
 
 test.beforeEach(async ({ request }) => { await request.get("http://localhost:3441/__test/reset"); });

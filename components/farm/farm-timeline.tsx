@@ -1,170 +1,157 @@
 "use client";
 
-import { useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { smoothstep } from "@/lib/intro-choreography";
 import { farmTimeline } from "@/content/farm";
 
 /**
  * The farm years, told with OriginStory's composition — sticky text on the
- * left, image on the right — advanced by scroll rather than by clicking.
+ * left, a normal column of figures on the right.
  *
  * Structure is OriginStory's exactly (12-column grid, 5 / 6-from-7 split,
- * rounded-media 4:3 frame). The scroll mechanism is IntroSequence's: one tall
- * wrapper, one sticky stage, progress read with useScroll. Nothing new is
- * introduced on either axis.
+ * rounded-media 4:3 frame, space-y-16). The right column is ordinary
+ * document flow: seven figures that scroll past naturally, with no
+ * transforms, no sticky and no pinning. The left column is md:sticky
+ * md:top-32, so it stays put while the images move past it. The only thing
+ * added is that the sticky text swaps to match whichever figure is
+ * currently in view, detected with an IntersectionObserver against the
+ * figures themselves.
  *
- * All seven states are always in the DOM. The quiet variant is what the server
- * renders, so a visitor without JavaScript, a screen reader, or a narrow screen
- * gets the whole chronology as ordinary stacked prose; a wide screen upgrades
- * to the pinned stage after hydration.
+ * All seven states are always in the DOM. The quiet variant is what the
+ * server renders, so a visitor without JavaScript, a screen reader, or a
+ * narrow screen gets the whole chronology as an ordinary stacked sequence —
+ * year text above its own image, in order — with nothing pinned and nothing
+ * faded. A wide screen upgrades to the synced sticky version after
+ * hydration.
  */
 
-/* Scroll budget per state. Six spacers advance seven states, so the stage is
-   pinned for 6 × 64vh — about a third shorter than one viewport per year, and
-   short enough that the section reads as part of the page rather than a
-   detour. */
-const TRANSITIONS = farmTimeline.length - 1;
+function SyncedTimeline() {
+  const [active, setActive] = useState(0);
+  const figuresRef = useRef<(HTMLElement | null)[]>([]);
 
-/* Each state holds full opacity across the middle of its segment, then trades
-   with its neighbour across the band at the boundary. The overlap is what keeps
-   the change continuous: there is no progress value at which one state cuts to
-   the next, only a band where both are partly present.
-   
-   The plateau stops short of the halfway point so two states are never both
-   fully opaque — these panels have transparent backgrounds, and overlapping
-   text at full strength reads as a printing error rather than a dissolve. At
-   the midpoint both sit at 0.5 and sum to exactly one. */
-const PLATEAU = 0.4;
-const FADE = 0.2;
+  useEffect(() => {
+    const figures = figuresRef.current.filter(
+      (figure): figure is HTMLElement => figure !== null,
+    );
+    if (figures.length === 0) return;
+    if (typeof IntersectionObserver === "undefined") return;
 
-function panelOpacity(progress: number, index: number) {
-  const distance = Math.abs(progress * TRANSITIONS - index);
-  return 1 - smoothstep(PLATEAU, PLATEAU + FADE, distance);
-}
-
-function ScrollTimeline() {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: wrapperRef,
-    offset: ["start start", "end end"],
-  });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const index = Number(
+            (entry.target as HTMLElement).dataset.index,
+          );
+          if (!Number.isNaN(index)) setActive(index);
+        }
+      },
+      // A narrow band around the viewport middle: exactly one figure sits
+      // in it at a time while the column scrolls past.
+      { rootMargin: "-45% 0px -45% 0px", threshold: 0 },
+    );
+    for (const figure of figures) observer.observe(figure);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div ref={wrapperRef} className="relative">
-      <div className="sticky top-0 flex min-h-screen items-center">
-        <div className="w-full">
-          <div
-            id="farm-timeline-stage"
-            data-farm-timeline-stage
-            className="grid"
-          >
-            {farmTimeline.map((entry, index) => (
-              <Panel
-                key={entry.id}
-                entry={entry}
-                index={index}
-                progress={scrollYProgress}
-              />
-            ))}
+    <div
+      id="farm-timeline-stage"
+      data-farm-timeline-stage
+      data-mode="synced"
+      data-active-index={active}
+      className="grid gap-14 md:grid-cols-12"
+    >
+      <div className="md:col-span-5">
+        <div data-farm-timeline-sticky className="md:sticky md:top-32">
+          {/* All seven texts share one grid cell so the tallest sets the
+              height and swapping never moves the block. Hidden panels stay
+              in layout (invisible, not display:none) but are inert and
+              excluded from the accessibility tree. The swap itself is the
+              existing short opacity treatment on the text only. */}
+          <div className="grid">
+            {farmTimeline.map((entry, index) => {
+              const isActive = index === active;
+              return (
+                <div
+                  key={entry.id}
+                  data-farm-timeline-panel
+                  data-index={index}
+                  aria-hidden={!isActive}
+                  inert={!isActive}
+                  className={`col-start-1 row-start-1 motion-safe:transition-opacity motion-safe:duration-300 ${
+                    isActive
+                      ? "opacity-100"
+                      : "pointer-events-none invisible opacity-0"
+                  }`}
+                >
+                  <p className="label text-olive">{entry.eyebrow}</p>
+                  <h3 className="mt-5 text-3xl tracking-tight md:text-4xl">
+                    {entry.heading}
+                  </h3>
+                  {entry.paragraphs.map((paragraph) => (
+                    <p
+                      key={paragraph}
+                      className="mt-5 max-w-sm text-sm leading-relaxed text-ink/65 md:text-base"
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* The scroll the stage is pinned against. Purely structural. */}
-      <div aria-hidden="true">
-        {farmTimeline.slice(1).map((entry) => (
-          <div key={entry.id} className="h-[64vh]" />
+      <div className="space-y-16 md:col-span-6 md:col-start-7">
+        {farmTimeline.map((entry, index) => (
+          <figure
+            key={entry.id}
+            ref={(node) => {
+              figuresRef.current[index] = node;
+            }}
+            data-farm-timeline-figure
+            data-index={index}
+            data-active={index === active ? "true" : undefined}
+          >
+            <div
+              data-farm-timeline-image
+              className="relative aspect-[4/3] overflow-hidden rounded-media"
+            >
+              <Image
+                src={entry.image}
+                alt={entry.imageAlt}
+                fill
+                sizes="(min-width: 768px) 45vw, 100vw"
+                className="object-cover"
+              />
+            </div>
+          </figure>
         ))}
       </div>
     </div>
   );
 }
 
-function Panel({
-  entry,
-  index,
-  progress,
-}: {
-  entry: (typeof farmTimeline)[number];
-  index: number;
-  progress: ReturnType<typeof useScroll>["scrollYProgress"];
-}) {
-  const opacity = useTransform(progress, (value) => panelOpacity(value, index));
-  // Exactly one state is exposed to assistive tech and hit-testing: the one
-  // whose segment the scroll is currently within.
-  const nearest = useTransform(progress, (value) =>
-    Math.round(value * TRANSITIONS) === index ? 1 : 0,
-  );
-  const active = useSyncExternalStore(
-    (notify) => nearest.on("change", notify),
-    () => nearest.get() === 1,
-    () => index === 0,
-  );
-
-  return (
-    <motion.div
-      data-farm-timeline-panel
-      aria-hidden={!active}
-      inert={!active}
-      style={{ opacity }}
-      className="col-start-1 row-start-1 grid gap-14 md:grid-cols-12"
-    >
-      <div className="md:col-span-5">
-        <p className="label text-olive">{entry.eyebrow}</p>
-        <h3 className="mt-5 text-3xl tracking-tight md:text-4xl">
-          {entry.heading}
-        </h3>
-        {entry.paragraphs.map((paragraph) => (
-          <p
-            key={paragraph}
-            className="mt-5 max-w-sm text-sm leading-relaxed text-ink/65 md:text-base"
-          >
-            {paragraph}
-          </p>
-        ))}
-      </div>
-
-      <div className="md:col-span-6 md:col-start-7">
-        <div
-          data-farm-timeline-image
-          className="relative aspect-[4/3] overflow-hidden rounded-media"
-        >
-          <Image
-            src={entry.image}
-            alt={entry.imageAlt}
-            fill
-            sizes="(min-width: 768px) 45vw, 100vw"
-            className="object-cover"
-          />
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
 /**
  * Reduced motion, no JavaScript, and narrow screens all get this: the same
  * seven states in the same order, stacked and fully readable, with nothing
- * pinned and nothing faded.
+ * sticky and nothing faded. Each year text sits directly above its own
+ * image, so the sequence is coherent on its own.
  */
 function QuietTimeline() {
   return (
     <div
       id="farm-timeline-stage"
       data-farm-timeline-stage
+      data-mode="quiet"
       className="grid gap-24"
     >
-      {farmTimeline.map((entry) => (
-        <div
-          key={entry.id}
-          data-farm-timeline-panel
-          aria-hidden={false}
-          className="grid gap-14 md:grid-cols-12"
-        >
+      {farmTimeline.map((entry, index) => (
+        <div key={entry.id} className="grid gap-14 md:grid-cols-12">
           <div className="md:col-span-5">
-            <div className="md:sticky md:top-32">
+            <div data-farm-timeline-panel data-index={index}>
               <p className="label text-olive">{entry.eyebrow}</p>
               <h3 className="mt-5 text-3xl tracking-tight md:text-4xl">
                 {entry.heading}
@@ -180,7 +167,11 @@ function QuietTimeline() {
             </div>
           </div>
 
-          <div className="md:col-span-6 md:col-start-7">
+          <figure
+            data-farm-timeline-figure
+            data-index={index}
+            className="md:col-span-6 md:col-start-7"
+          >
             <div
               data-farm-timeline-image
               className="relative aspect-[4/3] overflow-hidden rounded-media"
@@ -193,30 +184,31 @@ function QuietTimeline() {
                 className="object-cover"
               />
             </div>
-          </div>
+          </figure>
         </div>
       ))}
     </div>
   );
 }
 
-/* The pinned stage needs both a pointer-sized viewport and a visitor who has
-   not asked for stillness. Read through useSyncExternalStore so the server and
-   the first client render agree, as IntroSequence does. */
-const STAGE_QUERY = "(min-width: 768px) and (prefers-reduced-motion: no-preference)";
+/* The synced sticky version needs both a pointer-sized viewport and a
+   visitor who has not asked for stillness. Read through
+   useSyncExternalStore so the server and the first client render agree. */
+const SYNC_QUERY =
+  "(min-width: 768px) and (prefers-reduced-motion: no-preference)";
 
-const subscribeToStagePreference = (notify: () => void) => {
-  const query = window.matchMedia(STAGE_QUERY);
+const subscribeToSyncPreference = (notify: () => void) => {
+  const query = window.matchMedia(SYNC_QUERY);
   query.addEventListener("change", notify);
   return () => query.removeEventListener("change", notify);
 };
 
-const stageAvailable = () => window.matchMedia(STAGE_QUERY).matches;
+const syncAvailable = () => window.matchMedia(SYNC_QUERY).matches;
 
 export function FarmTimeline() {
-  const pinned = useSyncExternalStore(
-    subscribeToStagePreference,
-    stageAvailable,
+  const synced = useSyncExternalStore(
+    subscribeToSyncPreference,
+    syncAvailable,
     () => false,
   );
 
@@ -230,7 +222,7 @@ export function FarmTimeline() {
           Bahçeden notlar
         </h2>
         <div className="mt-10">
-          {pinned ? <ScrollTimeline /> : <QuietTimeline />}
+          {synced ? <SyncedTimeline /> : <QuietTimeline />}
         </div>
       </div>
     </section>
