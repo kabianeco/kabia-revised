@@ -42,7 +42,6 @@ export const PERMISSIONS = {
   viewCustomers: ["admin", "super_admin"],
   manageMedia: ["admin", "super_admin"],
   manageContent: ["admin", "super_admin"],
-  manageBlog: ["admin", "super_admin"],
   manageSettings: ["admin", "super_admin"],
   manageTheme: ["admin", "super_admin"],
   manageSensitiveSettings: ["super_admin"],

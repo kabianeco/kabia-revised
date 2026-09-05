@@ -285,3 +285,30 @@ test("header offers Çiftlik and Seçki and keeps Üreticiler and Günlük in th
     await expect(footer.getByRole("link", { name: label, exact: true })).toHaveAttribute("href", href);
   }
 });
+
+test("admin blog surfaces are gone while every other admin route keeps its response", async ({ page }) => {
+  // Unauthenticated only. The proxy redirects every /admin/* path to the login
+  // before routing — a path that never existed answers 307 just as a removed
+  // one does — so this cannot by itself prove removal. It proves the removal
+  // introduced no special handling and left the surviving routes untouched;
+  // that the routes are really gone is asserted from the source in
+  // tests/admin-nav.test.ts and from the build's route manifest.
+  const neverExisted = await page.request.get("/admin/definitely-not-a-route", { maxRedirects: 0 });
+  for (const removed of ["/admin/blog", "/admin/blog/new", "/admin/blog/categories"]) {
+    const response = await page.request.get(removed, { maxRedirects: 0 });
+    expect(response.status(), `${removed} should behave like a nonexistent admin path`)
+      .toBe(neverExisted.status());
+  }
+
+  const surviving = [
+    ["/admin/login", 200], ["/admin/unauthorized", 200],
+    ["/admin/products", 307], ["/admin/orders", 307], ["/admin/customers", 307],
+    ["/admin/inventory", 307], ["/admin/categories", 307], ["/admin/content", 307],
+    ["/admin/media", 307], ["/admin/settings", 307], ["/admin/appearance", 307],
+    ["/admin/audit-logs", 307], ["/admin/administrators", 307], ["/admin/search", 307],
+  ] as const;
+  for (const [route, expected] of surviving) {
+    const response = await page.request.get(route, { maxRedirects: 0 });
+    expect(response.status(), `${route} changed response`).toBe(expected);
+  }
+});

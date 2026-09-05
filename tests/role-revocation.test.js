@@ -234,7 +234,7 @@ describe("admin role revocation", { skip: ready ? false : "needs Supabase creden
   })
 
   it("denies every other admin route, not just the overview", async () => {
-    for (const path of ["/admin/products", "/admin/media", "/admin/orders", "/admin/administrators", "/admin/blog"]) {
+    for (const path of ["/admin/products", "/admin/media", "/admin/orders", "/admin/administrators", "/admin/content"]) {
       const result = await follow(path, cookieA)
       assert.equal(
         result.final,

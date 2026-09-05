@@ -7,7 +7,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
-  BookOpen,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
@@ -74,7 +73,6 @@ const NAV_ICONS: Record<AdminNavIcon, LucideIcon> = {
   customers: Users,
   media: ImageIcon,
   content: FileText,
-  blog: BookOpen,
   appearance: Palette,
   settings: Settings,
   administrators: ShieldCheck,
