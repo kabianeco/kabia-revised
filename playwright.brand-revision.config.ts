@@ -18,7 +18,10 @@ export default defineConfig({
     command: "node tests/support/brand-revision-server.mjs",
     url: `http://localhost:${port}/ciftlik`,
     reuseExistingServer: false,
-    timeout: 120_000,
+    // A cold webpack dev compile of /ciftlik measured 153.7s on the development
+    // machine, so the previous 120s budget only passed against a warm .next
+    // cache. 300s keeps a clean checkout reproducible with margin.
+    timeout: 300_000,
     stdout: "pipe",
     stderr: "pipe",
   },
