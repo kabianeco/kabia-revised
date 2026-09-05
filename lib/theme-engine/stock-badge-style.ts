@@ -32,23 +32,3 @@ export const STOCK_BADGE_STYLE: CSSProperties = {
   borderRadius: "var(--theme-stock-badge-radius, 0px)",
   color: "var(--theme-stock-badge-color, var(--color-clay))",
 };
-
-/**
- * Source badge (Kabia Çiftliği / Kabia Seçki / Kabia Mutfak), reusing the
- * out-of-stock badge's exact fill/border/radius/color so the two read as one
- * visual language — no new color token, no new component. Position is
- * pinned to the opposite corner with the same literal fallback values the
- * stock badge uses (top:8px), so the two never sit in the same spot on a
- * product that is both out of stock and carries a source label. This is a
- * static opposite-corner pin, not a themed one: the stock badge's own corner
- * is admin-configurable via the theme engine, so a custom theme that moves it
- * to the right could still collide — an accepted, narrow edge case rather
- * than adding a second themeable position axis for one label.
- */
-export const SOURCE_BADGE_STYLE: CSSProperties = {
-  ...STOCK_BADGE_STYLE,
-  top: "8px",
-  right: "8px",
-  bottom: "auto",
-  left: "auto",
-};

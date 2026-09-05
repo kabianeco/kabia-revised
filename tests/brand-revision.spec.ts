@@ -300,6 +300,16 @@ test("the restored grid, source row and two controls drive one shared listing", 
   expect(columns).toBe(3);
   await expect(store.getByText("Stokta yok").first()).toBeVisible();
 
+  // Sade rozet: görselde en fazla "Stokta yok" yazar, kaynak metin satırındadır.
+  const imageTexts = await store.evaluate(() =>
+    [...document.querySelectorAll("[data-store-listing] ul.grid > li")].map(
+      (li) => li.querySelector("div.relative")?.textContent ?? "",
+    ),
+  );
+  expect(imageTexts.length).toBe(10);
+  for (const text of imageTexts) expect(text).not.toMatch(/Kabia/);
+  await expect(grid.locator("> li").first().locator("p.label").first()).toContainText("•");
+
   // Option A: sources stay as the row; category and sort are controls right.
   const sort = store.getByLabel("Sırala");
   const category = store.getByLabel("Kategori");

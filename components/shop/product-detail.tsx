@@ -23,7 +23,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { routes } from "@/lib/site";
 import { recordProductView } from "@/lib/recently-viewed";
 import { EASE } from "@/lib/motion";
-import { STOCK_BADGE_STYLE, SOURCE_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
+import { STOCK_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
 
 /**
  * The last two rows named a single farm/product ("Geyve, Sabırlar" / "Yalnızca
@@ -254,9 +254,6 @@ export function ProductDetail({
                 <span className="label">Stokta yok</span>
               </span>
             )}
-            <span className="absolute px-4 py-2" style={SOURCE_BADGE_STYLE}>
-              <span className="label">{sourceBadgeLabel(product.source)}</span>
-            </span>
           </div>
 
           {galleryImages.length > 1 && (
@@ -291,7 +288,7 @@ export function ProductDetail({
 
         {/* Info */}
         <div className="lg:col-span-5 lg:col-start-8">
-          <p className="label text-olive">{categoryLabel(product.category)}</p>
+          <p className="label text-olive">{categoryLabel(product.category)} • {sourceBadgeLabel(product.source)}</p>
           <h1 className="mt-4 text-3xl leading-[1.1] tracking-tight md:text-4xl">
             {product.name}
           </h1>

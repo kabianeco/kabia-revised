@@ -2,12 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { categoryLabel, formatTL, inStock, sourceBadgeLabel, type Product } from "@/lib/products";
 import { routes } from "@/lib/site";
-import { STOCK_BADGE_STYLE, SOURCE_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
+import { STOCK_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
 
 /**
  * One entry in the shop index. Deliberately not a card: no shadow, no radius,
  * no filled surface — the image sits on the page and a hairline carries the
  * metadata, the same way the homepage ledger presents a product.
+ *
+ * The image carries at most one badge ("Stokta yok"). The source
+ * (Kabia Çiftliği / Seçki / Mutfak) lives in the metadata line under the
+ * hairline instead, so a product that is both out of stock and sourced
+ * never wears two overlapping labels.
  */
 export function ProductEntry({
   product,
@@ -43,13 +48,10 @@ export function ProductEntry({
               <span className="label">Stokta yok</span>
             </span>
           )}
-          <span className="absolute px-3 py-1.5" style={SOURCE_BADGE_STYLE}>
-            <span className="label">{sourceBadgeLabel(product.source)}</span>
-          </span>
         </div>
 
         <div className="mt-5 border-t border-ink/10 pt-4">
-          <p className="label text-olive">{categoryLabel(product.category)}</p>
+          <p className="label text-olive">{categoryLabel(product.category)} • {sourceBadgeLabel(product.source)}</p>
           <h2 className="mt-2 text-xl leading-snug tracking-tight transition-colors duration-300 group-hover:text-brand">
             {product.name}
           </h2>
