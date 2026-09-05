@@ -15,5 +15,24 @@ test('default preserves order, price sorts are stable and source/category pairs 
   assert.deepEqual(ids('fiyat-azalan'),['a','b','d','c']);
   assert.deepEqual(ids('onerilen','paketli-urunler','secki'),['b','d']);
   assert.deepEqual(ids('onerilen','cig-badem','mutfak'),[]);
-  assert.deepEqual(listing.categoryGroups(products as never).map((g:{source:string,categories:{id:string}[]})=>[g.source,g.categories.map(c=>c.id)]),[['ciftlik',['cig-badem']],['secki',['paketli-urunler']],['mutfak',['paketli-urunler']]]);
+});
+
+test('the bar offers only sources and categories the catalogue actually has', () => {
+  assert.ok(listing);
+  const ids = (list:{id:string}[]) => list.map(entry => entry.id);
+  assert.deepEqual(ids(listing.presentSources(products as never)),['tumu','ciftlik','secki','mutfak']);
+  // Narrowed to one source, only that source's categories are offered.
+  assert.deepEqual(ids(listing.presentCategories(products as never,'ciftlik')),['tumu','cig-badem']);
+  assert.deepEqual(ids(listing.presentCategories(products as never,'secki')),['tumu','paketli-urunler']);
+  assert.deepEqual(ids(listing.presentCategories(products as never,'tumu')),['tumu','cig-badem','paketli-urunler']);
+  // A catalogue missing a source never offers it.
+  const farmOnly = [products[0]];
+  assert.deepEqual(ids(listing.presentSources(farmOnly as never)),['tumu','ciftlik']);
+});
+
+test('listingHref keeps the existing parameters and omits defaults', () => {
+  assert.ok(listing);
+  assert.equal(listing.listingHref('/magaza','tumu','tumu','onerilen'),'/magaza');
+  assert.equal(listing.listingHref('/magaza','cig-badem','ciftlik','fiyat-artan'),'/magaza?kategori=cig-badem&kaynak=ciftlik&sirala=fiyat-artan');
+  assert.equal(listing.listingHref('/magaza/tarhana','tumu','tumu','fiyat-azalan'),'/magaza/tarhana?sirala=fiyat-azalan');
 });

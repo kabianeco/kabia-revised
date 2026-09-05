@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { ArrowLink } from "@/components/ui/button";
-import { ProductLedger } from "@/components/shop/product-ledger";
+import { ProductEntry } from "@/components/shop/product-entry";
+import { SortSelect } from "@/components/shop/sort-select";
 import {
-  categoryGroups,
   listingHref,
+  presentCategories,
+  presentSources,
   selectProducts,
   SORT_OPTIONS,
 } from "@/lib/store-listing";
@@ -16,9 +18,24 @@ export type StoreSearch = {
 };
 
 /**
- * Existing storefront link selections, composed into the site's 12-column grid.
- * Mobile uses the native details/summary idiom from admin time-series charts.
+ * The one listing shared by /shop, /magaza and /magaza/[producer-slug], so the
+ * whole store reads as one place.
+ *
+ * Presentation is the shop index as it stands on main: the same filter bar
+ * treatment, the same three-column ProductEntry grid, the same count line and
+ * the same empty and error states. What this adds is the source row, because
+ * the catalogue now comes from three of them, and a sort control in place of
+ * main's row of sort links.
  */
+
+/** Selected filters read as links, so every combination stays a shareable URL. */
+const linkClass = (active: boolean) =>
+  `inline-flex min-h-11 items-center text-sm transition-colors duration-300 ${
+    active
+      ? "text-ink underline decoration-brand decoration-2 underline-offset-8"
+      : "text-ink/55 hover:text-ink"
+  }`;
+
 export function StoreListing({
   products: all,
   error = false,
@@ -30,46 +47,53 @@ export function StoreListing({
   base: string;
   search: StoreSearch;
 }) {
-  const category = search.kategori ?? "tumu";
   const source = search.kaynak ?? "tumu";
   const sort = SORT_OPTIONS.some((option) => option.id === search.sirala)
     ? search.sirala!
     : "onerilen";
-  const products = selectProducts(all, category, source, sort);
-  const groups = categoryGroups(all);
 
+  const categories = presentCategories(all, source);
+  // A category that does not survive the current source selection falls back to
+  // Tümü rather than resolving to an empty grid.
+  const requested = search.kategori ?? "tumu";
+  const category = categories.some((c) => c.id === requested) ? requested : "tumu";
+
+  const products = selectProducts(all, category, source, sort);
+  const sources = presentSources(all);
   const href = (c: string, s: string, order = sort) =>
     listingHref(base, c, s, order);
 
-  const linkClass = (active: boolean) =>
-    `inline-flex min-h-11 items-center text-sm transition-colors duration-300 ${
-      active
-        ? "text-ink underline decoration-brand decoration-2 underline-offset-8"
-        : "text-ink/55 hover:text-ink"
-    }`;
+  return (
+    <div data-store-listing>
+      <nav aria-label="Kaynaklar" className="border-t border-ink/10 pt-5">
+        <ul className="flex flex-wrap items-center gap-x-7 gap-y-3">
+          {sources.map((entry) => {
+            const active = entry.id === source;
+            return (
+              <li key={entry.id}>
+                <Link
+                  href={href(entry.id === "tumu" ? "tumu" : category, entry.id)}
+                  prefetch={false}
+                  aria-current={active ? "true" : undefined}
+                  className={linkClass(active)}
+                >
+                  {entry.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
 
-  const categories = (
-    <nav aria-label="Kategoriler">
-      <Link
-        href={href("tumu", "tumu")}
-        prefetch={false}
-        aria-current={
-          category === "tumu" && source === "tumu" ? "true" : undefined
-        }
-        className={linkClass(category === "tumu" && source === "tumu")}
-      >
-        Tümü
-      </Link>
-      {groups.map((group) => (
-        <div key={group.source} className="mt-6">
-          <p className="label text-olive">{group.label}</p>
-          <ul className="mt-3">
-            {group.categories.map((cat) => {
-              const active = cat.id === category && group.source === source;
+      <div className="mt-4 flex flex-wrap items-end justify-between gap-x-7 gap-y-4 border-b border-ink/10 pb-5">
+        <nav aria-label="Kategoriler" className="min-w-0">
+          <ul className="flex flex-wrap items-center gap-x-7 gap-y-3">
+            {categories.map((cat) => {
+              const active = cat.id === category;
               return (
                 <li key={cat.id}>
                   <Link
-                    href={href(cat.id, group.source)}
+                    href={href(cat.id, source)}
                     prefetch={false}
                     aria-current={active ? "true" : undefined}
                     className={linkClass(active)}
@@ -80,85 +104,56 @@ export function StoreListing({
               );
             })}
           </ul>
-        </div>
-      ))}
-    </nav>
-  );
+        </nav>
 
-  const sorting = (
-    <nav aria-label="Sıralama">
-      <p className="label text-olive">Sıralama</p>
-      <ul className="mt-3">
-        {SORT_OPTIONS.map((option) => (
-          <li key={option.id}>
-            <Link
-              href={href(category, source, option.id)}
-              prefetch={false}
-              aria-current={sort === option.id ? "true" : undefined}
-              className={linkClass(sort === option.id)}
-            >
-              {option.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
+        <SortSelect
+          value={sort}
+          options={SORT_OPTIONS.map((option) => ({
+            id: option.id,
+            label: option.label,
+            href: href(category, source, option.id),
+          }))}
+        />
+      </div>
 
-  return (
-    <div className="pb-24 md:pb-32" data-store-listing>
-      <details className="border-y border-ink/10 py-5 lg:hidden">
-        <summary className="cursor-pointer text-sm text-ink">
-          Kategoriler ve sıralama
-        </summary>
-        <div className="mt-6 grid gap-8 sm:grid-cols-2">
-          {categories}
-          {sorting}
-        </div>
-      </details>
-
-      <div className="grid gap-8 pt-10 lg:grid-cols-12">
-        <aside className="hidden lg:col-span-2 lg:block">{categories}</aside>
-
-        <div className="lg:col-span-8">
-          {error ? (
-            <div role="alert" className="py-24 text-center">
-              <p className="font-theme-display text-2xl italic text-clay">
-                Ürünler şu anda yüklenemiyor.
-              </p>
-              <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink/55">
-                Mağaza sayfası açık kalacak. Lütfen daha sonra yeniden deneyin.
-              </p>
-            </div>
-          ) : products.length === 0 ? (
-            <div className="py-24 text-center">
-              <p className="font-theme-display text-2xl italic text-ink/70">
-                {all.length === 0
-                  ? "Mağaza şu an boş."
-                  : "Bu kategoride ürün yok."}
-              </p>
-              <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink/55">
-                {all.length === 0
-                  ? "Yeni hasat yüklendiğinde ürünler burada listelenir."
-                  : "Diğer kategorilere göz atabilirsiniz."}
-              </p>
-              {all.length > 0 && (
-                <div className="mt-8">
-                  <ArrowLink href={base} prefetch={false}>
-                    Tüm ürünler
-                  </ArrowLink>
-                </div>
-              )}
-            </div>
-          ) : (
-            <>
-              <p className="label pb-5 text-olive">{products.length} ürün</p>
-              <ProductLedger products={products} />
-            </>
-          )}
-        </div>
-
-        <aside className="hidden lg:col-span-2 lg:block">{sorting}</aside>
+      <div className="pt-14">
+        {error ? (
+          <div role="alert" className="py-24 text-center">
+            <p className="font-theme-display text-2xl italic text-clay">
+              Ürünler şu anda yüklenemiyor.
+            </p>
+            <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink/55">
+              Mağaza sayfası açık kalacak. Lütfen daha sonra yeniden deneyin.
+            </p>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="py-24 text-center">
+            <p className="font-theme-display text-2xl italic text-ink/70">
+              {all.length === 0 ? "Mağaza şu an boş." : "Bu kategoride ürün yok."}
+            </p>
+            <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink/55">
+              {all.length === 0
+                ? "Yeni hasat yüklendiğinde ürünler burada listelenir."
+                : "Diğer kategorilere göz atabilirsiniz."}
+            </p>
+            {all.length > 0 && (
+              <div className="mt-8">
+                <ArrowLink href={base} prefetch={false}>
+                  Tüm ürünler
+                </ArrowLink>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <p className="label pb-5 text-olive">{products.length} ürün</p>
+            <ul className="grid grid-cols-1 gap-x-8 gap-y-14 pb-24 sm:grid-cols-2 md:pb-32 lg:grid-cols-3">
+              {products.map((product, i) => (
+                <ProductEntry key={product.id} product={product} priority={i < 3} />
+              ))}
+            </ul>
+          </>
+        )}
       </div>
     </div>
   );

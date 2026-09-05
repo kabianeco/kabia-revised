@@ -217,23 +217,76 @@ test("preview producer stores validate source slugs and avoid catalog reads incl
   }
 });
 
-test("store category pair, sorting, mobile disclosure and stock controls share one listing", async ({ page }) => {
+test("the restored grid, source bar and sort control drive one shared listing", async ({ page }) => {
   test.skip(!previewEnabled, "local example catalog only; off-state result/layout covered separately");
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto('/magaza');
-  const store = page.locator('[data-store-listing]');
-  await expect(store.locator('h2')).toHaveCount(10);
-  await expect(store.getByRole('button', { name: 'Stokta yok', exact: true })).toBeDisabled();
-  await store.getByRole('link', { name: 'Fiyat: azalan', exact: true }).click();
-  await expect(store.locator('h2').first()).toHaveText('Örnek Tarhana');
-  await store.getByRole('link', { name: 'Çiğ Badem', exact: true }).click();
+  await page.goto("/magaza");
+  const store = page.locator("[data-store-listing]");
+
+  // main's grid: three columns of ProductEntry, each an <li> with an h2.
+  const grid = store.locator("ul.grid");
+  await expect(grid.locator("> li")).toHaveCount(10);
+  await expect(store.locator("h2")).toHaveCount(10);
+  const columns = await grid.evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length);
+  expect(columns).toBe(3);
+  await expect(store.getByText("Stokta yok").first()).toBeVisible();
+
+  // Sorting is one select, not a row of links.
+  const sort = store.getByLabel("Sırala");
+  await expect(sort).toHaveCount(1);
+  await expect(store.getByRole("link", { name: "Fiyat: azalan", exact: true })).toHaveCount(0);
+  await sort.selectOption("fiyat-azalan");
+  await expect(page).toHaveURL(/sirala=fiyat-azalan/);
+  await expect(store.locator("h2").first()).toHaveText("Örnek Tarhana");
+
+  // The source row narrows the category row to what that source has.
+  await store.getByRole("link", { name: "Çiftlik", exact: true }).click();
+  await expect(page).toHaveURL(/kaynak=ciftlik/);
+  await store.getByRole("link", { name: "Çiğ Badem", exact: true }).click();
   await expect(page).toHaveURL(/kategori=cig-badem&kaynak=ciftlik/);
-  await expect(store.locator('h2')).toHaveCount(1);
+  await expect(store.locator("h2")).toHaveCount(1);
+
+  // The same grid collapses to one column on a phone; no sidebar survives.
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(store.locator('aside').first()).toBeHidden();
-  await store.locator('summary').click();
-  await expect(store.getByRole('link', { name: 'Varsayılan', exact: true })).toBeVisible();
+  await expect(store.locator("aside")).toHaveCount(0);
+  const narrow = await grid.evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length);
+  expect(narrow).toBe(1);
 });
+
+test("shop, magaza and a producer store render the same listing structure", async ({ page }) => {
+  test.skip(!previewEnabled, "producer stores exist only behind the gate");
+  await page.setViewportSize({ width: 1280, height: 900 });
+
+  const shape = async (path: string) => {
+    await page.goto(path);
+    return page.evaluate(() => {
+      const store = document.querySelector("[data-store-listing]")!;
+      const grid = store.querySelector("ul.grid");
+      const entry = grid?.querySelector("li");
+      return {
+        navs: [...store.querySelectorAll("nav")].map((n) => n.getAttribute("aria-label")),
+        hasSort: !!store.querySelector("select"),
+        gridClass: grid?.className ?? null,
+        columns: grid ? getComputedStyle(grid).gridTemplateColumns.split(" ").length : 0,
+        entryClass: entry?.className ?? null,
+        imageClass: entry?.querySelector("div")?.className ?? null,
+      };
+    });
+  };
+
+  const shop = await shape("/shop");
+  const magaza = await shape("/magaza");
+  const producer = await shape("/magaza/tarhana");
+
+  expect(magaza).toEqual(shop);
+  // The producer store is the same listing, only its catalogue is narrower.
+  expect(producer.gridClass).toBe(shop.gridClass);
+  expect(producer.entryClass).toBe(shop.entryClass);
+  expect(producer.imageClass).toBe(shop.imageClass);
+  expect(producer.columns).toBe(shop.columns);
+  expect(producer.hasSort).toBe(shop.hasSort);
+});
+
 
 test("homepage introduces three sources with three product links and no commerce", async ({ page }) => {
   await page.goto("/");

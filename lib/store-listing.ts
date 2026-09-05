@@ -22,18 +22,26 @@ export function selectProducts(
   return filtered;
 }
 
-export function categoryGroups(products: readonly Product[]) {
-  return SOURCES.filter((s) => s.id !== "tumu")
-    .map((source) => ({
-      source: source.id,
-      label: source.badgeLabel,
-      categories: CATEGORIES.filter(
-        (c) =>
-          c.id !== "tumu" &&
-          products.some((p) => p.source === source.id && p.category === c.id),
-      ),
-    }))
-    .filter((group) => group.categories.length > 0);
+/** The three sources, narrowed to those the current catalogue actually has. */
+export function presentSources(products: readonly Product[]) {
+  return SOURCES.filter(
+    (source) =>
+      source.id === "tumu" || products.some((p) => p.source === source.id),
+  );
+}
+
+/**
+ * Categories narrowed to what is present, and — once a source is chosen —
+ * to what is present *within that source*, so the bar never offers a
+ * combination that resolves to an empty grid.
+ */
+export function presentCategories(products: readonly Product[], source: string) {
+  const scope =
+    source === "tumu" ? products : products.filter((p) => p.source === source);
+  return CATEGORIES.filter(
+    (category) =>
+      category.id === "tumu" || scope.some((p) => p.category === category.id),
+  );
 }
 
 export function listingHref(
