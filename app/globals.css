@@ -210,6 +210,24 @@ body::before {
   }
 }
 
+/* The header only goes transparent at the very top of the homepage, where
+   what is behind it is the intro's footage under its forest veil. The ink
+   palette it carries on every other surface disappears against that, so
+   while it is floating it switches to the light one the intro copy uses.
+   Written here rather than as utilities because the links set their own
+   `text-ink` classes and a rule of this shape is what outranks them. */
+.site-header--over-film :is(a, button) {
+  color: color-mix(in srgb, var(--color-on-brand) 78%, transparent);
+}
+
+.site-header--over-film :is(a, button):hover {
+  color: var(--color-on-brand);
+}
+
+.site-header--over-film :focus-visible {
+  outline-color: var(--color-cream);
+}
+
 /* Small tracked uppercase metadata label — used sparingly */
 .label {
   font-size: 0.6875rem;

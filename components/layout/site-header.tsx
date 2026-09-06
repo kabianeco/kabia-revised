@@ -110,7 +110,11 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
         bannerOffset ? "top-10" : "top-0",
         surfaced
           ? "border-b border-ink/10 bg-ivory/95 backdrop-blur-sm"
-          : "border-b border-transparent bg-transparent",
+          // Floating with no ground of its own means floating over the
+          // intro's footage, which is dark. The ink palette used everywhere
+          // else is invisible there, so the header borrows the light one
+          // (see .site-header--over-film in globals.css).
+          : "site-header--over-film border-b border-transparent bg-transparent",
       )}
     >
       <div className="wrap flex h-16 items-center justify-between md:h-20">

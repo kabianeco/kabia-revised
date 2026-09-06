@@ -44,9 +44,6 @@ export const intro = {
     statementB: "Sonra ürün.",
     ctaLabel: "Keşfet",
   },
-  /** Read by screen readers in place of the decorative 3D scene. */
-  sceneDescription:
-    "Dekoratif üç boyutlu badem: sayfa kaydırıldıkça sahnede yer değiştirir, sonunda kabuğu ortadan ikiye açılır ve içine saklanmış kırışık bir kâğıt not açılarak mesajı ortaya çıkarır.",
   /** Brand word shown during the transition to the store. */
   transitionWord: "kabia",
   transitionAnnouncement: "kabia — mağazaya yönlendiriliyorsunuz",
