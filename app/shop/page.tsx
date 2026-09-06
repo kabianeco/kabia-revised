@@ -7,7 +7,7 @@ import { previewProducts } from "@/content/preview-products";
 import { SORT_OPTIONS } from "@/lib/store-listing";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { fetchPublicProducts } from "@/lib/catalog";
-import { CATEGORIES, SOURCES, type ProductCategory, type ProductSource } from "@/lib/products";
+import { ALL_CATEGORIES, SOURCES, type ProductCategory, type ProductSource } from "@/lib/products";
 import { routes } from "@/lib/site";
 import { getPublicSettings } from "@/lib/settings";
 import { shopBannerVisible, type ShopBannerSettings } from "@/lib/shop-banner";
@@ -54,7 +54,7 @@ async function ProductGrid({
   activeSource,
   sort,
 }: {
-  activeCategory: ProductCategory | "tumu";
+  activeCategory: ProductCategory | typeof ALL_CATEGORIES;
   activeSource: ProductSource | "tumu";
   sort: SortOption;
 }) {
@@ -81,10 +81,15 @@ export default async function ShopPage({
   };
   const showBanner = shopBannerVisible(banner);
   const sort: SortOption = isSort(sirala) ? sirala : "onerilen";
-  const activeCategory =
-    kategori && CATEGORIES.some((c) => c.id === kategori)
-      ? (kategori as ProductCategory)
-      : "tumu";
+  // Categories are rows now, and the grid that knows which ones exist streams
+  // in behind Suspense — so membership cannot be checked here. What is checked
+  // is the shape: a slug, or nothing. An unknown-but-well-formed slug reaches
+  // the grid and resolves to an empty one, which is the honest answer for a
+  // category that is not in the catalogue.
+  const activeCategory: ProductCategory | typeof ALL_CATEGORIES =
+    kategori && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(kategori) && kategori.length <= 80
+      ? kategori
+      : ALL_CATEGORIES;
   const activeSource =
     kaynak && SOURCES.some((s) => s.id === kaynak)
       ? (kaynak as ProductSource)

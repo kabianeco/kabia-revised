@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { products as copy } from "@/content/homepage";
 import { Reveal } from "@/components/motion/reveal";
+import { ArrowLink } from "@/components/ui/button";
 import { routes } from "@/lib/site";
 import { isBrandPreview } from "@/lib/brand-preview";
 import { previewProducts } from "@/content/preview-products";
@@ -57,7 +58,7 @@ export function ProductCollection() {
           </Reveal>
         </div>
 
-        <ul className="mt-16 grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-3">
+        <ul className="mt-16 grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
           {copy.entries.map((entry, index) => (
             <Reveal as="li" key={entry.slug} delay={index * 0.05} className="group">
               <Link href={hrefFor(entry)} className="block">
@@ -66,7 +67,7 @@ export function ProductCollection() {
                     src={entry.image}
                     alt={entry.alt}
                     fill
-                    sizes="(min-width: 640px) 33vw, 100vw"
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                   />
                 </div>
@@ -81,6 +82,10 @@ export function ProductCollection() {
             </Reveal>
           ))}
         </ul>
+
+        <Reveal className="mt-14 border-t border-ink/10 pt-7">
+          <ArrowLink href={routes.store}>Tüm ürünleri gör</ArrowLink>
+        </Reveal>
       </div>
     </section>
   );

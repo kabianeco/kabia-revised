@@ -3,27 +3,27 @@
 // shared TypeScript interfaces and the formatTL / category-label helpers used
 // across the UI. No mock business data remains here.
 
-export type ProductCategory =
-  | "cig-badem"
-  | "kavrulmus"
-  | "badem-unu"
-  | "badem-ezmesi"
-  | "paketli-urunler"
+/**
+ * A category slug as it exists in the `categories` table.
+ *
+ * This was a closed union of five almond slugs with a matching hardcoded
+ * label list. Administrators can create categories from /admin/categories,
+ * so the two drifted apart completely: the union still named kavrulmus,
+ * badem-unu, badem-ezmesi and paketli-urunler — none of which are in the
+ * database — while the nine categories that actually hold products (sirke,
+ * bal, ceviz, findik, ihlamur, kabuklu-badem, salca, tarhana, eriste) were
+ * named nowhere in the code. The mapper's fallback then quietly labelled
+ * every single product "Çiğ Badem".
+ *
+ * A union cannot track a table somebody edits at runtime, so it no longer
+ * tries. The slug is whatever the row says, and its display name travels
+ * with it — see `Product.categoryLabel` — rather than being looked up in a
+ * copy of the table kept over here.
+ */
+export type ProductCategory = string
 
-// UI label config (not transactional business data) — the matching category
-// records are seeded into the `categories` table from the same slugs.
-export const CATEGORIES: { id: ProductCategory | "tumu"; label: string }[] = [
-  { id: "tumu", label: "Tümü" },
-  { id: "cig-badem", label: "Çiğ Badem" },
-  { id: "kavrulmus", label: "Kavrulmuş" },
-  { id: "badem-unu", label: "Badem Unu" },
-  { id: "badem-ezmesi", label: "Badem Ezmesi" },
-  { id: "paketli-urunler", label: "Paketli Ürünler" },
-]
-
-export function categoryLabel(id: ProductCategory) {
-  return CATEGORIES.find((c) => c.id === id)?.label ?? id
-}
+/** The one category id that is not a row: the unfiltered state. */
+export const ALL_CATEGORIES = "tumu"
 
 /** Which of Kabia's three product lines this belongs to. */
 export type ProductSource = "ciftlik" | "secki" | "mutfak"
@@ -91,6 +91,8 @@ export interface Product {
   slug: string
   name: string
   category: ProductCategory
+  /** The category's display name, read from the same row as the slug. */
+  categoryLabel: string
   source: ProductSource
   defaultWeight: string
   price: number

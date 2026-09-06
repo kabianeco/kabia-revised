@@ -33,33 +33,30 @@ function XIcon(props: React.SVGProps<SVGSVGElement>) {
 /* Absolute so these keep working from the store and account routes, where the
    homepage sections do not exist.
    Grouped by brand pillar (Appendix A.10 of the KABIA 2.0 brief) rather than
-   by page type. Phase 3 added /ureticiler, /kabia-standardi, /gunluk,
-   /ciftlik and /toprak, so those now appear below. Hikâyemiz and Akademi are
+   by page type. Phase 3 added /ureticiler, /kabia-standardi, /gunluk
+   and /ciftlik, so those now appear below. Hikâyemiz and Akademi are
    still P2/deferred — not linked here yet, since those routes don't exist. */
-const farmItems = [
-  { label: "Çiftliğimiz", href: homeAnchor(anchors.farm) },
-  { label: "Bahçeyi keşfet", href: routes.farm },
-  { label: "Toprak", href: routes.soil },
-  { label: "Yaklaşım", href: routes.farmApproach },
-];
-
-const selectionItems = [
-  { label: "Ürünler", href: homeAnchor(anchors.products) },
+/* Three quiet columns: what Kabia sells, where it grows, and how to reach
+   it. Legal destinations live once in the tertiary row below — never
+   repeated up here. */
+const shopItems = [
   { label: "Mağaza", href: routes.store },
   { label: "Seçki", href: routes.secki },
   { label: "Üreticiler", href: routes.producers },
   { label: "Kabia Standardı", href: routes.kabiaStandard },
 ];
 
-const kabiaItems = [
-  { label: "Günlük", href: routes.journal },
-  { label: "İletişim", href: routes.contact },
+const farmItems = [
+  { label: "Çiftliğimiz", href: homeAnchor(anchors.farm) },
+  { label: "Bahçeyi keşfet", href: routes.farm },
+  { label: "Yaklaşım", href: routes.farmApproach },
 ];
 
 const supportItems = [
   { label: "Sepet", href: routes.cart },
   { label: "Hesabım", href: routes.account },
-  ...legalLinks,
+  { label: "Günlük", href: routes.journal },
+  { label: "İletişim", href: routes.contact },
 ];
 
 export async function SiteFooter() {
@@ -78,9 +75,10 @@ export async function SiteFooter() {
 
   return (
     <footer className="bg-paper border-t border-ink/10">
-      <div className="mx-auto max-w-[1200px] px-6 md:px-10 py-14 md:py-20">
-        <div className="grid gap-10 md:grid-cols-12">
-          <div className="md:col-span-3">
+      <div className="mx-auto max-w-[1200px] px-6 md:px-10 py-12 md:py-16">
+        {/* Primary: brand and contact, then the three ways in. */}
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-12">
+          <div className="sm:col-span-2 lg:col-span-5">
             <Link
               href="/"
               prefetch={false}
@@ -98,13 +96,65 @@ export async function SiteFooter() {
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-ink/60">
               Toprağa saygıyla üretilenleri bir araya getiriyoruz.
             </p>
-            <p className="mt-4 max-w-xs text-xs leading-relaxed text-ink/45">
-              ETBİS kayıtlı satıcıyız. Güvenli ödeme altyapısı ve 3D Secure ile
-              korunursunuz.
-            </p>
+            <address className="mt-5 space-y-2 text-sm not-italic text-ink/70">
+              <p>{settings.contactAddress}</p>
+              <p>
+                <a
+                  href={`mailto:${settings.supportEmail}`}
+                  className="hover:text-ink transition-colors duration-300"
+                >
+                  {settings.supportEmail}
+                </a>
+              </p>
+              <p>
+                <a
+                  href={phoneHref}
+                  className="hover:text-ink transition-colors duration-300"
+                >
+                  {settings.supportPhone}
+                </a>
+              </p>
+              {settings.supportHours && (
+                <p className="text-ink/50">{settings.supportHours}</p>
+              )}
+            </address>
+            {socialItems.length > 0 && (
+              <ul className="mt-5 flex gap-1">
+                {socialItems.map(({ label, href, Icon }) => (
+                  <li key={label}>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      className="flex h-11 w-11 items-center justify-center text-ink/60 hover:text-ink transition-colors duration-300"
+                    >
+                      <Icon className="h-4 w-4" aria-hidden="true" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
-          <nav aria-label="Çiftlik menüsü" className="md:col-span-2">
+          <nav aria-label="Mağaza menüsü" className="lg:col-span-2">
+            <h2 className="label text-olive">Mağaza</h2>
+            <ul className="mt-5 space-y-3">
+              {shopItems.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    prefetch={false}
+                    className="text-sm text-ink/70 hover:text-ink transition-colors duration-300"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <nav aria-label="Çiftlik menüsü" className="lg:col-span-2">
             <h2 className="label text-olive">Çiftlik</h2>
             <ul className="mt-5 space-y-3">
               {farmItems.map((item) => (
@@ -120,41 +170,7 @@ export async function SiteFooter() {
             </ul>
           </nav>
 
-          <nav aria-label="Seçki menüsü" className="md:col-span-2">
-            <h2 className="label text-olive">Seçki</h2>
-            <ul className="mt-5 space-y-3">
-              {selectionItems.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    prefetch={false}
-                    className="text-sm text-ink/70 hover:text-ink transition-colors duration-300"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <nav aria-label="Kabia menüsü" className="md:col-span-2">
-            <h2 className="label text-olive">Kabia</h2>
-            <ul className="mt-5 space-y-3">
-              {kabiaItems.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    prefetch={false}
-                    className="text-sm text-ink/70 hover:text-ink transition-colors duration-300"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <nav aria-label="Destek menüsü" className="md:col-span-2">
+          <nav aria-label="Destek menüsü" className="lg:col-span-2">
             <h2 className="label text-olive">Destek</h2>
             <ul className="mt-5 space-y-3">
               {supportItems.map((item) => (
@@ -170,77 +186,33 @@ export async function SiteFooter() {
               ))}
             </ul>
           </nav>
+        </div>
 
-          <div className="md:col-span-3">
-            <h2 className="label text-olive">İletişim</h2>
-            <ul className="mt-5 space-y-3 text-sm text-ink/70">
-              <li>{settings.contactAddress}</li>
-              <li>
-                <a
-                  href={`mailto:${settings.supportEmail}`}
-                  className="hover:text-ink transition-colors duration-300"
-                >
-                  {settings.supportEmail}
-                </a>
-              </li>
-              <li>
-                <a
-                  href={phoneHref}
-                  className="hover:text-ink transition-colors duration-300"
-                >
-                  {settings.supportPhone}
-                </a>
-              </li>
-              {settings.supportHours && (
-                <li className="text-ink/50">{settings.supportHours}</li>
-              )}
-            </ul>
-            <ul className="mt-6 flex gap-3">
-              {socialItems.map(({ label, href, Icon }) => (
-                <li key={label}>
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={label}
-                    className="flex h-11 w-11 items-center justify-center rounded-theme-icon-container border border-ink/15 text-ink/70 hover:border-brand hover:text-brand transition-colors duration-300"
-                  >
-                    <Icon className="h-4 w-4" aria-hidden="true" />
-                  </a>
+        {/* Secondary: trust stated as plain type, not badges. */}
+        <div className="mt-10 border-t border-ink/10 pt-6">
+          <p className="text-xs leading-relaxed text-ink/50">
+            256-bit SSL · 3D Secure · ETBİS kayıtlı satıcı · 14 gün cayma hakkı
+          </p>
+          <p className="mt-2 max-w-2xl text-xs leading-relaxed text-ink/40">
+            Ödeme altyapısı PCI-DSS uyumlu kuruluşlar üzerinden yürütülür; kart bilgileriniz bizde saklanmaz.
+          </p>
+        </div>
+
+        {/* Tertiary: the legal row, stated once. */}
+        <div className="mt-6 flex flex-col gap-3 border-t border-ink/10 pt-6 text-xs text-ink/50 lg:flex-row lg:items-center lg:justify-between">
+          <p>© {new Date().getFullYear()} Kabia Ekolojik. Tüm hakları saklıdır.</p>
+          <nav aria-label="Yasal menü">
+            <ul className="flex flex-wrap gap-x-5 gap-y-2">
+              {legalLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} prefetch={false} className="hover:text-ink transition-colors">
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
-          </div>
-        </div>
-
-        {/* Güven / ödeme bandı */}
-        <div className="mt-12 flex flex-wrap items-center gap-3 border-t border-ink/10 pt-6 text-xs text-ink/50">
-          <span className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-ivory px-3 py-1.5">
-            <span className="h-2 w-2 rounded-full bg-brand" aria-hidden="true" />
-            256-bit SSL · 3D Secure
-          </span>
-          <span className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-ivory px-3 py-1.5">
-            ETBİS Kayıtlı
-          </span>
-          <span className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-ivory px-3 py-1.5">
-            14 gün cayma hakkı
-          </span>
-          <span className="ml-auto hidden text-ink/40 md:inline">
-            Ödeme altyapısı PCI-DSS uyumlu kuruluşlar üzerinden yürütülür; kart bilgileriniz bizde saklanmaz.
-          </span>
-        </div>
-
-        <div className="mt-6 flex flex-col gap-3 border-t border-ink/10 pt-6 text-xs text-ink/50 md:flex-row md:items-center md:justify-between">
-          <p>© {new Date().getFullYear()} Kabia Ekolojik. Tüm hakları saklıdır.</p>
-          <div className="flex flex-wrap gap-4">
-            <Link href={routes.kvkkDisclosure} className="hover:text-ink transition-colors">
-              KVKK
-            </Link>
-            <Link href={routes.cookiePolicy} className="hover:text-ink transition-colors">
-              Çerezler
-            </Link>
-            <span className="text-ink/35">Sabırlar Köyü, Geyve</span>
-          </div>
+          </nav>
+          <p className="text-ink/35">Sabırlar Köyü, Geyve</p>
         </div>
       </div>
     </footer>

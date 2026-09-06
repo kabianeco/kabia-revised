@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { PageShell } from "@/components/layout/page-shell";
-import { ArrowLink } from "@/components/ui/button";
 import { FarmTimeline } from "@/components/farm/farm-timeline";
 import { farmCertificate, farmOpening, farmPrinciples } from "@/content/farm";
-import { routes } from "@/lib/site";
+import { soil } from "@/content/pages";
 
 export const metadata: Metadata = {
   title: "Çiftlik",
@@ -43,7 +42,64 @@ export default function FarmPage() {
               </li>
             ))}
           </ol>
-          <ArrowLink href={routes.soil}>Toprak yaklaşımımız</ArrowLink>
+        </div>
+      </section>
+
+      {/* Toprak kriterleri: toprağa dair her şey artık burada okunur —
+          çiftlik toprağın üstüyse, bu bölüm altıdır. Kopya
+          content/pages.ts'teki toprak metninin aynısıdır; ikinci bir kaynak
+          yaratılmaz. */}
+      <section
+        aria-labelledby="farm-soil-heading"
+        className="border-t border-ink/10"
+      >
+        <div className="wrap py-24 md:py-32">
+          <p className="label text-olive">{soil.eyebrow}</p>
+          <h2
+            id="farm-soil-heading"
+            className="mt-6 max-w-2xl text-3xl leading-[1.1] tracking-tight md:text-4xl"
+          >
+            {soil.title}
+          </h2>
+          <p className="mt-7 max-w-md text-base leading-relaxed text-ink/65">
+            {soil.body}
+          </p>
+
+          <ul className="mt-10 flex flex-wrap items-baseline gap-x-2 gap-y-2">
+            {soil.tags.map((tag, i) => (
+              <li key={tag} className="flex items-baseline gap-2">
+                {i > 0 && (
+                  <span aria-hidden="true" className="text-ink/30">
+                    ·
+                  </span>
+                )}
+                <span className="label text-ink/65">{tag}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-16 grid gap-12 border-t border-ink/10 pt-12 md:grid-cols-2 md:gap-16 md:pt-16">
+            <div>
+              <h3 className="text-2xl tracking-tight md:text-3xl">
+                {soil.practice.doTitle}
+              </h3>
+              <p className="mt-5 max-w-md text-sm leading-relaxed text-ink/65 md:text-base">
+                {soil.practice.doText}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-2xl tracking-tight md:text-3xl">
+                {soil.practice.dontTitle}
+              </h3>
+              <p className="mt-5 max-w-md text-sm leading-relaxed text-ink/65 md:text-base">
+                {soil.practice.dontText}
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-16 max-w-2xl font-theme-display text-2xl italic leading-snug md:mt-20 md:text-4xl">
+            {soil.closing}
+          </p>
         </div>
       </section>
 

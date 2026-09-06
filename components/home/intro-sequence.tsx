@@ -221,17 +221,17 @@ function QuietIntro() {
         </div>
       </div>
       <div className="bg-forest">
-        <div className="mx-auto max-w-[1200px] px-6 py-16 md:px-10">
+        <div className="mx-auto max-w-[1200px] px-6 py-12 md:px-10 md:py-14">
           <EditorialBeat kicker={intro.act2.kicker} text={intro.act2.text} />
         </div>
       </div>
       <div className="border-t border-on-brand/10 bg-forest">
-        <div className="mx-auto max-w-[1200px] px-6 py-16 md:px-10">
+        <div className="mx-auto max-w-[1200px] px-6 py-12 md:px-10 md:py-14">
           <EditorialBeat kicker={intro.act3.kicker} text={intro.act3.text} />
         </div>
       </div>
       <div className="border-t border-on-brand/10 bg-forest">
-        <div className="mx-auto max-w-[1200px] px-6 py-24 text-center md:px-10 md:py-32">
+        <div className="mx-auto max-w-[1200px] px-6 py-20 text-center md:px-10 md:py-24">
           <p className="font-theme-display text-[13vw] italic leading-none tracking-tight text-on-brand md:text-[7rem] lg:text-[9rem]">
             {intro.final.statementA}
             <br />
@@ -385,19 +385,23 @@ function ScrollIntro() {
   );
 
   /* One centred column cannot hold two beats at once, so the old one
-     clears the frame before the new one arrives. */
-  const bOut = 0.44;
-  const cIn = 0.53;
+     clears the frame before the new one arrives. The holds between beats
+     are deliberately short: each beat arrives, lands for a breath, and is
+     drawn up — the old timing left long stretches where only the footage
+     moved. */
+  const bOut = 0.36;
+  const cIn = 0.45;
+  const cOut = 0.63;
 
   const bOpacity = useTransform(
     scrollYProgress,
-    (v) => smoothstep(0.2, 0.27, v) * (1 - smoothstep(bOut, bOut + 0.07, v)),
+    (v) => smoothstep(0.18, 0.25, v) * (1 - smoothstep(bOut, bOut + 0.07, v)),
   );
   const bY = useTransform(
     scrollYProgress,
     (v) =>
       `${
-        ENTER_RISE * (1 - smoothstep(0.2, 0.28, v)) -
+        ENTER_RISE * (1 - smoothstep(0.18, 0.26, v)) -
         SWEEP_RISE * smoothstep(bOut, bOut + 0.07, v)
       }vh`,
   );
@@ -410,62 +414,62 @@ function ScrollIntro() {
     (v) => 1 - SWEEP_SQUEEZE * smoothstep(bOut, bOut + 0.07, v),
   );
   const bVisibility = useTransform(scrollYProgress, (v) =>
-    v > 0.19 && v < bOut + 0.08 ? "visible" : "hidden",
+    v > 0.17 && v < bOut + 0.08 ? "visible" : "hidden",
   );
 
   const cOpacity = useTransform(
     scrollYProgress,
-    (v) => smoothstep(cIn, cIn + 0.07, v) * (1 - smoothstep(0.745, 0.8, v)),
+    (v) => smoothstep(cIn, cIn + 0.07, v) * (1 - smoothstep(cOut, cOut + 0.06, v)),
   );
   const cY = useTransform(
     scrollYProgress,
     (v) =>
       `${
         ENTER_RISE * (1 - smoothstep(cIn, cIn + 0.07, v)) -
-        SWEEP_RISE * smoothstep(0.745, 0.8, v)
+        SWEEP_RISE * smoothstep(cOut, cOut + 0.06, v)
       }vh`,
   );
   const cSweepScaleX = useTransform(
     scrollYProgress,
-    (v) => 1 - SWEEP_NARROW * smoothstep(0.745, 0.8, v),
+    (v) => 1 - SWEEP_NARROW * smoothstep(cOut, cOut + 0.06, v),
   );
   const cSweepScaleY = useTransform(
     scrollYProgress,
-    (v) => 1 - SWEEP_SQUEEZE * smoothstep(0.745, 0.8, v),
+    (v) => 1 - SWEEP_SQUEEZE * smoothstep(cOut, cOut + 0.06, v),
   );
   const cVisibility = useTransform(scrollYProgress, (v) =>
-    v > cIn - 0.01 && v < 0.805 ? "visible" : "hidden",
+    v > cIn - 0.01 && v < cOut + 0.07 ? "visible" : "hidden",
   );
 
   /* Act 4 — forest green opens from the centre of the frame until it has
      covered the footage, and the closing line arrives on it. */
   const groundEdge = useTransform(
     scrollYProgress,
-    (v) => 50 * (1 - smoothstep(0.78, 0.84, v)),
+    (v) => 50 * (1 - smoothstep(0.66, 0.72, v)),
   );
   const groundClip = useMotionTemplate`inset(0 ${groundEdge}% 0 ${groundEdge}%)`;
   const groundVisibility = useTransform(scrollYProgress, (v) =>
-    v > 0.775 ? "visible" : "hidden",
+    v > 0.655 ? "visible" : "hidden",
   );
 
   /* The line starts the moment the green completes — nothing left on
      screen for the letters to share it with. */
   const dVisibility = useTransform(scrollYProgress, (v) =>
-    v > 0.826 ? "visible" : "hidden",
+    v > 0.715 ? "visible" : "hidden",
   );
   const ctaOpacity = useTransform(scrollYProgress, (v) =>
-    smoothstep(0.892, 0.915, v),
+    smoothstep(0.8, 0.83, v),
   );
   const ctaY = useTransform(
     scrollYProgress,
-    (v) => 18 * (1 - smoothstep(0.892, 0.915, v)),
+    (v) => 18 * (1 - smoothstep(0.8, 0.83, v)),
   );
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     setAtTop(v < 0.02);
-    setAct1Hot(v < 0.16);
-    setCtaHot(v > 0.909);
-    setActIndex(v < 0.21 ? 0 : v < 0.51 ? 1 : v < 0.78 ? 2 : 3);
+    setAct1Hot(v < 0.15);
+    setCtaHot(v > 0.825);
+    setActIndex(v < 0.19 ? 0 : v < 0.43 ? 1 : v < 0.66 ? 2 : 3);
   });
 
   const onKesfet = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -482,10 +486,11 @@ function ScrollIntro() {
 
   return (
     <section aria-labelledby="intro-heading" className="on-dark">
-      {/* Shorter than the sculpture's run: with nothing travelling across
-          the frame between beats, the old height left long stretches where
-          only the footage was moving. */}
-      <div ref={wrapperRef} className="relative h-[400vh] md:h-[440vh]">
+      {/* Four beats, one breath each: the run is a third shorter than the
+           sculpture era, and the holds between beats are tight — the story
+           lands its atmosphere, then hands the visitor to the products
+           instead of dwelling on the same feeling twice. */}
+      <div ref={wrapperRef} className="relative h-[280vh] md:h-[300vh]">
         <div ref={stageRef} className="sticky top-0 h-screen overflow-hidden">
           <StageBackdrop active={inView} />
 
@@ -589,7 +594,7 @@ function ScrollIntro() {
               <RisingLine
                 text={intro.final.statementA}
                 progress={scrollYProgress}
-                from={0.830}
+                from={0.72}
                 step={0.0022}
                 span={0.022}
               />
@@ -597,7 +602,7 @@ function ScrollIntro() {
                 <RisingLine
                   text={intro.final.statementB}
                   progress={scrollYProgress}
-                  from={0.854}
+                  from={0.745}
                   step={0.0022}
                   span={0.022}
                 />

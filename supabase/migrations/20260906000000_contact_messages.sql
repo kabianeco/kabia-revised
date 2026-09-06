@@ -86,14 +86,18 @@ revoke all on table public.contact_messages from anon;
 drop policy if exists contact_messages_admin_select on public.contact_messages;
 drop policy if exists contact_messages_admin_update on public.contact_messages;
 
+-- has_admin_role() is wrapped in a scalar subquery so the planner hoists it
+-- into an InitPlan and evaluates it once per statement rather than once per
+-- row. Called bare it is the `auth_rls_initplan` advisory the rest of this
+-- schema already trips 32 times.
 create policy contact_messages_admin_select on public.contact_messages
   for select to authenticated
-  using (public.has_admin_role());
+  using ((select public.has_admin_role()));
 
 -- Triage only. The policy cannot express "may change status but not message",
 -- so the action is the thing that only ever sends status and read_at; what the
 -- policy guarantees is that nobody outside the admin roles writes at all.
 create policy contact_messages_admin_update on public.contact_messages
   for update to authenticated
-  using (public.has_admin_role())
-  with check (public.has_admin_role());
+  using ((select public.has_admin_role()))
+  with check ((select public.has_admin_role()));

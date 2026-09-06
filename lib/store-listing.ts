@@ -1,4 +1,4 @@
-import { CATEGORIES, SOURCES, type Product } from "@/lib/products";
+import { ALL_CATEGORIES, SOURCES, type Product } from "@/lib/products";
 
 export const SORT_OPTIONS = [
   { id: "onerilen", label: "Varsayılan" },
@@ -38,10 +38,22 @@ export function presentSources(products: readonly Product[]) {
 export function presentCategories(products: readonly Product[], source: string) {
   const scope =
     source === "tumu" ? products : products.filter((p) => p.source === source);
-  return CATEGORIES.filter(
-    (category) =>
-      category.id === "tumu" || scope.some((p) => p.category === category.id),
-  );
+  // Built from the products in scope rather than filtered out of a fixed
+  // list, so a category an administrator adds appears here the moment a
+  // product is in it, and one that is emptied disappears. Each product
+  // carries its own label, so the bar never has to look one up.
+  const seen = new Map<string, string>();
+  for (const product of scope) {
+    if (product.category && !seen.has(product.category)) {
+      seen.set(product.category, product.categoryLabel || product.category);
+    }
+  }
+  return [
+    { id: ALL_CATEGORIES, label: "Tümü" },
+    ...[...seen]
+      .map(([id, label]) => ({ id, label }))
+      .sort((a, b) => a.label.localeCompare(b.label, "tr")),
+  ];
 }
 
 export function listingHref(

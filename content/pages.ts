@@ -1,9 +1,9 @@
 /**
- * Static copy for the standalone brand pages (/kabia-standardi, /toprak,
- * /ciftlik). Same convention as content/homepage.ts: every fact here is
- * either taken directly from the KABIA 2.0 brief's Appendix A copy blocks,
- * or already established elsewhere in this codebase (content/homepage.ts) —
- * nothing invented.
+ * Static copy for the standalone brand pages (/kabia-standardi, /ciftlik)
+ * and the soil section now living on /ciftlik. Same convention as
+ * content/homepage.ts: every fact here is either taken directly from the
+ * KABIA 2.0 brief's Appendix A copy blocks, or already established
+ * elsewhere in this codebase (content/homepage.ts) — nothing invented.
  */
 
 export const kabiaStandard = {

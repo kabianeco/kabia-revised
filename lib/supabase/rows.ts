@@ -16,6 +16,8 @@ export type Numeric = number | string;
 
 export interface CategoryRow {
   slug: string;
+  /** Selected alongside the slug so a product carries its own label. */
+  name: string;
 }
 
 export interface ProductVariantRow {

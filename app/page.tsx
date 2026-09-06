@@ -27,7 +27,10 @@ const EditorialImage = dynamic(
  * sequence owns the viewport on load and drives the header out of frame, so
  * `main` here is deliberately not the shared padded one.
  *
- * Motion configuration lives in the root Providers, not here.
+ * Order is atmosphere → discovery → storytelling: the intro lands the
+ * feeling, the collection answers "what does Kabia sell?" immediately
+ * after, and only then does the page settle into manifesto, origin and
+ * process. Motion configuration lives in the root Providers, not here.
  */
 export default function HomePage() {
   return (
@@ -35,7 +38,6 @@ export default function HomePage() {
       <SiteHeader />
       <main>
         <IntroSequence />
-        <BrandManifesto />
         <Suspense
           fallback={
             <section className="border-y border-ink/10 bg-paper">
@@ -47,6 +49,7 @@ export default function HomePage() {
         >
           <ProductCollection />
         </Suspense>
+        <BrandManifesto />
         <OriginStory />
         <ProcessStory />
         <Principles />

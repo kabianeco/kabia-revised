@@ -2,10 +2,8 @@ import { unstable_cache } from "next/cache"
 import { createClient } from "@supabase/supabase-js"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import {
-  CATEGORIES,
   SOURCES,
   type Product,
-  type ProductCategory,
   type ProductSource,
   type ProductCertification,
   type ProductReview,
@@ -35,16 +33,11 @@ function mapNutrition(n: NutritionFactsRow | null): NutritionInfo {
 }
 
 /**
- * Category slugs are seeded from the same list the UI filters on. Anything the
- * database returns outside that list would otherwise silently break filtering,
- * so it falls back to the raw slug being unmatched rather than being trusted.
+ * Sources are a database enum with three values the UI knows by name, so an
+ * unexpected one is a real anomaly and is defended against here. Categories get
+ * no such treatment any more: they are rows an administrator can add at will,
+ * so the slug is taken as it comes — see ProductCategory in lib/products.ts.
  */
-function toCategory(slug: string | undefined): ProductCategory {
-  const known = CATEGORIES.find((c) => c.id !== "tumu" && c.id === slug)
-  return (known?.id as ProductCategory | undefined) ?? "cig-badem"
-}
-
-/** Same defend-against-unexpected-values approach as toCategory above. */
 function toSource(value: string | undefined): ProductSource {
   const known = SOURCES.find((s) => s.id !== "tumu" && s.id === value)
   return (known?.id as ProductSource | undefined) ?? "ciftlik"
@@ -103,7 +96,8 @@ export function mapProduct(row: ProductRow, includeReviews = false): Product {
     id: row.id,
     slug: row.slug,
     name: row.name,
-    category: toCategory(row.category?.slug),
+    category: row.category?.slug ?? "",
+    categoryLabel: row.category?.name ?? "",
     source: toSource(row.source),
     defaultWeight: defaultVariant?.weight ?? "",
     producerId: row.producer_id ?? null,
@@ -148,19 +142,22 @@ const PRODUCT_SELECT = `
   processing, allergens, net_weight,
   short_description, description, is_active, is_featured, created_at,
   rating_avg, rating_count, rating_breakdown,
-  category:categories(slug),
+  category:categories(slug, name),
   producer:producers(slug, name, why_selected),
   product_variants(id, label, price, stock_quantity),
   product_images(image_url, sort_order),
   nutrition_facts(calories, protein, carbohydrates, fat, fiber, sodium)
 `
 
-// Lean select for listing pages (anasayfa, magaza): sadece kartta görünen alanlar + rating
+// Lean select for listing pages (anasayfa, magaza): sadece kartta görünen alanlar + rating.
+// `certification` travels with it so the store grid can state an organic
+// certification wherever the catalogue asserts one — without it every lean
+// row would silently fall back to the non-organic default.
 const PRODUCT_LEAN_SELECT = `
-  id, slug, name, base_price, main_image_url, source,
+  id, slug, name, base_price, main_image_url, source, certification,
   short_description, is_active, is_featured, created_at,
   rating_avg, rating_count,
-  category:categories(slug)
+  category:categories(slug, name)
 `
 
 // ---- async fetch functions (accept a server or browser client) ----

@@ -57,7 +57,6 @@ export const routes = {
   // version of it under `anchors.approach`, but /ciftlik is where it is set
   // out in full, so that is where the link goes from anywhere on the site.
   farmApproach: "/ciftlik#yaklasim",
-  soil: "/toprak",
   cart: "/sepet",
   checkout: "/odeme",
   login: "/giris",

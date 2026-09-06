@@ -204,6 +204,14 @@ body::before {
   pointer-events: none;
 }
 
+/* The open mobile index is a destination of its own: it holds the header in
+   frame even mid-film so the menu is never drawn up out of view with it. */
+[data-intro-stage="on"] .site-header--menu-open {
+  transform: none;
+  opacity: 1;
+  pointer-events: auto;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .site-header {
     transition: none;

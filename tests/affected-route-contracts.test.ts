@@ -52,22 +52,19 @@ function revisionsClient(result: { data: unknown; error: unknown; count?: number
   }
 }
 
+/**
+ * Stands in for the query builder fetchPublicProducts actually chains:
+ * from().select().eq().order().limit(). Each step returns the same object, so
+ * the stub keeps answering however long that chain grows — the previous version
+ * stopped at order() and broke the moment limit() was added to the real query.
+ */
 function productsClient(result: { data: unknown; error: unknown }) {
-  return {
-    from() {
-      return {
-        select() {
-          return {
-            eq() {
-              return {
-                order: async () => result,
-              }
-            },
-          }
-        },
-      }
-    },
+  const builder: Record<string, unknown> = {}
+  for (const step of ["select", "eq", "neq", "order", "limit", "range"]) {
+    builder[step] = () => builder
   }
+  builder.then = (resolve: (value: unknown) => unknown) => Promise.resolve(result).then(resolve)
+  return { from: () => builder }
 }
 
 function publishedThemeClient(result: { data: unknown; error: unknown }) {

@@ -92,9 +92,18 @@ describe("shop is backed by real data", () => {
   });
 
   it("filters by category without leaving the server", async () => {
-    const { status, body } = await get("/shop?kategori=kavrulmus");
+    // Read from the catalogue rather than named here. Categories are rows an
+    // administrator can add or rename, so a slug written into the assertion
+    // goes stale silently — this test spent its last while asserting
+    // "kavrulmus", a category the database has not had for some time.
+    const all = await get("/shop");
+    assert.equal(all.status, 200);
+    const slug = all.body.match(/\?kategori=([a-z0-9-]+)/)?.[1];
+    assert.ok(slug, "no category filter offered by /shop");
+
+    const { status, body } = await get(`/shop?kategori=${slug}`);
     assert.equal(status, 200);
-    assert.match(body, /Kavrulmuş/);
+    assert.match(body, /href="\/shop\//, "category filter returned no products");
   });
 
   it("introduces the three sources with three product links and no commerce", async () => {

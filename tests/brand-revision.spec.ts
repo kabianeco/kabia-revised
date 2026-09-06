@@ -94,7 +94,10 @@ test("sticky farm text stays put while the figures scroll past in order", async 
   expect(firstFigureYs[0] - firstFigureYs[firstFigureYs.length - 1], "first figure scrolls past").toBeGreaterThan(500);
 
   await expect(page.getByText("2026", { exact: true })).toHaveCount(0);
-  await expect(page.locator("[data-farm-approach]").getByRole("link")).toHaveAttribute("href", "/toprak");
+  // The soil criteria live on /ciftlik itself now — no standalone /toprak
+  // to link out to, so the approach section carries no link.
+  await expect(page.locator("[data-farm-approach]").getByRole("link")).toHaveCount(0);
+  await expect(page.locator("#farm-soil-heading")).toHaveText("Her şey toprağın altında başlar.");
 });
 
 test("every state and image is in the DOM up front, in order", async ({ page }) => {
@@ -490,8 +493,8 @@ test("admin blog surfaces are gone while every other admin route keeps its respo
   }
 });
 
-test("public blog is gone while the journal, soil and producer pages survive", async ({ page }) => {
-  for (const removed of ["/blog", "/blog/herhangi-bir-yazi", "/blog/rss.xml"]) {
+test("public blog and standalone soil page are gone while the journal and producer pages survive", async ({ page }) => {
+  for (const removed of ["/blog", "/blog/herhangi-bir-yazi", "/blog/rss.xml", "/toprak"]) {
     const response = await page.request.get(removed, { maxRedirects: 0 });
     expect(response.status(), `${removed} should be gone`).toBe(404);
   }
@@ -499,8 +502,9 @@ test("public blog is gone while the journal, soil and producer pages survive", a
   await page.goto("/");
   await expect(page.locator('a[href^="/blog"]')).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Blog", exact: true })).toHaveCount(0);
+  await expect(page.locator('a[href="/toprak"]')).toHaveCount(0);
 
-  for (const kept of ["/gunluk", "/toprak", "/ciftlik", "/secki", "/ureticiler", "/magaza"]) {
+  for (const kept of ["/gunluk", "/ciftlik", "/secki", "/ureticiler", "/magaza"]) {
     const response = await page.request.get(kept, { maxRedirects: 0 });
     expect(response.status(), `${kept} must survive`).toBe(200);
   }

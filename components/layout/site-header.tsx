@@ -4,8 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Menu, ShoppingBag, User, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { EASE } from "@/lib/motion";
 import { routes } from "@/lib/site";
 import { useAuth } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
@@ -18,6 +20,18 @@ const sectionItems = [
   { label: "Yaklaşım", href: routes.farmApproach },
   { label: "İletişim", href: routes.contact },
 ];
+
+/* Mobile index groupings. Primary is where Kabia lives (shop, farm, the
+   people behind the selection); account keeps commerce and contact at hand.
+   The cart icon also remains in the bar itself. */
+const mobilePrimary = [
+  { label: "Çiftlik", href: routes.farm },
+  { label: "Seçki", href: routes.secki },
+  { label: "Üreticiler", href: routes.producers },
+  { label: "Mağaza", href: routes.store },
+];
+
+
 
 
 export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean }) {
@@ -33,6 +47,20 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
   const open = openedOn === pathname;
   const toggleRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  // The menu is one full-screen piece, bar included: a single opaque
+  // curtain reveals it top to bottom, and the rows are uncovered by that
+  // same sweep — no second, staggered animation on top of it. Reduced-motion
+  // visitors get the same destinations with no movement at all.
+  const reducedMotion = useReducedMotion() ?? false;
+  const panelTransition = reducedMotion
+    ? { duration: 0 }
+    : { duration: 0.5, ease: EASE };
+  const panelExitTransition = reducedMotion
+    ? { duration: 0 }
+    : { duration: 0.35, ease: EASE };
+  // Focus returns to the header toggle only after the curtain has lifted,
+  // so it never lands on an element hidden behind the overlay mid-exit.
+  const focusOnCloseRef = useRef(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -42,11 +70,18 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
   }, []);
 
   const close = useCallback((restoreFocus = true) => {
+    focusOnCloseRef.current = restoreFocus;
     setOpenedOn(null);
-    if (restoreFocus) toggleRef.current?.focus();
   }, []);
 
-  // Escape closes the menu; focus is trapped inside the panel while it is open.
+  const handleExitComplete = useCallback(() => {
+    if (focusOnCloseRef.current) {
+      focusOnCloseRef.current = false;
+      toggleRef.current?.focus();
+    }
+  }, []);
+
+  // Escape closes the menu; focus is trapped inside the overlay while open.
   useEffect(() => {
     if (!open) return;
     const panel = panelRef.current;
@@ -59,7 +94,6 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
       }
       if (e.key === "Tab" && panel) {
         const focusables = [
-          toggleRef.current,
           ...panel.querySelectorAll<HTMLElement>("a, button"),
         ].filter(Boolean) as HTMLElement[];
         const first = focusables[0];
@@ -105,16 +139,25 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
       className={cn(
         "site-header fixed inset-x-0 z-40",
         bannerOffset ? "top-10" : "top-0",
-        surfaced
-          ? "border-b border-ink/10 bg-ivory/95 backdrop-blur-sm"
-          // Floating with no ground of its own means floating over the
-          // intro's footage, which is dark. The ink palette used everywhere
-          // else is invisible there, so the header borrows the light one
-          // (see .site-header--over-film in globals.css).
-          : "site-header--over-film border-b border-transparent bg-transparent",
+        // While the menu is open the header carries its own surface and stays
+        // in frame even over the intro film (see .site-header--menu-open in
+        // globals.css) — the open index is a destination, not a hidden panel.
+        // Deliberately solid, never blurred: backdrop-filter would turn the
+        // header into the containing block for the fixed overlay and shrink
+        // the full-screen curtain to the bar's own 64px.
+        open && "site-header--menu-open",
+        open
+          ? "border-b border-ink/10 bg-ivory"
+          : surfaced
+            ? "border-b border-ink/10 bg-ivory/95 backdrop-blur-sm"
+            // Floating with no ground of its own means floating over the
+            // intro's footage, which is dark. The ink palette used everywhere
+            // else is invisible there, so the header borrows the light one
+            // (see .site-header--over-film in globals.css).
+            : "site-header--over-film border-b border-transparent bg-transparent",
       )}
     >
-      <div className="wrap flex h-16 items-center justify-between md:h-20">
+      <div className="wrap flex h-16 items-center justify-between lg:h-20">
         <Link
           href={routes.home}
           prefetch={false}
@@ -131,17 +174,10 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
           />
         </Link>
 
-        <nav aria-label="Ana menü" className="hidden items-center gap-8 md:flex">
-          <Link
-            href={routes.store}
-            prefetch={false}
-            aria-current={pathname.startsWith(routes.store) ? "page" : undefined}
-            className={`text-sm transition-colors duration-300 hover:text-ink ${
-              pathname.startsWith(routes.store) ? "text-ink" : "text-ink/70"
-            }`}
-          >
-            Mağaza
-          </Link>
+        {/* Full navigation earns its horizontal space: at tablet widths the
+            five links plus commerce icons crowd the measure, so tablet gets
+            the editorial index instead of a squeezed desktop row. */}
+        <nav aria-label="Ana menü" className="hidden items-center gap-8 lg:flex">
           <Link
             href={routes.farm}
             prefetch={false}
@@ -173,6 +209,17 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
             </a>
           ))}
 
+          <Link
+            href={routes.store}
+            prefetch={false}
+            aria-current={pathname.startsWith(routes.store) ? "page" : undefined}
+            className={`text-sm transition-colors duration-300 hover:text-ink ${
+              pathname.startsWith(routes.store) ? "text-ink" : "text-ink/70"
+            }`}
+          >
+            Mağaza
+          </Link>
+
           <span className="flex items-center gap-1">
             <ThemeToggle />
 
@@ -199,7 +246,7 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
           </span>
         </nav>
 
-        <div className="flex items-center md:hidden">
+        <div className="flex items-center lg:hidden">
           <ThemeToggle />
 
           <Link
@@ -222,88 +269,174 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
             aria-label={open ? "Menüyü kapat" : "Menüyü aç"}
             onClick={() => (open ? close() : setOpenedOn(pathname))}
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={open ? "kapat" : "ac"}
+                initial={reducedMotion ? false : { opacity: 0, rotate: -60 }}
+                animate={{ opacity: 1, rotate: 0 }}
+                exit={reducedMotion ? undefined : { opacity: 0, rotate: 60 }}
+                transition={reducedMotion ? { duration: 0 } : { duration: 0.22, ease: EASE }}
+                className="flex"
+                aria-hidden="true"
+              >
+                {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </motion.span>
+            </AnimatePresence>
           </button>
         </div>
       </div>
 
-      {open && (
-        <div
-          id="mobile-menu"
-          ref={panelRef}
-          className="fixed inset-x-0 bottom-0 top-16 overflow-y-auto border-t border-ink/10 bg-ivory px-6 py-10 md:hidden"
-        >
-          <nav aria-label="Mobil menü" className="flex flex-col">
-            <Link
-              href={routes.store}
-              prefetch={false}
-              onClick={() => close(false)}
-              className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
-            >
-              Mağaza
-            </Link>
-            <Link
-              href={routes.farm}
-              prefetch={false}
-              onClick={() => close(false)}
-              className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
-            >
-              Çiftlik
-            </Link>
-            <Link
-              href={routes.secki}
-              prefetch={false}
-              onClick={() => close(false)}
-              className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
-            >
-              Seçki
-            </Link>
-
-            {sectionItems.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
+      <AnimatePresence onExitComplete={handleExitComplete}>
+        {open && (
+          <motion.div
+            id="mobile-menu"
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menü"
+            initial={reducedMotion ? false : { clipPath: "inset(0 0 100% 0)" }}
+            animate={{ clipPath: "inset(0 0 0% 0)" }}
+            exit={
+              reducedMotion
+                ? undefined
+                : {
+                    clipPath: "inset(0 0 100% 0)",
+                    transition: panelExitTransition,
+                  }
+            }
+            transition={panelTransition}
+            className="fixed inset-0 z-50 flex flex-col bg-ivory lg:hidden"
+          >
+            {/* The bar travels with the curtain: one piece from the very top,
+                not a fixed bar with a second panel unfolding beneath it.
+                w-full matters — as a flex item .wrap would shrink-wrap and
+                pull the logo and icons toward the center. */}
+            <div className="wrap flex h-16 w-full shrink-0 items-center justify-between border-b border-ink/10">
+              <Link
+                href={routes.home}
+                prefetch={false}
+                aria-label="Kabia Ekolojik — anasayfa"
                 onClick={() => close(false)}
-                className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
               >
-                {item.label}
-              </a>
-            ))}
-            <Link
-              href={routes.cart}
-              prefetch={false}
-              onClick={() => close(false)}
-              className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
-            >
-              Sepet
-              {showCount && (
-                <span className="label text-olive">{itemCount} ürün</span>
-              )}
-            </Link>
-            <Link
-              href={accountHref}
-              prefetch={false}
-              onClick={() => close(false)}
-              className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
-            >
-              {accountLabel}
-            </Link>
-          </nav>
+                <Image
+                  src="/images/logo.svg"
+                  alt="Kabia Ekolojik"
+                  width={177}
+                  height={60}
+                  className="h-7 w-auto"
+                />
+              </Link>
 
-          {authHydrated && isLoggedIn && (
-            <button
-              type="button"
-              onClick={() => {
-                close(false);
-                logout();
-              }}
-              className="mt-8 min-h-11 text-sm text-ink/60 transition-colors duration-300 hover:text-ink"
-            >
-              Çıkış yap
-            </button>
-          )}
-        </div>
-      )}
+              <div className="flex items-center">
+                <ThemeToggle />
+
+                <Link
+                  href={routes.cart}
+                  prefetch={false}
+                  aria-label={cartLabel}
+                  onClick={() => close(false)}
+                  className="relative flex h-11 w-11 items-center justify-center text-ink"
+                >
+                  <ShoppingBag className="h-5 w-5" aria-hidden="true" />
+                  {cartBadge}
+                </Link>
+
+                <button
+                  type="button"
+                  className="flex h-11 w-11 items-center justify-center text-ink"
+                  aria-label="Menüyü kapat"
+                  onClick={() => close()}
+                >
+                  <X className="h-5 w-5" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+
+            {/* The index scrolls within the remaining viewport on short screens. */}
+            <div className="flex-1 overflow-y-auto overscroll-contain pb-[max(2rem,env(safe-area-inset-bottom))]">
+              <nav
+                aria-label="Mobil menü"
+                className="wrap flex max-h-none flex-col pb-2 pt-8"
+              >
+                <p className="label text-olive">Kabia</p>
+                <ul>
+                  {mobilePrimary.map((item) => (
+                    <li key={item.href} className="border-b border-ink/10">
+                      <Link
+                        href={item.href}
+                        prefetch={false}
+                        onClick={() => close(false)}
+                        aria-current={
+                          pathname.startsWith(item.href) ? "page" : undefined
+                        }
+                        className="flex min-h-11 items-baseline justify-between py-3.5 font-serif text-[1.7rem] leading-snug tracking-tight"
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="label mt-8 text-olive">Hesap</p>
+                <ul>
+                  <li className="border-b border-ink/10">
+                    <Link
+                      href={routes.cart}
+                      prefetch={false}
+                      onClick={() => close(false)}
+                      className="flex min-h-11 items-baseline justify-between py-3 text-[1.05rem] leading-snug text-ink/80 transition-colors duration-300 hover:text-ink"
+                    >
+                      Sepet
+                      <span className="label text-olive">
+                        {showCount ? `${itemCount} ürün` : "Boşsa da buyurun"}
+                      </span>
+                    </Link>
+                  </li>
+                  <li className="border-b border-ink/10">
+                    <Link
+                      href={accountHref}
+                      prefetch={false}
+                      onClick={() => close(false)}
+                      className="flex min-h-11 items-baseline justify-between py-3 text-[1.05rem] leading-snug text-ink/80 transition-colors duration-300 hover:text-ink"
+                    >
+                      {accountLabel}
+                      <span aria-hidden="true" className="text-ink/30">
+                        →
+                      </span>
+                    </Link>
+                  </li>
+                  <li className="border-b border-ink/10">
+                    <Link
+                      href={routes.contact}
+                      prefetch={false}
+                      onClick={() => close(false)}
+                      className="flex min-h-11 items-baseline justify-between py-3 text-[1.05rem] leading-snug text-ink/80 transition-colors duration-300 hover:text-ink"
+                    >
+                      İletişim
+                      <span aria-hidden="true" className="text-ink/30">
+                        →
+                      </span>
+                    </Link>
+                  </li>
+                </ul>
+
+                {authHydrated && isLoggedIn && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      close(false);
+                      logout();
+                    }}
+                    className="mt-6 min-h-11 self-start text-sm text-ink/60 transition-colors duration-300 hover:text-ink"
+                  >
+                    Çıkış yap
+                  </button>
+                )}
+              </nav>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

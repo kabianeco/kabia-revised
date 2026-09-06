@@ -15,12 +15,6 @@ const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURICom
   `${site.address} ${site.name}`,
 )}`
 
-const socials = [
-  { label: "Instagram", handle: "@kabiaekolojik", href: site.social.instagram },
-  { label: "Facebook", handle: "kabiaekolojik", href: site.social.facebook },
-  { label: "X", handle: "@kabiaekolojik", href: site.social.x },
-]
-
 /**
  * The contact page.
  *
@@ -105,24 +99,6 @@ export default async function ContactPage() {
                     >
                       {site.email}
                     </a>
-                  </dd>
-                </div>
-
-                <div>
-                  <dt className="text-sm text-ink/50">Sosyal</dt>
-                  <dd className="mt-3 space-y-2">
-                    {socials.map((social) => (
-                      <a
-                        key={social.label}
-                        href={social.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-baseline justify-between border-b border-ink/10 pb-2 text-sm transition-colors duration-300 hover:text-olive"
-                      >
-                        <span>{social.label}</span>
-                        <span className="text-ink/45">{social.handle}</span>
-                      </a>
-                    ))}
                   </dd>
                 </div>
               </dl>

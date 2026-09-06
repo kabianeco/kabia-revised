@@ -12,7 +12,6 @@ import { ProductEntry } from "@/components/shop/product-entry";
 import { ProductPurchase } from "@/components/shop/product-purchase";
 import { isPreviewItem } from "@/lib/preview-identity";
 import {
-  categoryLabel,
   formatTL,
   sourceBadgeLabel,
   CERTIFICATION_LABEL,
@@ -51,8 +50,10 @@ function guarantees(source: Product["source"]) {
 /**
  * Certification rendering is legal-critical (brief §7.2/§9): only
  * 'organik_sertifikali' may ever be described as organic. 'kabia_secki' and
- * 'kabia_mutfak' are Kabia's own selection standard, never that word, and
- * link to /kabia-standardi where the distinction is explained (Appendix A.8).
+ * 'kabia_mutfak' are Kabia's own selection standard — stated in those words,
+ * never with the organic vocabulary — and link to /kabia-standardi where the
+ * distinction is explained (Appendix A.8). An asserted organic certification
+ * stands alone up in the purchase area; this row never qualifies it.
  */
 function certificationRow(product: Product): ReactNode {
   if (isOrganicCertified(product.certification)) {
@@ -60,8 +61,8 @@ function certificationRow(product: Product): ReactNode {
   }
   return (
     <span>
-      {CERTIFICATION_LABEL[product.certification]} — resmi organik sertifika
-      değildir.{" "}
+      {CERTIFICATION_LABEL[product.certification]} — Kabia&rsquo;nın kendi
+      seçim standardı.{" "}
       <Link
         href={routes.kabiaStandard}
         prefetch={false}
@@ -226,9 +227,12 @@ export function ProductDetail({
         </ol>
       </nav>
 
-      <div className="mt-10 grid gap-12 lg:grid-cols-12 lg:gap-16">
+      {/* Tablet reads side-by-side rather than stacked: at md the gallery
+          no longer owns the whole first viewport and the title, price and
+          purchase controls enter the decision area with it. */}
+      <div className="mt-8 grid gap-10 md:grid-cols-2 md:gap-8 lg:grid-cols-12 lg:gap-16">
         {/* Gallery */}
-        <div className="lg:col-span-6">
+        <div className="md:col-span-1 lg:col-span-6">
           <div className="relative aspect-[4/5] overflow-hidden rounded-theme-product-image bg-paper">
             <AnimatePresence mode="wait">
               <motion.div
@@ -287,8 +291,11 @@ export function ProductDetail({
         </div>
 
         {/* Info */}
-        <div className="lg:col-span-5 lg:col-start-8">
-          <p className="label text-olive">{categoryLabel(product.category)} • {sourceBadgeLabel(product.source)}</p>
+        <div className="md:col-span-1 lg:col-span-5 lg:col-start-8">
+          <p className="label text-olive">{product.categoryLabel} • {sourceBadgeLabel(product.source)}</p>
+          {isOrganicCertified(product.certification) && (
+            <p className="label mt-2 text-brand">{CERTIFICATION_LABEL[product.certification]}</p>
+          )}
           <h1 className="mt-4 text-3xl leading-[1.1] tracking-tight md:text-4xl">
             {product.name}
           </h1>
@@ -316,6 +323,17 @@ export function ProductDetail({
               </span>
             )}
           </p>
+
+          {/* Size and availability read as one quiet line directly under the
+              price, so the eye meets provenance → name → size → price →
+              availability in that order. */}
+          {variant && (
+            <p className={`mt-2 text-sm ${available ? "text-ink/55" : "text-clay"}`}>
+              {variant.weight}
+              <span aria-hidden="true" className="mx-2">·</span>
+              {available ? "Stokta" : "Stokta yok"}
+            </p>
+          )}
 
           <p className="mt-6 text-base leading-relaxed text-ink/65">
             {product.shortDescription}

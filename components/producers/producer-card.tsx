@@ -69,7 +69,9 @@ export function ProducerCard({
             <p className="label mt-3 text-olive">{producer.productType}</p>
           )}
 
-          <div className="mt-5 flex flex-wrap gap-3">
+          {/* One dominant action per card: this page introduces people, so
+              the story leads and the shop follows as a quiet text link. */}
+          <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
             <ButtonLink
               href={routes.producer(producer.slug)}
               prefetch={false}
@@ -79,15 +81,20 @@ export function ProducerCard({
               Hikâyeyi Gör
               <span className="sr-only"> — {producer.name}</span>
             </ButtonLink>
-            <ButtonLink
+            <Link
               href={routes.producerStore(producer.slug)}
               prefetch={false}
-              variant="outline"
-              size="sm"
+              className="group/shop inline-flex min-h-11 items-center gap-2 text-sm text-ink/60 transition-colors duration-300 hover:text-ink"
             >
               Mağazada Gör
               <span className="sr-only"> — {producer.name}</span>
-            </ButtonLink>
+              <span
+                aria-hidden="true"
+                className="transition-transform duration-300 group-hover/shop:translate-x-1"
+              >
+                →
+              </span>
+            </Link>
           </div>
         </div>
       </li>

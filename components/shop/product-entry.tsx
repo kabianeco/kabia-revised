@@ -1,6 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import { categoryLabel, formatTL, inStock, sourceBadgeLabel, type Product } from "@/lib/products";
+import {
+  CERTIFICATION_LABEL,
+  formatTL,
+  inStock,
+  isOrganicCertified,
+  sourceBadgeLabel,
+  type Product,
+} from "@/lib/products";
 import { routes } from "@/lib/site";
 import { STOCK_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
 
@@ -13,6 +20,10 @@ import { STOCK_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
  * (Kabia Çiftliği / Seçki / Mutfak) lives in the metadata line under the
  * hairline instead, so a product that is both out of stock and sourced
  * never wears two overlapping labels.
+ *
+ * Hierarchy under the hairline is provenance → name → size → price →
+ * availability. An asserted organic certification is stated as plain type
+ * in the provenance area — never as a badge, never with a disclaimer.
  */
 export function ProductEntry({
   product,
@@ -21,7 +32,12 @@ export function ProductEntry({
   product: Product;
   priority?: boolean;
 }) {
-  const available = inStock(product);
+  // Lean rows (related products) carry no variants, so stock is unknown
+  // there — an unknown state must read as nothing, never as "out of stock".
+  const stockKnown = product.variants.length > 0;
+  const available = !stockKnown || inStock(product);
+  const outOfStock = stockKnown && !available;
+  const organic = isOrganicCertified(product.certification);
   const discounted =
     product.originalPrice != null && product.originalPrice > product.price;
 
@@ -43,7 +59,7 @@ export function ProductEntry({
               <span className="label text-olive">Fotoğraf hazırlanıyor</span>
             </div>
           )}
-          {!available && (
+          {outOfStock && (
             <span className="absolute px-3 py-1.5" style={STOCK_BADGE_STYLE}>
               <span className="label">Stokta yok</span>
             </span>
@@ -51,10 +67,16 @@ export function ProductEntry({
         </div>
 
         <div className="mt-5 border-t border-ink/10 pt-4">
-          <p className="label text-olive">{categoryLabel(product.category)} • {sourceBadgeLabel(product.source)}</p>
+          <p className="label text-olive">{product.categoryLabel} • {sourceBadgeLabel(product.source)}</p>
+          {organic && (
+            <p className="label mt-2 text-brand">{CERTIFICATION_LABEL[product.certification]}</p>
+          )}
           <h2 className="mt-2 text-xl leading-snug tracking-tight transition-colors duration-300 group-hover:text-brand">
             {product.name}
           </h2>
+          {product.defaultWeight && (
+            <p className="mt-1 text-sm text-ink/55">{product.defaultWeight}</p>
+          )}
           <p className="mt-3 flex items-baseline gap-3">
             <span className="figure text-lg text-ink">
               {formatTL(product.price)}
@@ -65,7 +87,7 @@ export function ProductEntry({
               </span>
             )}
           </p>
-          {!available && <p className="mt-2 label text-clay">Stokta yok</p>}
+          {outOfStock && <p className="mt-2 label text-clay">Stokta yok</p>}
         </div>
       </Link>
     </li>
