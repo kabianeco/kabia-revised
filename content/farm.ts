@@ -103,3 +103,37 @@ export const farmTimeline: readonly FarmState[] = [
     "imageAlt": "2025 18 Mart — 4 gün süren don, çiçekte yakalandı"
   }
 ];
+
+/**
+ * The organic certificate the bahçe's production is audited under.
+ *
+ * Every value below is read straight off the document in
+ * public/images/organik-sertifika.jpg. When the certificate is renewed the
+ * numbers and dates change together — re-read the new document rather than
+ * editing a field from memory.
+ *
+ * The scope is deliberately worded as the *method* being certified rather than
+ * the products: the certificate is a müteşebbis (enterprise) certificate and
+ * says on its own face that it is not a product certificate.
+ */
+export const farmCertificate = {
+  eyebrow: "Belge",
+  title: "Usulümüz dışarıdan denetleniyor.",
+  body: [
+    "Bahçedeki üretim, 5262 sayılı Organik Tarım Kanunu kapsamında ANADOLU Kontrol ve Sertifikasyon tarafından denetleniyor. Elimizdeki müteşebbis sertifikası badem, ceviz ve nadas üretimini kapsıyor — ürünün kendisini değil, onu yetiştirdiğimiz usulü belgeliyor.",
+    "Belge asgari olanı söylüyor; biz bir adım öteye gidiyoruz. Organik sertifikalı bile olsa dışarıdan gübre almıyoruz — girdilerin tamamı kendi bahçemizden çıkıyor.",
+  ],
+  facts: [
+    { label: "Sertifika no", value: "TR-OT-012-MS-510/02" },
+    { label: "Veren kurum", value: "ANADOLU Kontrol ve Sertifikasyon — TÜRKAK akrediteli (TS EN ISO/IEC 17065)" },
+    { label: "Kapsam", value: "Badem, ceviz, nadas" },
+    { label: "Geçerlilik", value: "24 Ekim 2025 — 3 Ekim 2026" },
+    { label: "Sertifika sahibi", value: "Epilantis Kozmetik Estetik Medikal San. Dış Tic. Ltd. Şti." },
+  ],
+  image: "/images/organik-sertifika.jpg",
+  imageWidth: 1056,
+  imageHeight: 1489,
+  imageAlt:
+    "ANADOLU Kontrol ve Sertifikasyon tarafından düzenlenen TR-OT-012-MS-510/02 numaralı organik tarım müteşebbis sertifikası",
+  viewLabel: "Belgeyi tam boyutta aç",
+} as const;

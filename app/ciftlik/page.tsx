@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { PageShell } from "@/components/layout/page-shell";
 import { ArrowLink } from "@/components/ui/button";
 import { FarmTimeline } from "@/components/farm/farm-timeline";
-import { farmOpening, farmPrinciples } from "@/content/farm";
+import { farmCertificate, farmOpening, farmPrinciples } from "@/content/farm";
 import { routes } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -43,6 +44,78 @@ export default function FarmPage() {
             ))}
           </ol>
           <ArrowLink href={routes.soil}>Toprak yaklaşımımız</ArrowLink>
+        </div>
+      </section>
+
+      {/* The certificate closes the approach rather than opening the page: the
+          principles above are the claim, and this is the part of it somebody
+          outside the bahçe signed. The document is the object here, so it is
+          shown at a size worth looking at and opens full-size for anyone who
+          wants to read the small print. */}
+      <section
+        aria-labelledby="farm-certificate-heading"
+        className="border-t border-ink/10"
+      >
+        <div className="wrap py-24 md:py-32">
+          <div className="grid gap-12 md:grid-cols-12 md:gap-16">
+            <div className="md:col-span-5">
+              <a
+                href={farmCertificate.image}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block"
+              >
+                <Image
+                  src={farmCertificate.image}
+                  alt={farmCertificate.imageAlt}
+                  width={farmCertificate.imageWidth}
+                  height={farmCertificate.imageHeight}
+                  sizes="(max-width: 767px) 100vw, 40vw"
+                  className="h-auto w-full rounded-theme-image border border-ink/10 bg-paper shadow-theme-image"
+                />
+                <span className="label mt-5 inline-block text-olive transition-colors duration-300 group-hover:text-ink">
+                  {farmCertificate.viewLabel}
+                  <span
+                    aria-hidden="true"
+                    className="ml-2 inline-block transition-transform duration-300 group-hover:translate-x-1"
+                  >
+                    →
+                  </span>
+                </span>
+              </a>
+            </div>
+
+            <div className="md:col-span-6 md:col-start-7">
+              <p className="label text-olive">{farmCertificate.eyebrow}</p>
+              <h2
+                id="farm-certificate-heading"
+                className="mt-6 text-3xl leading-[1.1] tracking-tight md:text-4xl"
+              >
+                {farmCertificate.title}
+              </h2>
+              {farmCertificate.body.map((paragraph) => (
+                <p
+                  key={paragraph}
+                  className="mt-6 text-base leading-relaxed text-ink/65"
+                >
+                  {paragraph}
+                </p>
+              ))}
+              <dl className="mt-10 border-t border-ink/10">
+                {farmCertificate.facts.map((fact) => (
+                  <div
+                    key={fact.label}
+                    className="grid gap-1 border-b border-ink/10 py-4 md:grid-cols-3 md:gap-6"
+                  >
+                    <dt className="label text-olive">{fact.label}</dt>
+                    <dd className="text-sm leading-relaxed md:col-span-2">
+                      {fact.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
         </div>
       </section>
     </PageShell>
