@@ -19,6 +19,19 @@ const control =
   "placeholder:text-ink/35 transition-colors duration-300 focus:border-brand focus:outline-none " +
   "disabled:opacity-55";
 
+/**
+ * Single-line controls get a height rather than growing into one.
+ *
+ * Left to themselves an <input> and a <select> do not agree: the input takes
+ * its 24px line-height from text-base and lands on 49px, while Blink ignores
+ * line-height on <select> entirely — `leading-*` has no effect there — and the
+ * select stops at the 48px floor. One pixel is invisible on its own and
+ * obvious the moment the two sit side by side in a grid row, so both are
+ * pinned to the same 48. Textareas are deliberately left out: they size to
+ * their rows.
+ */
+const controlFixedHeight = "h-12";
+
 const controlInvalid = "border-clay focus:border-clay";
 
 interface FieldShellProps {
@@ -82,7 +95,7 @@ export function TextField({
           id={id}
           aria-describedby={describedBy}
           aria-invalid={invalid || undefined}
-          className={cn(control, invalid && controlInvalid, className)}
+          className={cn(control, controlFixedHeight, invalid && controlInvalid, className)}
           {...props}
         />
       )}
@@ -146,7 +159,7 @@ export function SelectField({
           id={id}
           aria-describedby={describedBy}
           aria-invalid={invalid || undefined}
-          className={cn(control, "cursor-pointer", invalid && controlInvalid, className)}
+          className={cn(control, controlFixedHeight, "cursor-pointer", invalid && controlInvalid, className)}
           {...props}
         >
           {children}
