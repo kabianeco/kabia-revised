@@ -189,8 +189,8 @@ function StageBackdrop({ active }: { active: boolean }) {
         preload="auto"
         disablePictureInPicture
       />
-      <div className="absolute inset-0 bg-forest/55" />
-      <div className="absolute inset-0 bg-gradient-to-b from-forest/60 via-transparent to-forest/70" />
+      <div className="absolute inset-0 bg-forest/30" />
+      <div className="absolute inset-0 bg-gradient-to-b from-forest/50 via-transparent to-forest/60" />
     </div>
   );
 }
@@ -212,7 +212,10 @@ function QuietIntro() {
           className="absolute inset-0 -z-10 bg-forest bg-cover bg-center"
           style={{ backgroundImage: `url(${HERO_POSTER})` }}
         />
-        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-forest/65" />
+        {/* Heavier than the scroll stage's wash: this is one still frame with
+            the copy sitting straight on it, and no gradient underneath it to
+            pick up the top and bottom. */}
+        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-forest/50" />
         <div className="mx-auto max-w-[1200px] px-6 pb-24 pt-28 md:px-10 md:pb-32 md:pt-36">
           <Act1Copy hot />
         </div>
