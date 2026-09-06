@@ -22,6 +22,7 @@ export type AdminNavIcon =
   | "settings"
   | "administrators"
   | "audit"
+  | "messages"
 
 export interface AdminNavItem {
   href: string
@@ -50,6 +51,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
     permission: "manageAdministrators",
     matchPrefix: true,
   },
+  { href: "/admin/messages", label: "Mesajlar", icon: "messages", permission: "viewMessages", matchPrefix: true },
   { href: "/admin/audit-logs", label: "Denetim Kayıtları", icon: "audit", matchPrefix: true },
 ]
 

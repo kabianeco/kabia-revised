@@ -13,6 +13,7 @@ import {
   FileText,
   Image as ImageIcon,
   LayoutDashboard,
+  Mail,
   Menu,
   Palette,
   Package,
@@ -77,6 +78,7 @@ const NAV_ICONS: Record<AdminNavIcon, LucideIcon> = {
   settings: Settings,
   administrators: ShieldCheck,
   audit: ScrollText,
+  messages: Mail,
 }
 
 function NavIcon({ icon, className }: { icon: AdminNavIcon; className?: string }) {
