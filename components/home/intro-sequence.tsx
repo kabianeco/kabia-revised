@@ -189,7 +189,7 @@ function StageBackdrop({ active }: { active: boolean }) {
         preload="auto"
         disablePictureInPicture
       />
-      <div className="absolute inset-0 bg-forest/42" />
+      <div className="absolute inset-0 bg-forest/20" />
       <div className="absolute inset-0 bg-gradient-to-b from-forest/55 via-transparent to-forest/65" />
     </div>
   );
