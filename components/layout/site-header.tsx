@@ -15,8 +15,8 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
    in full, and the homepage section is only its short introduction, so keeping
    both would put two links labelled "Çiftlik" in the same nav. */
 const sectionItems = [
-  { label: "Yaklaşım", anchor: anchors.approach },
-  { label: "İletişim", anchor: anchors.contact },
+  { label: "Yaklaşım", target: routes.farmApproach },
+  { label: "İletişim", target: anchors.contact },
 ];
 
 
@@ -85,8 +85,11 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
   // behind it for it to be transparent over.
   const surfaced = scrolled || open || !isHome;
 
-  // Anchors resolve only on the homepage, so prefix them everywhere else.
-  const sectionHref = (anchor: string) => (isHome ? anchor : homeAnchor(anchor));
+  /* A bare "#…" is a homepage anchor and only resolves on `/`, so anywhere
+     else it needs the home route in front of it. A target that already names
+     a route of its own is left exactly as it is. */
+  const sectionHref = (target: string) =>
+    target.startsWith("#") && !isHome ? homeAnchor(target) : target;
 
   const accountHref = isLoggedIn ? routes.account : routes.login;
   // Used as the icon's accessible name; resolves once auth has hydrated.
@@ -168,8 +171,8 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
 
           {sectionItems.map((item) => (
             <a
-              key={item.anchor}
-              href={sectionHref(item.anchor)}
+              key={item.target}
+              href={sectionHref(item.target)}
               className="text-sm text-ink/70 transition-colors duration-300 hover:text-ink"
             >
               {item.label}
@@ -264,8 +267,8 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
 
             {sectionItems.map((item) => (
               <a
-                key={item.anchor}
-                href={sectionHref(item.anchor)}
+                key={item.target}
+                href={sectionHref(item.target)}
                 onClick={() => close(false)}
                 className="flex items-baseline justify-between border-b border-ink/10 py-4 font-serif text-2xl"
               >

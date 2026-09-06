@@ -239,6 +239,21 @@ export function FarmTimeline() {
     () => false,
   );
 
+  /* The server always renders the quiet variant, and a wide client swaps in
+     the synced one — which stacks nothing and so is around 1,300px shorter.
+     A browser landing on a hash *below* this section (/ciftlik#yaklasim, from
+     the nav) has already scrolled using the taller layout by the time the swap
+     commits, and is left that far past its target; scroll anchoring does not
+     catch a jump of this size. The section that moved the ground is the one
+     that puts the visitor back on it. `scrollIntoView` honours the target's
+     scroll-margin, so this lands clear of the fixed header like any other
+     anchor. */
+  useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    document.getElementById(id)?.scrollIntoView();
+  }, [synced]);
+
   return (
     <section
       aria-labelledby="timeline-heading"

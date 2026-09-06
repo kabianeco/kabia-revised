@@ -40,7 +40,7 @@ const farmItems = [
   { label: "Çiftliğimiz", href: homeAnchor(anchors.farm) },
   { label: "Bahçeyi keşfet", href: routes.farm },
   { label: "Toprak", href: routes.soil },
-  { label: "Yaklaşım", href: homeAnchor(anchors.approach) },
+  { label: "Yaklaşım", href: routes.farmApproach },
 ];
 
 const selectionItems = [

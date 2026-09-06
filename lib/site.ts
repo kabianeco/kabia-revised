@@ -48,6 +48,10 @@ export const routes = {
   journal: "/gunluk",
   journalEntry: (slug: string) => `/gunluk/${slug}`,
   farm: "/ciftlik",
+  // The approach the nav points at. The homepage still opens with a short
+  // version of it under `anchors.approach`, but /ciftlik is where it is set
+  // out in full, so that is where the link goes from anywhere on the site.
+  farmApproach: "/ciftlik#yaklasim",
   soil: "/toprak",
   cart: "/sepet",
   checkout: "/odeme",

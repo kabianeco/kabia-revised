@@ -24,7 +24,14 @@ export default function FarmPage() {
         </div>
       </section>
       <FarmTimeline />
-      <section data-farm-approach aria-labelledby="farm-approach-heading">
+      {/* The nav's "Yaklaşım" lands here, so the id has to clear the fixed
+          header the same way the homepage sections do. */}
+      <section
+        id="yaklasim"
+        data-farm-approach
+        aria-labelledby="farm-approach-heading"
+        className="scroll-mt-20"
+      >
         <div className="wrap py-24 md:py-32">
           <h2 id="farm-approach-heading" className="label text-olive">Yaklaşım</h2>
           <ol className="mt-10">
