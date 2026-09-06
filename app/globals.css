@@ -228,6 +228,25 @@ body::before {
   outline-color: var(--color-cream);
 }
 
+/* The wordmark is a flat green SVG served as an <img>, so its own fill cannot
+   be reached from here — knocking it to black and inverting is what turns it
+   white. It goes back to green the moment the header takes a surface, which is
+   every other state on every other page. The timing matches the header's own
+   background fade so the two read as one change. */
+.site-header img {
+  transition: filter 300ms;
+}
+
+.site-header--over-film img {
+  filter: brightness(0) invert(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header img {
+    transition: none;
+  }
+}
+
 /* Small tracked uppercase metadata label — used sparingly */
 .label {
   font-size: 0.6875rem;
