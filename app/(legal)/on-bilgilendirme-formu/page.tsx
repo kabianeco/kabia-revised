@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalLayout } from "@/components/legal/legal-layout";
+import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Ön Bilgilendirme Formu",
@@ -16,7 +17,7 @@ export default function Page() {
     >
       <h2>1. Satıcıya ilişkin bilgiler</h2>
       <ul>
-        <li>Unvan: Kabia Ekolojik Tarım Ürünleri — Geyve / Sakarya</li>
+        <li>Unvan: {site.legalName} (“{site.name}” markası)</li>
         <li>Adres: Sabırlar Köyü, 54700 Geyve / Sakarya</li>
         <li>E-posta: info@kabia.com · Telefon: +90 553 744 76 74</li>
         <li>MERSİS / KEP / ETBİS: Fatura ve ETBİS kaydında sunulur; eticaret.gov.tr üzerinden doğrulanabilir.</li>

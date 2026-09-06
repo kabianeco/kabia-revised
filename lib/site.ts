@@ -4,6 +4,10 @@
  */
 export const site = {
   name: "Kabia Ekolojik",
+  /* Kabia Ekolojik is the brand. The company behind it — the one that sells,
+     invoices and holds the organic certificate — is Epilantis, so anywhere the
+     law asks who the seller is, this is the name that belongs there. */
+  legalName: "Epilantis Kozmetik Estetik Medikal San. Dış Tic. Ltd. Şti.",
   url: "https://kabiaekolojik.com",
   email: "info@kabia.com",
   phone: "+90 553 744 76 74",
@@ -48,6 +52,7 @@ export const routes = {
   journal: "/gunluk",
   journalEntry: (slug: string) => `/gunluk/${slug}`,
   farm: "/ciftlik",
+  contact: "/iletisim",
   // The approach the nav points at. The homepage still opens with a short
   // version of it under `anchors.approach`, but /ciftlik is where it is set
   // out in full, so that is where the link goes from anywhere on the site.

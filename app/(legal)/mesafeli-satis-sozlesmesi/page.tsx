@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalLayout } from "@/components/legal/legal-layout";
+import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Mesafeli Satış Sözleşmesi",
@@ -26,7 +27,7 @@ export default function Page() {
           <tr>
             <th>Satıcı</th>
             <td>
-              Kabia Ekolojik Tarım Ürünleri — Sakarya Geyve, Sabırlar Köyü 54700
+              {site.legalName} (“{site.name}” markası) — Sakarya Geyve, Sabırlar Köyü 54700
               <br />
               E-posta: info@kabia.com · Tel: +90 553 744 76 74
               <br />
