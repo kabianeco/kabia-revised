@@ -40,22 +40,22 @@ function XIcon(props: React.SVGProps<SVGSVGElement>) {
    it. Legal destinations live once in the tertiary row below — never
    repeated up here. */
 const shopItems = [
-  { label: "Mağaza", href: routes.store },
+  { label: "Hasat Listesi", href: routes.store },
   { label: "Seçki", href: routes.secki },
+  { label: "Mutfak", href: routes.mutfak },
   { label: "Üreticiler", href: routes.producers },
-  { label: "Kabia Standardı", href: routes.kabiaStandard },
 ];
 
 const farmItems = [
-  { label: "Çiftliğimiz", href: homeAnchor(anchors.farm) },
-  { label: "Bahçeyi keşfet", href: routes.farm },
+  { label: "Çiftliğimiz", href: routes.farm },
   { label: "Yaklaşım", href: routes.farmApproach },
+  { label: "Emanet", href: `${routes.farm}#emanet` },
+  { label: "Saha Notları", href: routes.journal },
 ];
 
 const supportItems = [
   { label: "Sepet", href: routes.cart },
   { label: "Hesabım", href: routes.account },
-  { label: "Günlük", href: routes.journal },
   { label: "İletişim", href: routes.contact },
 ];
 
@@ -138,7 +138,7 @@ export async function SiteFooter() {
           </div>
 
           <nav aria-label="Mağaza menüsü" className="lg:col-span-2">
-            <h2 className="label text-olive">Mağaza</h2>
+            <h2 className="label text-olive">Hasat Listesi</h2>
             <ul className="mt-5 space-y-3">
               {shopItems.map((item) => (
                 <li key={item.href}>

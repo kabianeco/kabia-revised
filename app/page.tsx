@@ -5,8 +5,10 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { IntroSequence } from "@/components/home/intro-sequence";
 import { BrandManifesto } from "@/components/home/brand-manifesto";
 import { ProductCollection } from "@/components/home/product-collection";
+import { Producers } from "@/components/home/producers";
 import { OriginStory } from "@/components/home/origin-story";
 import { Principles } from "@/components/home/principles";
+import { Emanet } from "@/components/home/emanet";
 import { BrandQuote } from "@/components/home/brand-quote";
 import { FinalCta } from "@/components/home/final-cta";
 
@@ -38,6 +40,8 @@ export default function HomePage() {
       <SiteHeader />
       <main>
         <IntroSequence />
+        <OriginStory />
+        <Emanet />
         <Suspense
           fallback={
             <section className="border-y border-ink/10 bg-paper">
@@ -50,7 +54,7 @@ export default function HomePage() {
           <ProductCollection />
         </Suspense>
         <BrandManifesto />
-        <OriginStory />
+        <Producers />
         <ProcessStory />
         <Principles />
         <EditorialImage />

@@ -28,7 +28,7 @@ export default function OrdersListPage() {
           edebilirsiniz.
         </p>
         <ButtonLink href={routes.store} className="mt-8">
-          Mağazaya göz at
+          Hasat Listesine göz at
         </ButtonLink>
       </div>
     );

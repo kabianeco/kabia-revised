@@ -17,11 +17,11 @@ export default function NotFound() {
           Bu sayfa <em className="font-serif italic text-brand">yok</em>.
         </h1>
         <p className="mt-7 max-w-md text-base leading-relaxed text-ink/65">
-          Aradığınız sayfa taşınmış ya da hiç var olmamış olabilir. Mağazadan
-          devam edebilirsiniz.
+          Aradığınız sayfa taşınmış ya da hiç var olmamış olabilir. Hasat
+          Listesinden devam edebilirsiniz.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-7">
-          <ButtonLink href={routes.store}>Mağazaya git</ButtonLink>
+          <ButtonLink href={routes.store}>Hasat Listesine git</ButtonLink>
           <ButtonLink href={routes.home} variant="ghost">
             Anasayfa
           </ButtonLink>

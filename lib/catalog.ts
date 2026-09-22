@@ -157,7 +157,8 @@ const PRODUCT_LEAN_SELECT = `
   id, slug, name, base_price, main_image_url, source, certification,
   short_description, is_active, is_featured, created_at,
   rating_avg, rating_count,
-  category:categories(slug, name)
+  category:categories(slug, name),
+  producer:producers(slug, name)
 `
 
 // ---- async fetch functions (accept a server or browser client) ----

@@ -10,14 +10,14 @@ import { farmTimeline } from "@/content/farm";
  *
  * Structure is OriginStory's exactly (12-column grid, 5 / 6-from-7 split,
  * rounded-media 4:3 frame, space-y-16). The right column is ordinary
- * document flow: seven figures that scroll past naturally, with no
+ * document flow: figures that scroll past naturally, with no
  * transforms, no sticky and no pinning. The left column is md:sticky
  * md:top-32, so it stays put while the images move past it. The only thing
  * added is that the sticky text swaps to match whichever figure is
  * currently in view, detected with an IntersectionObserver against the
  * figures themselves.
  *
- * All seven states are always in the DOM. The quiet variant is what the
+ * All states are always in the DOM. The quiet variant is what the
  * server renders, so a visitor without JavaScript, a screen reader, or a
  * narrow screen gets the whole chronology as an ordinary stacked sequence —
  * year text above its own image, in order — with nothing pinned and nothing
@@ -88,7 +88,7 @@ function SyncedTimeline() {
     >
       <div className="md:col-span-5">
         <div data-farm-timeline-sticky className="md:sticky md:top-32">
-          {/* All seven texts share one grid cell so the tallest sets the
+          {/* All texts share one grid cell so the tallest sets the
               height and swapping never moves the block. Hidden panels stay
               in layout (invisible, not display:none) but are inert and
               excluded from the accessibility tree. The swap is a soft
@@ -161,8 +161,7 @@ function SyncedTimeline() {
 }
 
 /**
- * Reduced motion, no JavaScript, and narrow screens all get this: the same
- * seven states in the same order, stacked and fully readable, with nothing
+ * Reduced motion, no JavaScript, and narrow screens all get this: all states in order, stacked and fully readable, with nothing
  * sticky and nothing faded. Each year text sits directly above its own
  * image, so the sequence is coherent on its own.
  */
@@ -270,3 +269,5 @@ export function FarmTimeline() {
     </section>
   );
 }
+
+

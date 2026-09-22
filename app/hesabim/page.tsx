@@ -25,7 +25,7 @@ function EmptyRecentlyViewed() {
         bulmanız kolay olur.
       </p>
       <div className="mt-4">
-        <ArrowLink href={routes.store}>Mağazaya göz atın</ArrowLink>
+        <ArrowLink href={routes.store}>Hasat Listesine göz atın</ArrowLink>
       </div>
     </div>
   );
@@ -197,7 +197,7 @@ export default function AccountOverviewPage() {
           <div className="mt-6 border-t border-ink/10 pt-6">
             <p className="text-sm text-ink/60">Henüz siparişiniz yok.</p>
             <div className="mt-4">
-              <ArrowLink href={routes.store}>Mağazaya göz atın</ArrowLink>
+              <ArrowLink href={routes.store}>Hasat Listesine göz atın</ArrowLink>
             </div>
           </div>
         )}
@@ -208,7 +208,7 @@ export default function AccountOverviewPage() {
           <h2 id="recently-viewed" className="text-2xl tracking-tight">
             Son baktıklarınız
           </h2>
-          <ArrowLink href={routes.store}>Mağaza</ArrowLink>
+          <ArrowLink href={routes.store}>Hasat Listesi</ArrowLink>
         </div>
         <RecentlyViewed />
       </section>

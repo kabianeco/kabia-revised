@@ -14,9 +14,21 @@ import { shopBannerVisible, type ShopBannerSettings } from "@/lib/shop-banner";
 import { ShopHeroBanner } from "@/components/shop/shop-hero-banner";
 
 export const metadata: Metadata = {
-  title: "Mağaza",
+  title: "Hasat Listesi",
   description:
-    "Geyve'deki bahçelerimizden çiğ badem, kavrulmuş badem, badem unu ve badem ezmesi. Katkısız, tek kaynaktan.",
+    "Kabuklu badem, kabuklu fındık, kabuklu ceviz, bal, ıhlamur, salça, sirke, erişte, tarhana. Katkısız, izlenebilir, hikâyesiyle.",
+  keywords: [
+    "kabuklu badem",
+    "organik badem",
+    "kabuklu fındık",
+    "kabuklu ceviz",
+    "doğal bal",
+    "ıhlamur",
+    "domates salçası",
+    "elma sirkesi",
+    "erişte",
+    "tarhana",
+  ],
   alternates: { canonical: "/magaza" },
 };
 
@@ -108,16 +120,16 @@ export default async function ShopPage({
       )}
       <section aria-labelledby="shop-heading">
         <div className={showBanner ? "wrap mt-14 md:mt-20" : "wrap page-top"}>
-          <p className="label text-olive">Mağaza</p>
+          <p className="label text-olive">Hasat Listesi</p>
           <h1
             id="shop-heading"
             className="mt-6 max-w-3xl text-4xl leading-[1.08] tracking-tight md:text-6xl"
           >
-            Bahçeden <em className="font-theme-display italic text-brand">sofraya</em>.
+            Hasat <em className="font-theme-display italic text-brand">defteri</em>.
           </h1>
           <p className="mt-7 max-w-md text-base leading-relaxed text-ink/65">
-            Geyve&apos;deki bahçelerimizde kimyasal gübre ve ilaç kullanmadan
-            yetiştirilen badem. Katkı maddesi eklenmez.
+            Önce hikâyesini okumanızı isteriz — nereden geldiğini, neden
+            Kabia&apos;da olduğunu. Sonra hasattan dilediğinizi seçebilirsiniz.
           </p>
         </div>
 

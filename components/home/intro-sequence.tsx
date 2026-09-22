@@ -180,15 +180,17 @@ function StageBackdrop({ active }: { active: boolean }) {
       <video
         ref={videoRef}
         className="h-full w-full object-cover"
-        src={HERO_VIDEO}
         poster={HERO_POSTER}
         autoPlay
         muted
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
         disablePictureInPicture
-      />
+      >
+        <source src="/video/kabia-hero-mobile.mp4" media="(max-width: 768px)" type="video/mp4" />
+        <source src={HERO_VIDEO} media="(min-width: 769px)" type="video/mp4" />
+      </video>
       <div className="absolute inset-0 bg-forest/20" />
       <div className="absolute inset-0 bg-gradient-to-b from-forest/55 via-transparent to-forest/65" />
     </div>
@@ -237,14 +239,6 @@ function QuietIntro() {
             <br />
             {intro.final.statementB}
           </p>
-          <div className="mt-10 md:mt-14">
-            <Link
-              href={routes.store}
-              className="inline-block rounded-theme-button bg-on-brand px-10 py-4 text-sm font-medium text-forest transition-colors duration-300 hover:bg-cream"
-            >
-              {intro.final.ctaLabel}
-            </Link>
-          </div>
         </div>
       </div>
     </section>
@@ -477,10 +471,11 @@ function ScrollIntro() {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
     if (veilPhase !== "off") return;
+    // "Önce üretici": the veil lifts onto the producers strip, not the store.
     setVeilPhase("enter");
     timers.current.push(window.setTimeout(() => setVeilPhase("settle"), 1250));
     timers.current.push(
-      window.setTimeout(() => router.push(routes.store), 1700),
+      window.setTimeout(() => router.push("/#ureticiler"), 1700),
     );
   };
 
@@ -608,21 +603,6 @@ function ScrollIntro() {
                 />
               </span>
             </p>
-            <motion.div
-              style={{ opacity: ctaOpacity, y: ctaY }}
-              className="mt-10 md:mt-14"
-            >
-              <a
-                href={routes.store}
-                onClick={onKesfet}
-                tabIndex={ctaHot ? 0 : -1}
-                className={`inline-block rounded-theme-button bg-on-brand px-10 py-4 text-sm font-medium text-forest transition-colors duration-300 hover:bg-cream ${
-                  ctaHot ? "pointer-events-auto" : "pointer-events-none"
-                }`}
-              >
-                {intro.final.ctaLabel}
-              </a>
-            </motion.div>
           </motion.div>
 
           {/* Four acts, four quiet markers. Every act now sits on dark —

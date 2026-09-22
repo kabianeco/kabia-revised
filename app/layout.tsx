@@ -25,10 +25,43 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${settings.storeName}`,
     },
     description: settings.seoDefaultDescription,
-    alternates: { canonical: "/" },
+    keywords: [
+      "Kabia Ekolojik",
+      "organik badem",
+      "kabuklu badem",
+      "Marinada badem",
+      "doğal fındık",
+      "kabuklu fındık",
+      "kabuklu ceviz",
+      "ciğ badem",
+      "doğal bal",
+      "Kılıçkaya balı",
+      "ıhlamur",
+      "alıç sirkesi",
+      "elma sirkesi",
+      "domates salçası",
+      "erişte",
+      "tarhana",
+      "ekolojik tarım",
+      "organik tarım",
+      "Geyve",
+      "Sakarya",
+      "Kılıçkaya",
+    ],
+    authors: [{ name: "Kabia Ekolojik", url: site.url }],
+    creator: "Kabia Ekolojik",
+    publisher: "Epilantis Kozmetik Estetik Medikal Sanayi Dış Tic. Ltd. Şti.",
+    formatDetection: { email: false, address: false, telephone: false },
+    category: "organic food, ecological agriculture",
+    classification: "Ecological Agriculture, Organic Food",
+    alternates: {
+      canonical: "/",
+      languages: { "tr-TR": "/", "en-US": "/en" },
+    },
     openGraph: {
       type: "website",
       locale: "tr_TR",
+      alternateLocale: ["en_US"],
       url: site.url,
       siteName: settings.storeName,
       title: settings.seoDefaultTitle,
@@ -47,8 +80,14 @@ export async function generateMetadata(): Promise<Metadata> {
       title: settings.seoDefaultTitle,
       description: settings.seoDefaultDescription,
       images: [settings.seoSocialImage],
+      creator: "@kabiaekolojik",
     },
-    robots: { index: true, follow: true },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+    },
+    verification: { google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || undefined },
   };
 }
 
@@ -73,7 +112,21 @@ const organizationJsonLd = {
     streetAddress: "Sabırlar",
     addressCountry: "TR",
   },
-  sameAs: [site.social.instagram, site.social.facebook, site.social.x],
+  sameAs: [site.social.instagram, site.social.facebook, site.social.x].filter(Boolean),
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: site.name,
+  url: site.url,
+  inLanguage: "tr-TR",
+  publisher: { "@type": "Organization", name: site.name, logo: { "@type": "ImageObject", url: `${site.url}/images/logo.svg` } },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${site.url}/magaza?q={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
 };
 
 export default async function RootLayout({
@@ -111,6 +164,12 @@ export default async function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          nonce={nonce}
+          suppressHydrationWarning
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
           nonce={nonce}
           suppressHydrationWarning
         />

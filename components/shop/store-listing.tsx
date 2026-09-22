@@ -113,14 +113,14 @@ export function StoreListing({
             <p className="font-theme-display text-2xl italic text-clay">
               Ürünler şu anda yüklenemiyor.
             </p>
-            <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink/55">
-              Mağaza sayfası açık kalacak. Lütfen daha sonra yeniden deneyin.
-            </p>
+              <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink/55">
+                Hasat Listesi açık kalacak. Lütfen daha sonra yeniden deneyin.
+              </p>
           </div>
         ) : products.length === 0 ? (
           <div className="py-24 text-center">
             <p className="font-theme-display text-2xl italic text-ink/70">
-              {all.length === 0 ? "Mağaza şu an boş." : "Bu kategoride ürün yok."}
+              {all.length === 0 ? "Hasat Listesi şu an boş." : "Bu kategoride ürün yok."}
             </p>
             <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink/55">
               {all.length === 0

@@ -33,7 +33,7 @@ const CartContext = createContext<CartContextValue | null>(null)
 
 const STORAGE_KEY = "kabia_cart"
 
-export const FREE_SHIPPING_THRESHOLD = 500
+export const FREE_SHIPPING_THRESHOLD = 2000
 export const SHIPPING_COST = 29.9
 
 const CART_SELECT =
