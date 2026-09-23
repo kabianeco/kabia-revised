@@ -48,7 +48,7 @@ export default function FavoritesPage() {
           buraya ekleyebilirsiniz.
         </p>
         <ButtonLink href={routes.store} className="mt-8">
-          Hasat Listesine göz at
+          Mağazaya göz at
         </ButtonLink>
       </div>
     );

@@ -53,7 +53,7 @@ function breadcrumbJsonLd(product: Product) {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Ana sayfa", item: site.url },
-      { "@type": "ListItem", position: 2, name: "Hasat Listesi", item: `${site.url}/magaza` },
+      { "@type": "ListItem", position: 2, name: "Mağaza", item: `${site.url}/magaza` },
       { "@type": "ListItem", position: 3, name: product.name, item: `${site.url}/shop/${product.slug}` },
     ],
   };

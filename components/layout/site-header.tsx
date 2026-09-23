@@ -26,7 +26,7 @@ const mobilePrimary = [
   { label: "Seçki", href: routes.secki },
   { label: "Mutfak", href: routes.mutfak },
   { label: "Üreticiler", href: routes.producers },
-  { label: "Hasat Listesi", href: routes.store },
+  { label: "Mağaza", href: routes.store },
 ];
 
 
@@ -223,7 +223,7 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
             aria-current={pathname.startsWith(routes.store) ? "page" : undefined}
             className="inline-flex min-h-11 items-center rounded-full bg-brand px-5 text-sm font-medium text-on-brand transition-colors duration-300 hover:bg-forest"
           >
-            Hasat Listesi
+            Mağaza
           </Link>
 
           <span className="flex items-center gap-1">

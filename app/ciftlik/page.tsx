@@ -21,7 +21,7 @@ export default function FarmPage() {
           <div className="mx-auto max-w-3xl text-center">
             <p className="label text-olive">Sabırlar Köyü — Geyve, Sakarya</p>
             <h1 id="farm-heading" className="mt-6 text-4xl leading-[1.08] tracking-tight md:text-6xl">946 ağaçlık <em className="font-theme-display italic text-brand">bir bahçe</em>.</h1>
-            <p className="mt-7 text-base leading-relaxed text-ink/65">Kılıçkaya yamaçlarında, 2021’den beri organik sertifikalı badem yetiştiriyoruz. Hikayenin başladığı yer burası.</p>
+            <p className="mt-7 text-base leading-relaxed text-ink/65">Kılıçkaya yamaçlarında, 2021’den beri <a href="#sertifika" className="underline decoration-ink/25 underline-offset-4 transition-colors duration-300 hover:text-ink hover:decoration-ink/60">organik sertifikalı</a> badem yetiştiriyoruz. Hikayenin başladığı yer burası.</p>
           </div>
         </div>
       </section>
@@ -327,8 +327,9 @@ export default function FarmPage() {
           shown at a size worth looking at and opens full-size for anyone who
           wants to read the small print. */}
       <section
+        id="sertifika"
         aria-labelledby="farm-certificate-heading"
-        className="border-t border-ink/10"
+        className="border-t border-ink/10 scroll-mt-20"
       >
         <div className="wrap py-24 md:py-32">
           <div className="grid gap-12 md:grid-cols-12 md:gap-16">
@@ -396,9 +397,9 @@ export default function FarmPage() {
       <FaqList group="ciftlik" />
       <FaqList group="emanet" heading="Emanet hakkında" />
 
-      <section aria-label="Hasat Listesi" className="border-t border-ink/10">
+      <section aria-label="Mağaza" className="border-t border-ink/10">
         <div className="wrap py-24 text-center md:py-32">
-          <p className="label text-olive">Hasat Listesi</p>
+          <p className="label text-olive">Mağaza</p>
           <p className="mx-auto mt-6 max-w-xl font-theme-display text-2xl italic leading-snug md:text-4xl">
             Bu toprağın hasadını tat.
           </p>
@@ -406,7 +407,7 @@ export default function FarmPage() {
             href="/magaza"
             className="mt-8 inline-flex min-h-11 items-center gap-2 rounded-full bg-brand px-7 text-sm font-medium text-on-brand transition-colors duration-300 hover:bg-forest"
           >
-            Hasat Listesi
+            Mağaza
             <span aria-hidden="true">→</span>
           </a>
         </div>

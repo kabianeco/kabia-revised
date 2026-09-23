@@ -119,7 +119,7 @@ export default function BademPage() {
                 href="/magaza"
                 className="inline-flex min-h-11 items-center gap-2 text-sm text-ink/60 transition-colors duration-300 hover:text-ink"
               >
-                Hasat Listesi
+                Mağaza
                 <span aria-hidden="true">→</span>
               </a>
             </div>

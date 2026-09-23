@@ -40,7 +40,7 @@ function XIcon(props: React.SVGProps<SVGSVGElement>) {
    it. Legal destinations live once in the tertiary row below — never
    repeated up here. */
 const shopItems = [
-  { label: "Hasat Listesi", href: routes.store },
+  { label: "Mağaza", href: routes.store },
   { label: "Seçki", href: routes.secki },
   { label: "Mutfak", href: routes.mutfak },
   { label: "Üreticiler", href: routes.producers },
@@ -50,6 +50,7 @@ const farmItems = [
   { label: "Çiftliğimiz", href: routes.farm },
   { label: "Yaklaşım", href: routes.farmApproach },
   { label: "Emanet", href: `${routes.farm}#emanet` },
+  { label: "Sertifika", href: `${routes.farm}#sertifika` },
   { label: "Saha Notları", href: routes.journal },
 ];
 
@@ -138,7 +139,7 @@ export async function SiteFooter() {
           </div>
 
           <nav aria-label="Mağaza menüsü" className="lg:col-span-2">
-            <h2 className="label text-olive">Hasat Listesi</h2>
+            <h2 className="label text-olive">Mağaza</h2>
             <ul className="mt-5 space-y-3">
               {shopItems.map((item) => (
                 <li key={item.href}>

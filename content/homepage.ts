@@ -74,7 +74,7 @@ export const products = {
     "Üreticilerin mutfağından.",
   ],
   intro:
-    "Kendi çiftliğimizden ve güvendiğimiz üreticilerden — öne çıkan üçü; tamamı Hasat Listesinde.",
+    "Kendi çiftliğimizden ve güvendiğimiz üreticilerden — öne çıkan üçü; tamamı Mağazada.",
   entries: [
     {
       source: "ciftlik",
@@ -217,7 +217,7 @@ export const finalCta = {
   titleA: "Toprakla başlayan",
   titleB: "bir hikâye.",
   body: "Kendi çiftliğimizden ve güvendiğimiz üreticilerden.",
-  cta: { label: "Hasat Listesi", href: routes.store },
+  cta: { label: "Mağaza", href: routes.store },
   image: {
     src: "/images/almonds-net.jpg",
     alt: "File içinde kabuklu Kabia bademleri",

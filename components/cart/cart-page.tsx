@@ -61,10 +61,10 @@ export function CartPage() {
           Sepetiniz <em className="font-serif italic text-brand">boş</em>.
         </h1>
         <p className="mt-6 max-w-sm text-base leading-relaxed text-ink/60">
-          Hasat Listesinden seçtikleriniz burada birikir.
+          Mağazadan seçtikleriniz burada birikir.
         </p>
         <ButtonLink href={routes.store} className="mt-9">
-          Hasat Listesine git
+          Mağazaya git
         </ButtonLink>
       </div>
     );

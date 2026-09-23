@@ -1,5 +1,5 @@
 /**
- * Single source for the catalogue order (Hasat Listesi default sort).
+ * Single source for the catalogue order (Mağaza default sort).
  *
  * The recommended order used to live inline in store-listing; any second
  * manual order would drift from it. Badge classification needs no such

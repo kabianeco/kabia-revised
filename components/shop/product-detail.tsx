@@ -210,9 +210,9 @@ export function ProductDetail({
           </li>
           <li aria-hidden="true">·</li>
           <li>
-            <Link href={routes.store} className="transition-colors hover:text-ink">
-              Hasat Listesi
-            </Link>
+              <Link href={routes.store} className="transition-colors hover:text-ink">
+                Mağaza
+              </Link>
           </li>
           <li aria-hidden="true">·</li>
           <li className="text-ink/80">{product.name}</li>
