@@ -1,4 +1,4 @@
-import { anchors, routes, site } from "@/lib/site";
+import { anchors, site } from "@/lib/site";
 
 /**
  * All visible homepage copy lives here, in Turkish.
@@ -216,8 +216,7 @@ export const quote = {
 export const finalCta = {
   titleA: "Toprakla başlayan",
   titleB: "bir hikâye.",
-  body: "Kendi çiftliğimizden ve güvendiğimiz üreticilerden.",
-  cta: { label: "Mağaza", href: routes.store },
+  body: "Sorun, önerin, toptan alım — bahçeden biri okuyor, hafta içi dönüyoruz.",
   image: {
     src: "/images/almonds-net.jpg",
     alt: "File içinde kabuklu Kabia bademleri",
