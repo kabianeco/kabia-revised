@@ -118,11 +118,11 @@ export const origin = {
       caption: "Badem ağaçları 3. yıl, Kılıçkaya yamaçları.",
     },
     {
-      src: "/images/field-tractor.jpg",
-      width: 1200,
-      height: 1600,
-      alt: "Badem bahçesinde bakım, arkada sisli dağlar",
-      caption: "Bakım bize ait. Budamadan hasada, her adım kendi ekibimizle, yerinde.",
+      src: "/images/gunluk-2026-09-13-catlak-kabuk.jpeg",
+      width: 1144,
+      height: 2040,
+      alt: "Dalında çatlamış yeşil kabuklu bademler — hasat zamanı",
+      caption: "Yeşil kabuk çatlayınca hasat başlar.",
     },
     {
       src: "/images/orchard-winter.jpg",
