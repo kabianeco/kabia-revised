@@ -6,6 +6,7 @@ import { getPublishedTheme } from "@/lib/theme-settings";
 import { ALL_FONT_VARIABLES } from "@/lib/fonts";
 import { ThemeVars } from "@/components/theme/theme-vars";
 import { Providers } from "@/components/providers";
+import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
 import { themeInitScript } from "@/lib/theme";
 import "./globals.css";
 
@@ -173,7 +174,10 @@ export default async function RootLayout({
           nonce={nonce}
           suppressHydrationWarning
         />
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <WhatsAppFloat />
+        </Providers>
       </body>
     </html>
   );

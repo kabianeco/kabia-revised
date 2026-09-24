@@ -12,6 +12,8 @@ export const site = {
   email: "info@kabia.com",
   phone: "+90 553 744 76 74",
   phoneHref: "tel:+905537447674",
+  /* WhatsApp Business hattı: telefonla aynı numara, tek hat karışmaz. */
+  whatsappNumber: "905537447674",
   address: "Sabırlar, 54700 Geyve / Sakarya",
   region: "Geyve, Sakarya",
   social: {
@@ -20,6 +22,14 @@ export const site = {
     x: "https://x.com/kabiaekolojik",
   },
 } as const;
+
+/** Hazır mesajlı WhatsApp sohbet linki — boş sohbet insanlara zor gelir. */
+const WHATSAPP_DEFAULT_MESSAGE =
+  "Merhaba, Kabia ürünleri hakkında bilgi almak istiyorum.";
+
+export function whatsappHref(message: string = WHATSAPP_DEFAULT_MESSAGE) {
+  return `https://wa.me/${site.whatsappNumber}?text=${encodeURIComponent(message)}`;
+}
 
 /**
  * In-page anchors on the homepage. These only resolve on `/`, so navigation

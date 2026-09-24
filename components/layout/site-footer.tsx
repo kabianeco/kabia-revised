@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { anchors, homeAnchor, legalLinks, routes } from "@/lib/site";
+import { anchors, homeAnchor, legalLinks, routes, whatsappHref } from "@/lib/site";
 import { getPublicSettings } from "@/lib/settings";
 
 /* Lucide dropped brand icons; these are minimal inline equivalents. */
@@ -113,6 +113,16 @@ export async function SiteFooter() {
                   className="hover:text-ink transition-colors duration-300"
                 >
                   {settings.supportPhone}
+                </a>
+              </p>
+              <p>
+                <a
+                  href={whatsappHref()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-ink transition-colors duration-300"
+                >
+                  WhatsApp’tan yazın
                 </a>
               </p>
               {settings.supportHours && (
