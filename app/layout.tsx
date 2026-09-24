@@ -93,7 +93,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#f4f1e8",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f4f1e8" },
+    { media: "(prefers-color-scheme: dark)", color: "#12150f" },
+  ],
 };
 
 /** Organization data limited to facts from the existing Kabia project. */
