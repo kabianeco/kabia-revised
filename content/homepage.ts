@@ -74,7 +74,7 @@ export const products = {
     "Üreticilerin mutfağından.",
   ],
   intro:
-    "Kendi çiftliğimizden ve güvendiğimiz üreticilerden — öne çıkan üçü; tamamı Mağazada.",
+    "Üç dünyadan birer tat — kendi bahçemizden, tanıdığımız üreticiden, üreticinin mutfağından.",
   entries: [
     {
       source: "ciftlik",

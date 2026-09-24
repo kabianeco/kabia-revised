@@ -7,8 +7,9 @@ import { routes } from "@/lib/site";
  * Öne çıkanlar şeridi: fiyat ve sepete ekle ile.
  *
  * Satış başlamadığı için "Çok Satanlar" denmiyor — o isim ilk siparişlerden
- * sonra hak edilir. Bölüm, keşif akışının devamı olarak ProductCollection'dan
- * hemen sonra gelir: önce hikaye, sonra fiyat.
+ * sonra hak edilir. Hikayenin sonunda, FinalCta ile haber-ver bandının
+ * komşuluğunda durur: okudun, beğendin, al; alamıyorsan e-postanı bırak.
+ * Üç dünya bölümüyle üst üste binmemesi için bilerek buradadır.
  */
 export async function BestSellers() {
   const products = await getCachedFeaturedFullProducts();

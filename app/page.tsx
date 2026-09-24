@@ -55,13 +55,13 @@ export default function HomePage() {
         >
           <ProductCollection />
         </Suspense>
-        <BestSellers />
         <BrandManifesto />
         <Producers />
         <ProcessStory />
         <Principles />
         <EditorialImage />
         <BrandQuote />
+        <BestSellers />
         <FinalCta />
         <HarvestNotify />
       </main>
