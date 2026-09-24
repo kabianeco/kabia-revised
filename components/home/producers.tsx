@@ -32,7 +32,7 @@ export function Producers() {
               Bir ürünün arkasında
               <br />
               <em className="font-theme-display italic text-ink/80">
-                çoğu zaman bir insan vardır.
+                her zaman bir insan vardır.
               </em>
             </h2>
           </Reveal>
