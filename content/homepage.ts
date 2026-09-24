@@ -216,7 +216,7 @@ export const quote = {
 export const finalCta = {
   titleA: "Toprakla başlayan",
   titleB: "bir hikâye.",
-  body: "Sorun, önerin, toptan alım — bahçeden biri okuyor, hafta içi dönüyoruz.",
+  body: "Sorun, önerin — bahçeden biri okuyor, hafta içi dönüyoruz.",
   image: {
     src: "/images/almonds-net.jpg",
     alt: "File içinde kabuklu Kabia bademleri",
