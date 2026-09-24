@@ -32,7 +32,8 @@ import { STOCK_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
  */
 function guarantees(_product: Product) {
   return [
-    { label: "Ücretsiz kargo", detail: "2000₺ üzeri siparişlerde" },
+    // Kargo ücreti lib/cart-context SHIPPING_COST ile aynı olmalı (şu an 107,91₺ HepsiJet).
+    { label: "Ücretsiz kargo", detail: "2000₺ üzeri ücretsiz, altı ₺107,91" },
     { label: "15 gün iade", detail: "Açılmamış ürünlerde" },
     { label: "Tek kaynak", detail: "Kabia Ekolojik" },
     { label: "Katkısız", detail: "Koruyucu ve katkı maddesi içermez" },
