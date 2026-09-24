@@ -40,11 +40,11 @@ export function NotifyForm() {
   return (
     <form ref={formRef} action={formAction} noValidate>
       <input type="hidden" name="subject" value="diger" />
-      <input type="hidden" name="name" value="Hasat bildirimi" />
+      <input type="hidden" name="name" value="Ön sipariş listesi" />
       <input
         type="hidden"
         name="message"
-        value="Hasat başlayınca haber verin."
+        value="Ön sipariş açılınca haber verin."
       />
       <div className="flex flex-col gap-3 sm:flex-row">
         <label htmlFor="notify-email" className="sr-only">
@@ -68,7 +68,7 @@ export function NotifyForm() {
         {state.message && (
           <span className={state.ok ? "text-brand" : "text-clay"}>
             {state.ok
-              ? "Kaydoldunuz. Hasat açılınca ilk siz duyacaksınız."
+              ? "Listedesin. Ön sipariş açılınca ilk sana yazacağız."
               : state.message}
           </span>
         )}

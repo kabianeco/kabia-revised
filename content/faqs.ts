@@ -23,6 +23,12 @@ export const faqs = {
     { q: "Geleneksel mutfak nedir?", a: "Erişte, tarhana, salça, sirke — güvendiğimiz üreticilerin elinden, geleneksel yöntemlerle hazırlanan ürünlerdir. Organik sertifikası yoktur." },
     { q: "Ürünler nasıl saklanıyor?", a: "Serin ve kuru yerde, belirtilen süreye kadar. Geleneksel cam kavanoz ve karton paketleme, doğal dokuyu korur." },
   ],
+  magaza: [
+    { q: "Kargo ücreti ne kadar?", a: "2000₺ üzeri siparişlerde kargo ücretsiz; 2000₺ altında 107,91₺ (HepsiJet). Hasat tarihli paketle, serin ve kuru yolla gönderilir." },
+    { q: "Ürünler katkısız mı?", a: "Koruyucu ve katkı maddesi içermez. Organik sertifikalı üretimde bile dışarıdan gübre almıyoruz — girdilerin tamamı kendi bahçemizden." },
+    { q: "Stoklar neden kapalı?", a: "Hasat dönemi dışında stok açmıyoruz. Sayfanın sonundaki kutuya e-postanı bırakırsan, ön sipariş açılınca ilk sana yazıyoruz." },
+    { q: "İade var mı?", a: "Açılmamış ürünlerde 15 gün içinde iade ve değişim." },
+  ],
 } as const;
 
 export type FaqGroup = keyof typeof faqs;

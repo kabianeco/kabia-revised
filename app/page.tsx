@@ -6,6 +6,8 @@ import { IntroSequence } from "@/components/home/intro-sequence";
 import { BrandManifesto } from "@/components/home/brand-manifesto";
 import { ProductCollection } from "@/components/home/product-collection";
 import { BestSellers } from "@/components/home/best-sellers";
+import { CertStrip } from "@/components/home/cert-strip";
+import { HomeFaq } from "@/components/home/home-faq";
 import { HarvestNotify } from "@/components/home/harvest-notify";
 import { Producers } from "@/components/home/producers";
 import { OriginStory } from "@/components/home/origin-story";
@@ -62,6 +64,8 @@ export default function HomePage() {
         <EditorialImage />
         <BrandQuote />
         <BestSellers />
+        <CertStrip />
+        <HomeFaq />
         <FinalCta />
         <HarvestNotify />
       </main>
