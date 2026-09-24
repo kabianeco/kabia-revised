@@ -113,7 +113,7 @@ export default function BademPage() {
                 href="/shop/kabuklu-badem"
                 className="inline-flex min-h-11 items-center rounded-full bg-brand px-7 text-sm font-medium text-on-brand transition-colors duration-300 hover:bg-forest"
               >
-                Kabuklu Badem — Listede gör →
+                Kabuklu Badem — Mağazada gör →
               </a>
               <a
                 href="/magaza"

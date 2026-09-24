@@ -89,7 +89,7 @@ export const products = {
       sourceName: "Kabia Seçki",
       name: "Kabuklu Fındık",
       slug: "findik-ici",
-      image: "/images/findik-acik.jpeg",
+      image: "/images/findik2.jpeg",
       alt: "Güvendiğimiz üreticiden gelen kabuklu fındık",
     },
     {

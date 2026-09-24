@@ -86,7 +86,7 @@ export function ProducerCard({
               prefetch={false}
               className="group/shop inline-flex min-h-11 items-center gap-2 text-sm text-ink/60 transition-colors duration-300 hover:text-ink"
             >
-              Listede Gör
+              Mağazada Gör
               <span className="sr-only"> — {producer.name}</span>
               <span
                 aria-hidden="true"
