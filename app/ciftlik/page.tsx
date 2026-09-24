@@ -147,15 +147,15 @@ export default function FarmPage() {
             <figure>
               <div className="relative aspect-[4/3] overflow-hidden rounded-media bg-paper">
                 <Image
-                  src="/images/field-tractor.jpg"
-                  alt="Bahçe bakımı"
+                  src="/images/gunluk-2026-08-25-yesil-kabuk.jpeg"
+                  alt="Dalında yeşil kabuklu Marinada bademleri"
                   fill
                   sizes="(min-width: 768px) 50vw, 100vw"
                   className="object-cover"
                 />
               </div>
               <figcaption className="mt-3 text-xs text-olive">
-                — Bakım bize ait. Budamadan hasada, her adım kendi ekibimizle, yerinde.
+                — Yeşil kabuklu Marinada, dalında olgunlaşıyor.
               </figcaption>
             </figure>
           </div>
