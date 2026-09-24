@@ -256,6 +256,29 @@ export const getCachedHomepageProducts = unstable_cache(fetchProductsUncached, [
   tags: ["catalog-homepage"],
 })
 
+async function fetchFeaturedFullUncached(): Promise<Product[]> {
+  const client = getAnonClient()
+  if (!client) throw new Error("Supabase env eksik — Vercel build env kontrol edin")
+  const { data, error } = await client
+    .from("products")
+    .select(PRODUCT_SELECT)
+    .eq("is_active", true)
+    .eq("is_featured", true)
+    .order("created_at", { ascending: true })
+  if (error || !data) return []
+  return data.map((row) => mapProduct(row as unknown as ProductRow, false))
+}
+
+/**
+ * Öne çıkanlar şeridi varyant ister (stok + ağırlık + sepete ekle id'si);
+ * lean satırlar yetmez. Stok bilinmiyorken "Stokta yok" yazmak yasaktır —
+ * o yüzden bu şerit tam satır okur.
+ */
+export const getCachedFeaturedFullProducts = unstable_cache(fetchFeaturedFullUncached, ["kabia-featured-full-v2"], {
+  revalidate: 300,
+  tags: ["catalog-featured"],
+})
+
 export async function fetchProductBySlug(
   client: SupabaseClient,
   slug: string,

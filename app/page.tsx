@@ -5,6 +5,8 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { IntroSequence } from "@/components/home/intro-sequence";
 import { BrandManifesto } from "@/components/home/brand-manifesto";
 import { ProductCollection } from "@/components/home/product-collection";
+import { BestSellers } from "@/components/home/best-sellers";
+import { HarvestNotify } from "@/components/home/harvest-notify";
 import { Producers } from "@/components/home/producers";
 import { OriginStory } from "@/components/home/origin-story";
 import { Principles } from "@/components/home/principles";
@@ -53,6 +55,7 @@ export default function HomePage() {
         >
           <ProductCollection />
         </Suspense>
+        <BestSellers />
         <BrandManifesto />
         <Producers />
         <ProcessStory />
@@ -60,6 +63,7 @@ export default function HomePage() {
         <EditorialImage />
         <BrandQuote />
         <FinalCta />
+        <HarvestNotify />
       </main>
       <SiteFooter />
     </>
