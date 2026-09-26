@@ -97,7 +97,7 @@ export const products = {
       sourceName: "Kabia Mutfak",
       name: "Tarhana",
       slug: "tarhana",
-      image: "/images/tarhana-acik.jpeg",
+      image: "/images/acik-tarhana1.jpg",
       alt: "Üreticinin mutfağında geleneksel yöntemle hazırlanan tarhana",
     },
   ],
