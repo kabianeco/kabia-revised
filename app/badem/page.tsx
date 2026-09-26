@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { PageShell } from "@/components/layout/page-shell"
+import { CertStrip } from "@/components/home/cert-strip"
 import { process } from "@/content/homepage"
 
 export const metadata: Metadata = {
@@ -102,6 +103,9 @@ export default function BademPage() {
               </li>
             ))}
           </ol>
+
+          {/* Sürecin sonu, belgenin girişi: tam belge çiftlikte, burada rozet. */}
+          <CertStrip />
 
           <div className="border-t border-ink/10 py-16 text-center md:py-24">
             <p className="label text-olive">Kabuklu Badem</p>
