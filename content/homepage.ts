@@ -218,7 +218,7 @@ export const finalCta = {
   titleB: "bir hikâye.",
   body: "Sorun, önerin — bahçeden biri okuyor, hafta içi dönüyoruz.",
   image: {
-    src: "/images/almonds-net.jpg",
+      src: "/images/file-badem.jpg",
     alt: "File içinde kabuklu Kabia bademleri",
   },
 } as const;
