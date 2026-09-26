@@ -102,6 +102,6 @@ export const journalEntries: JournalEntry[] = [
     application: "Yok — sadece gözlem",
     observation: "Bademler dalda yeşil kabuğunda duruyor; çatlama başlamadı.",
     outcome: "Hasat için erken — takip sürüyor.",
-    photo: "/images/gunluk-2026-08-25-yesil-kabuk.jpeg",
+    photo: "/images/yesilbadem.jpg",
   },
 ]
