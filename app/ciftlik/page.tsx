@@ -165,7 +165,7 @@ export default function FarmPage() {
             <figure>
               <div className="relative aspect-[4/3] overflow-hidden rounded-media bg-paper">
                 <Image
-                  src="/images/orchard-hillside.jpg"
+                  src="/images/bademagaclari.jpg"
                   alt="Badem ağaçları 3. yıl, Kılıçkaya yamaçları"
                   fill
                   sizes="(min-width: 768px) 50vw, 100vw"
@@ -179,7 +179,7 @@ export default function FarmPage() {
             <figure>
               <div className="relative aspect-[4/3] overflow-hidden rounded-media bg-paper">
                 <Image
-                  src="/images/gunluk-2026-08-25-yesil-kabuk.jpeg"
+                  src="/images/yesilbadem.jpg"
                   alt="Dalında yeşil kabuklu Marinada bademleri"
                   fill
                   sizes="(min-width: 768px) 50vw, 100vw"
