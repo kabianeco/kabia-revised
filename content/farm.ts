@@ -13,7 +13,7 @@ export const farmPrinciples = [
   "Doğayı kontrol etmiyoruz, taklit ediyoruz.",
   "Her paket hasat tarihli — ne zaman, nereden, kimden."
 ] as const;
-export interface FarmState { id: string; year: string; substep?: string; eyebrow: string; heading: string; paragraphs: readonly string[]; image: string; imageAlt: string }
+export interface FarmState { id: string; year: string; substep?: string; eyebrow: string; heading?: string; paragraphs?: readonly string[]; image: string; imageAlt: string }
 
 /** Tam emanet manifestosu (3000 emanet sayfasından birebir): kısa özet
  * hero'da durur, tamamı burada okunur. */
@@ -112,11 +112,6 @@ export const farmTimeline: readonly FarmState[] = [
     "year": "2026",
     "substep": "Yeni sezon",
     "eyebrow": "2026 — YENİ SEZON",
-    "heading": "Notlar hazır, bahçe uyanıyor.",
-    "paragraphs": [
-      "Yeni sezon. Notlarımız hazır: kompost sıraları, çay takvimi, çiçeklenme gözlemleri. Bu yılın hasadı, bu notlarla başlıyor.",
-      "Kompost sıraları serili, çay takvimi duvarda, gözlem defteri açık. Yeni sezonun ilk işi toprağa dokunmak değil, not almak — bahçe ne derse onu yapacağız."
-    ],
     "image": "/images/catlakkabuk.jpg",
     "imageAlt": "2026 — Dalında yarılmış yeşil kabuklar, içi görünür Marinada bademler"
   }

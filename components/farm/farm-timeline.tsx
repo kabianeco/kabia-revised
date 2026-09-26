@@ -112,10 +112,12 @@ function SyncedTimeline() {
                 >
                   <YearMasthead index={index} />
                   <p className="label mt-5 text-olive">{entry.eyebrow}</p>
-                  <h3 className="mt-5 text-3xl tracking-tight md:text-4xl">
-                    {entry.heading}
-                  </h3>
-                  {entry.paragraphs.map((paragraph) => (
+                  {entry.heading && (
+                    <h3 className="mt-5 text-3xl tracking-tight md:text-4xl">
+                      {entry.heading}
+                    </h3>
+                  )}
+                  {(entry.paragraphs ?? []).map((paragraph) => (
                     <p
                       key={paragraph}
                       className="mt-5 max-w-sm text-sm leading-relaxed text-ink/65 md:text-base"
@@ -179,10 +181,12 @@ function QuietTimeline() {
             <div data-farm-timeline-panel data-index={index}>
               <YearMasthead index={index} />
               <p className="label mt-5 text-olive">{entry.eyebrow}</p>
-              <h3 className="mt-5 text-3xl tracking-tight md:text-4xl">
-                {entry.heading}
-              </h3>
-              {entry.paragraphs.map((paragraph) => (
+              {entry.heading && (
+                <h3 className="mt-5 text-3xl tracking-tight md:text-4xl">
+                  {entry.heading}
+                </h3>
+              )}
+              {(entry.paragraphs ?? []).map((paragraph) => (
                 <p
                   key={paragraph}
                   className="mt-5 max-w-sm text-sm leading-relaxed text-ink/65 md:text-base"
