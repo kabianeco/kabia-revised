@@ -162,6 +162,14 @@ function EditorialBeat({ kicker, text }: { kicker: string; text: string }) {
  */
 function StageBackdrop({ active }: { active: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  // Veri tasarrufu isteyen cihaza 3 MB video indirtmeyiz: poster kare
+  // zaten videonun ilk karesi olduğu için geçiş fark edilmez.
+  const [saveData, setSaveData] = useState(false);
+  useEffect(() => {
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } })
+      .connection;
+    if (conn?.saveData) setSaveData(true);
+  }, []);
 
   useEffect(() => {
     const el = videoRef.current;
@@ -174,6 +182,20 @@ function StageBackdrop({ active }: { active: boolean }) {
       el.pause();
     }
   }, [active]);
+
+  if (saveData) {
+    return (
+      <div aria-hidden="true" className="absolute inset-0 z-0 overflow-hidden">
+        <img
+          src={HERO_POSTER}
+          alt=""
+          className="h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-forest/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-forest/55 via-transparent to-forest/65" />
+      </div>
+    );
+  }
 
   return (
     <div aria-hidden="true" className="absolute inset-0 z-0 overflow-hidden">
@@ -486,7 +508,7 @@ function ScrollIntro() {
            lands its atmosphere, then hands the visitor to the products
            instead of dwelling on the same feeling twice. */}
       <div ref={wrapperRef} className="relative h-[280vh] md:h-[300vh]">
-        <div ref={stageRef} className="sticky top-0 h-screen overflow-hidden">
+        <div ref={stageRef} className="sticky top-0 h-dvh overflow-hidden">
           <StageBackdrop active={inView} />
 
           {/* The ground the film closes onto — a plain panel, so once the

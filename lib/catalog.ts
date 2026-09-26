@@ -283,17 +283,32 @@ export async function fetchProductBySlug(
   client: SupabaseClient,
   slug: string,
 ): Promise<Product | null> {
+  // Yorumlar ana sorguya gömülü değil: reviews okuma izni kalkarsa (42501)
+  // bütün ürün sayfası 404'e düşüyordu. Ürün her zaman döner; yorumlar
+  // okunamazsa boş liste + log ile devam eder.
   const { data, error } = await client
     .from("products")
-    .select(
-      `${PRODUCT_SELECT}, reviews(id, reviewer_name, user_id, rating, review_text, is_verified_purchase, created_at)`,
-    )
+    .select(PRODUCT_SELECT)
     .eq("slug", slug)
     .eq("is_active", true)
-    .order("created_at", { referencedTable: "reviews", ascending: false })
     .maybeSingle()
   if (error || !data) return null
-  return mapProduct(data as unknown as ProductRow, true)
+  let reviews: unknown[] = []
+  try {
+    const res = await client
+      .from("reviews")
+      .select("id, reviewer_name, user_id, rating, review_text, is_verified_purchase, created_at")
+      .eq("product_id", (data as { id: string }).id)
+      .order("created_at", { ascending: false })
+    if (res.error) {
+      console.error(`[catalog] reviews okunamadı (${slug}):`, res.error.message)
+    } else {
+      reviews = res.data ?? []
+    }
+  } catch (e) {
+    console.error(`[catalog] reviews sorgusu çöktü (${slug}):`, e instanceof Error ? e.message : e)
+  }
+  return mapProduct({ ...(data as object), reviews } as unknown as ProductRow, true)
 }
 
 export async function fetchRelatedProducts(

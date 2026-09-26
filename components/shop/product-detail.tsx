@@ -169,6 +169,30 @@ export function ProductDetail({
 }) {
   const preview = isPreviewItem(product);
   const reviewsRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const visibleTabs = preview ? TABS.slice(0, 1) : TABS;
+
+  const focusTab = (index: number) => {
+    const next = (index + visibleTabs.length) % visibleTabs.length;
+    setActiveTab(visibleTabs[next].id);
+    tabRefs.current[next]?.focus();
+  };
+
+  const onTabKeyDown = (event: React.KeyboardEvent, index: number) => {
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      focusTab(index + 1);
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      focusTab(index - 1);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      focusTab(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      focusTab(visibleTabs.length - 1);
+    }
+  };
 
   const galleryImages = useMemo(
     () => (product.images.length ? product.images : [product.mainImageUrl]),
@@ -334,7 +358,7 @@ export function ProductDetail({
 
           <ProductPurchase product={product} image={image} selectedWeight={selectedVariant} onWeightChange={setSelectedVariant} />
 
-          {!preview && <dl className="mt-12 grid grid-cols-2 border-t border-ink/10">
+          {!preview && <dl className="mt-12 grid grid-cols-1 border-t border-ink/10 min-[480px]:grid-cols-2">
             {guarantees(product).map((g) => (
               <div key={g.label} className="border-b border-ink/10 py-4 pr-4">
                 <dt className="text-sm text-ink">{g.label}</dt>
@@ -348,18 +372,23 @@ export function ProductDetail({
       {/* Tabs */}
       <div className="mt-20 md:mt-28" ref={reviewsRef}>
         <div className="border-b border-ink/10">
-          <div role="tablist" aria-label="Ürün bilgileri" className="flex flex-wrap gap-8">
-            {(preview ? TABS.slice(0, 1) : TABS).map((tab) => {
+          <div role="tablist" aria-label="Ürün bilgileri" className="flex flex-wrap gap-x-8 gap-y-2">
+            {visibleTabs.map((tab, index) => {
               const active = tab.id === activeTab;
               return (
                 <button
                   key={tab.id}
                   type="button"
                   role="tab"
+                  ref={(el) => {
+                    tabRefs.current[index] = el;
+                  }}
+                  tabIndex={active ? 0 : -1}
                   id={`tab-${tab.id}`}
                   aria-selected={active}
                   aria-controls={`panel-${tab.id}`}
                   onClick={() => setActiveTab(tab.id)}
+                  onKeyDown={(event) => onTabKeyDown(event, index)}
                   className={`-mb-px min-h-12 border-b-2 text-sm transition-colors duration-300 ${
                     active
                       ? "border-brand text-ink"
@@ -677,14 +706,19 @@ function ReviewsPanel({ product }: { product: Product }) {
               />
               <fieldset>
                 <legend className="label text-olive">Puanınız</legend>
-                <div className="mt-3 flex gap-1">
+                <div
+                  className="mt-3 flex gap-1"
+                  role="radiogroup"
+                  aria-label="Puanınız"
+                >
                   {Array.from({ length: 5 }).map((_, i) => (
                     <button
                       type="button"
                       key={i}
                       onClick={() => setFormRating(i + 1)}
+                      role="radio"
+                      aria-checked={formRating === i + 1}
                       aria-label={`${i + 1} yıldız`}
-                      aria-pressed={formRating === i + 1}
                       className="flex h-11 w-11 items-center justify-center"
                     >
                       <Star

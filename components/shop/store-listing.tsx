@@ -11,6 +11,7 @@ import {
   SORT_OPTIONS,
 } from "@/lib/store-listing";
 import type { Product } from "@/lib/products";
+import { homeAnchor } from "@/lib/site";
 
 export type StoreSearch = {
   kategori?: string;
@@ -127,7 +128,13 @@ export function StoreListing({
                 ? "Yeni hasat yüklendiğinde ürünler burada listelenir."
                 : "Diğer kategorilere göz atabilirsiniz."}
             </p>
-            {all.length > 0 && (
+            {all.length === 0 ? (
+              <div className="mt-8">
+                <ArrowLink href={homeAnchor("#haber-ver")} prefetch={false}>
+                  Hasat açılınca haber ver
+                </ArrowLink>
+              </div>
+            ) : (
               <div className="mt-8">
                 <ArrowLink href={base} prefetch={false}>
                   Tüm ürünler

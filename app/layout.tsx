@@ -53,8 +53,8 @@ export async function generateMetadata(): Promise<Metadata> {
     creator: "Kabia Ekolojik",
     publisher: "Epilantis Kozmetik Estetik Medikal Sanayi Dış Tic. Ltd. Şti.",
     formatDetection: { email: false, address: false, telephone: false },
-    category: "organic food, ecological agriculture",
-    classification: "Ecological Agriculture, Organic Food",
+    category: "organik gıda, ekolojik tarım",
+    classification: "Ekolojik Tarım, Organik Gıda",
     alternates: {
       canonical: "/",
       languages: { "tr-TR": "/" },

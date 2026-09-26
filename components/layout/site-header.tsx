@@ -317,7 +317,7 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
                 not a fixed bar with a second panel unfolding beneath it.
                 w-full matters — as a flex item .wrap would shrink-wrap and
                 pull the logo and icons toward the center. */}
-            <div className="wrap flex h-16 w-full shrink-0 items-center justify-between border-b border-ink/10">
+            <div className="wrap flex h-[calc(4rem+env(safe-area-inset-top))] w-full shrink-0 items-center justify-between border-b border-ink/10 pt-[env(safe-area-inset-top)]">
               <Link
                 href={routes.home}
                 prefetch={false}
