@@ -45,7 +45,7 @@ export const producerCollections: Record<ProductSource, SourceProducer[]> = {
     "source": "secki",
     "productType": "Ceviz",
     "region": "Kayadibi Köyü Aile Bahçesi",
-    "photoUrl": "/images/kabuklu-ceviz1.jpeg",
+    "photoUrl": "/images/acik-ceviz1.jpg",
     "desc": "Doğal üretim.",
     "story": "Kayadibi Köyü'nde Ertuğrul'un bahçesinde 210 ceviz ağacı var. Budama elle, hasat elle, kurutma gölgede tel ızgaralarda. Kabuk çatlamadan, içi tam kurumadan çuvala girmez.\n\n\"Ceviz sabır ister,\" diyor Ertuğrul. \"Dalından düşeni değil, dalında olanı beklersin. Erken toplarsan içi buruşur, geç kalırsan küflenir. Penceresi dardır, o pencereyi kaçırmayacaksın.\"\n\nBiz Kabia'da Ertuğrul'un cevizini bu yüzden seçtik: kabuklu, el ayıklaması, katkısız. Hızlı değil, doğru hasat.",
     "productionPlace": null,
