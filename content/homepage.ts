@@ -81,7 +81,7 @@ export const products = {
       sourceName: "Kabia Çiftliği",
       name: "Kabuklu Badem",
       slug: "kabuklu-badem",
-      image: "/images/kabuklu-badem-acik.jpeg",
+      image: "/images/acik-badem.jpg",
       alt: "Kabia Çiftliği'nin kendi bahçesinden kabuklu badem",
     },
     {
