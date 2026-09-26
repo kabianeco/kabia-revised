@@ -111,7 +111,9 @@ function SyncedTimeline() {
                   }`}
                 >
                   <YearMasthead index={index} />
-                  <p className="label mt-5 text-olive">{entry.eyebrow}</p>
+                  {entry.eyebrow && (
+                    <p className="label mt-5 text-olive">{entry.eyebrow}</p>
+                  )}
                   {entry.heading && (
                     <h3 className="mt-5 text-3xl tracking-tight md:text-4xl">
                       {entry.heading}
@@ -180,7 +182,9 @@ function QuietTimeline() {
           <div className="md:col-span-5">
             <div data-farm-timeline-panel data-index={index}>
               <YearMasthead index={index} />
-              <p className="label mt-5 text-olive">{entry.eyebrow}</p>
+              {entry.eyebrow && (
+                <p className="label mt-5 text-olive">{entry.eyebrow}</p>
+              )}
               {entry.heading && (
                 <h3 className="mt-5 text-3xl tracking-tight md:text-4xl">
                   {entry.heading}
