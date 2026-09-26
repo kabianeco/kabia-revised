@@ -117,8 +117,8 @@ export const farmTimeline: readonly FarmState[] = [
       "Yeni sezon. Notlarımız hazır: kompost sıraları, çay takvimi, çiçeklenme gözlemleri. Bu yılın hasadı, bu notlarla başlıyor.",
       "Kompost sıraları serili, çay takvimi duvarda, gözlem defteri açık. Yeni sezonun ilk işi toprağa dokunmak değil, not almak — bahçe ne derse onu yapacağız."
     ],
-    "image": "/images/gunluk-2026-09-13-catlak-kabuk.jpeg",
-    "imageAlt": "2026 — Yeşil kabuğu çatlamış Marinada bademler dalında, hasat eli bekliyor"
+    "image": "/images/catlakkabuk.jpg",
+    "imageAlt": "2026 — Dalında yarılmış yeşil kabuklar, içi görünür Marinada bademler"
   }
 ];
 
