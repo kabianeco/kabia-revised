@@ -1,10 +1,21 @@
-import { whatsappHref } from "@/lib/site";
+"use client";
+
+import { usePathname } from "next/navigation";
+import { routes, whatsappHref } from "@/lib/site";
 
 /**
  * Her sayfada sağ altta duran WhatsApp hattı. Yeşil daire + ahize,
- * hazır mesajla açılır; JavaScript gerektirmez, saf hizada bir linktir.
+ * hazır mesajlı link; JavaScript gerektirmez, saf hizada bir linktir.
+ *
+ * Mobilde alt barı olan sayfalarda (/shop/[slug] ürün barı, /odeme toplam
+ * barı) buton yukarı kayar — yoksa satın alma düğmesini kapatır. Masaüstünde
+ * alt bar olmadığı için hep aynı yerdedir. safe-area her durumda eklenir.
  */
 export function WhatsAppFloat() {
+  const pathname = usePathname();
+  const hasBottomBar =
+    pathname === routes.checkout || pathname.startsWith("/shop/");
+
   return (
     <a
       href={whatsappHref()}
@@ -12,8 +23,13 @@ export function WhatsAppFloat() {
       rel="noopener noreferrer"
       aria-label="WhatsApp'tan yazın"
       title="WhatsApp'tan yazın"
-      style={{ backgroundColor: "#25d366" }}
-      className="fixed bottom-5 right-5 z-40 grid h-14 w-14 place-items-center rounded-full text-white shadow-lg transition-transform duration-300 hover:scale-105"
+      style={{
+        backgroundColor: "#25d366",
+        bottom: hasBottomBar
+          ? "calc(6rem + env(safe-area-inset-bottom, 0px))"
+          : "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
+      }}
+      className="fixed right-5 z-40 grid h-14 w-14 place-items-center rounded-full text-white shadow-lg transition-all duration-300 hover:scale-105"
     >
       <svg
         viewBox="0 0 24 24"
