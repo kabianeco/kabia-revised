@@ -32,7 +32,7 @@ export default function FarmPage() {
           <figure>
             <div className="relative aspect-[4/3] overflow-hidden rounded-media bg-paper">
               <Image
-                src="/images/resim22.jpg"
+                src="/images/bostarla.jpg"
                 alt="2019 Kasım — Bahçe kurulmadan önce, Sabırlar"
                 fill
                 sizes="(min-width: 768px) 60vw, 100vw"
