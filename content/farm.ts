@@ -112,6 +112,11 @@ export const farmTimeline: readonly FarmState[] = [
     "year": "2026",
     "substep": "Yeni sezon",
     "eyebrow": "2026 — YENİ SEZON",
+    "heading": "Hasada az kaldı.",
+    "paragraphs": [
+      "Dış kabuklar çatlıyor — dal dal, tek tek. Yeşil kabuk yarıldı mı, bahçe haber vermiş demektir: hasat eli kulağında.",
+      "Şimdi iş beklemekte değil, doğru günü kollamakta. Erken toplanan badem içini doldurmaz, geç kalınan dalda çürür. Biz her sabah bahçeye bakıyoruz — kabuk ne derse o."
+    ],
     "image": "/images/catlakkabuk.jpg",
     "imageAlt": "2026 — Dalında yarılmış yeşil kabuklar, içi görünür Marinada bademler"
   }
