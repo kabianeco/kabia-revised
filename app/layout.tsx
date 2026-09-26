@@ -57,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
     classification: "Ecological Agriculture, Organic Food",
     alternates: {
       canonical: "/",
-      languages: { "tr-TR": "/", "en-US": "/en" },
+      languages: { "tr-TR": "/" },
     },
     openGraph: {
       type: "website",
