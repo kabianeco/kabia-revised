@@ -83,15 +83,15 @@ export const journalEntries: JournalEntry[] = [
     photo: "/images/gunluk-2026-03-01-subat-kis.jpeg",
   },
   {
-    slug: "2026-09-13-catlak-kabuk",
-    date: "2026-09-13",
+    slug: "2026-09-25-catlak-kabuk",
+    date: "2026-09-25",
     location: "Kabia Çiftliği",
     weather: "Açık 26°",
     orchardState: "Dış kabuk çatlamaya başladı",
     application: "Yok — sadece gözlem",
     observation: "Dış kabuk çatlamaya başladı; ama hasat için biraz daha zaman var gibi.",
     outcome: "Takip sürüyor — çatlama tamamlanınca hasat.",
-    photo: "/images/gunluk-2026-09-13-catlak-kabuk.jpeg",
+    photo: "/images/catlakkabuk.jpg",
   },
   {
     slug: "2026-08-25-yesil-kabuk",
