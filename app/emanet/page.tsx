@@ -37,7 +37,7 @@ const NOTLAR = [
   },
   {
     year: "2024",
-    text: "JADAM killi koruma ve canlı toprak kültürü oturdu. Toprak gözle değişti: daha koyu, daha nemli, daha canlı.",
+    text: "Doğal killer ile koruma ve canlı toprak kültürü oturdu. Toprak gözle değişti: daha koyu, daha nemli, daha canlı.",
   },
   {
     year: "2025",

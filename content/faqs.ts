@@ -1,6 +1,6 @@
 export const faqs = {
  ciftlik: [
-  { q: "Organik tarım nedir?", a: "Kimyasal sentetik gübre ve ilaç kullanılmaz; toprağı canlı bir ekosistem olarak değerlendirerek, orman kompostu, kompost çayı ve JADAM gibi doğal yöntemlerle üretim yapılır." },
+  { q: "Organik tarım nedir?", a: "Kimyasal sentetik gübre ve ilaç kullanılmaz; toprağı canlı bir ekosistem olarak değerlendirerek, orman kompostu, kompost çayı ve doğal killerle koruma gibi doğal yöntemlerle üretim yapılır." },
   { q: "2025 donu ne olduğu? ", a: "2025 yılında Kılıçkaya Vadisi'nde yaşanan bir gecelik don, beklediğimiz hasatı almamıza neden oldu. Saklamadık, dramatize etmedik — toprağın dinlenmesine izin verdik." },
   { q: "Kabia Çiftliği nerede?", a: "Sabırlar Köyü, Kılıçkaya Vadisi, Geyve / Sakarya. 946 Marinada badem ağacımız vardır." },
   { q: "Ürünlerimiz nasıl kargo edilir?", a: "500₺ üzeri siparişlerde ücretsiz kargo. Koton içerikli, hasat tarihili paketle, serin ve kuru yolla gönderiliriz." },

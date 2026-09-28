@@ -42,8 +42,8 @@ export default function UretimPage() {
   <p className="doc-muted" style={{ marginTop: 8, fontSize: 11 }}>Mart–Nisan: kompost çayı uygulaması</p>
   </div>
   <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 12, padding: 16 }}>
-  <h3 className="doc-heading" style={{ fontSize: 15 }}>4 — JADAM Killi Koruma</h3>
-  <p className="doc-body-text" style={{ marginTop: 6, fontSize: 13, lineHeight: 1.6 }}>İlaç yerine JADAM killi koruma. Kimyasal zehir değil, kil ve doğal preparatlar — bitkiyi kapatır, zararlıyı uzak tutar. Dozunda, mevsiminde.</p>
+  <h3 className="doc-heading" style={{ fontSize: 15 }}>4 — Doğal Killer ile Koruma</h3>
+  <p className="doc-body-text" style={{ marginTop: 6, fontSize: 13, lineHeight: 1.6 }}>İlaç yerine doğal killer. Kimyasal zehir değil, kil ve doğal preparatlar — bitkiyi kapatır, zararlıyı uzak tutar. Dozunda, mevsiminde.</p>
   <p className="doc-muted" style={{ marginTop: 8, fontSize: 11 }}>Haziran: killi koruma öncesi gözlem</p>
   </div>
   </div>
