@@ -196,10 +196,10 @@ export const emanet = {
 } as const;
 
 export const editorialImage = {
-  src: "/images/almonds-drying.jpg",
-  width: 2200,
-  height: 1466,
-  alt: "Hasat edilmiş kabuklu bademler, sepetin yanında yığın halinde kuruyor",
+  src: "/images/kilimbadem.jpg",
+  width: 1672,
+  height: 941,
+  alt: "Kilim üzerinde kurumaya serilmiş kabuklu bademler",
   caption: "Hasat sonrası. Bademler kabuğunda, kendi halinde kurur.",
 } as const;
 
