@@ -78,12 +78,12 @@ export default function BademPage() {
               Organik dediğimizde <em className="font-theme-display italic text-brand">ne kastediyoruz</em>?
             </h2>
             <p className="mt-5 max-w-prose text-base leading-relaxed text-ink/70">
-              Bademlerimizin hepsi aynı kalibrede, aynı büyüklükte değildir —
-              olamaz da. Yıla, ağaca, mevsime göre değişir; içinden küçük ya
-              da boş taneler çıkabilir. Konvansiyonel tarımda tek tiplilik
-              kimyasalla ve standartlamayla sağlanır. Biz o yoldan gitmiyoruz:
-              ağaç ne verirse soframıza o geliyor. Bu bir kusur değil,
-              kimyasal kullanmayan üretimin ta kendisidir.
+              Bademlerimizin hepsi aynı kalibrede, aynı büyüklükte değildir.
+              Doğal tarım koşullarında ağaçlar ve sezonlar arasında tane
+              büyüklüğü farklılık gösterebilir — bunda çeşit, ağaç yükü,
+              su, beslenme, tozlanma ve sezon koşulları rol oynar.
+              Kabia&apos;da ürünü yalnızca görüntü için tek tip hale
+              getirmeye çalışmıyoruz: ağaç ne verirse soframıza o geliyor.
             </p>
           </div>
 

@@ -8,7 +8,7 @@ export const faqs = {
     { q: "Organik tarım nedir?", a: "Kimyasal sentetik gübre ve ilaç kullanılmaz; toprağı canlı bir ekosistem olarak değerlendirerek, orman kompostu, kompost çayı ve doğal killerle koruma gibi doğal yöntemlerle üretim yapılır." },
     { q: "Kabia Çiftliği nerede?", a: "Sabırlar Köyü, Kılıçkaya Vadisi, Geyve / Sakarya. 946 Marinada badem ağacımız vardır." },
     { q: "Ürünler nasıl kargoya verilir?", a: "2000₺ üzeri siparişlerde kargo ücretsiz; 2000₺ altında 107,91₺ (HepsiJet, 4 desiye kadar). Hasat tarihli paketle, serin ve kuru yolla gönderilir." },
-    { q: "Bademler neden hep aynı büyüklükte değil?", a: "Çünkü organik üretiyoruz. Tek tip kalibre için kimyasal ve standartlama gerekir; bizde ağaç ne verirse o gelir. Küçük ya da içi boş taneler olabilir — kusur değil, doğallığın kanıtıdır." },
+    { q: "Bademler neden hep aynı büyüklükte değil?", a: "Doğal tarım koşullarında ağaçlar ve sezonlar arasında tane büyüklüğü farklılık gösterebilir. Kabia'da ürünü yalnızca görüntü için tek tip hale getirmeye çalışmıyoruz." },
   ],
   emanet: [
     { q: "Toprağı emanet olarak neden görüyorsunuz?", a: "Toprak bize ait değil; bizden sonrakilere bırakacağımız bir emanet. Hızlı değil, doğru ve kalıcı üretim — her hasat bir sonraki yılın toprağına bırakılan nottur." },
